@@ -85,7 +85,7 @@ class Editor extends Component {
 
   componentWillMount() {
     const { dispatch } = this.props
-    dispatch(initializeEditor(EDITOR_ID))
+    dispatch(initializeEditor(EDITOR_ID, true))
   }
 
   componentDidMount() {
@@ -239,12 +239,12 @@ class Editor extends Component {
         <View style={toolbarStyle}>
           <Button
             onPress={this.onPickImageFromLibrary}
-            title="LIBRARY"
+            title="LIB"
           />
           <Button
             disabled={isPosting || isLoading || !hasContent}
             onPress={this.onCreatePost}
-            title="SUBMIT"
+            title="POST"
           />
         </View>
         <KeyboardAvoidingView behavior="position">

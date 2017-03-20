@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import Immutable from 'immutable'
+import { REHYDRATE } from 'redux-persist/constants'
 import get from 'lodash/get'
 import { AUTHENTICATION, EDITOR, PROFILE } from '../constants/action_types'
 import editorMethods from '../helpers/editor_helper'
@@ -32,6 +33,11 @@ export default (state = initialState, action) => {
     case EDITOR.USER_COMPLETER_SUCCESS:
     case PROFILE.LOCATION_AUTOCOMPLETE_SUCCESS:
       return state.set('completions', editorMethods.getCompletions(action))
+    case REHYDRATE:
+      if (action.payload.editor) {
+        return editorMethods.rehydrateEditors(action.payload.editor)
+      }
+      return state
     default:
       return state
   }
