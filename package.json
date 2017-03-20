@@ -1,0 +1,96 @@
+{
+  "name": "NativeApp",
+  "version": "0.1.0",
+  "private": true,
+  "eslintConfig": {
+    "extends": "airbnb",
+    "parser": "babel-eslint",
+    "env": {
+      "browser": true,
+      "node": true,
+      "mocha": true
+    },
+    "globals": {
+      "AndroidInterface": false,
+      "ENV": false
+    },
+    "rules": {
+      "jsx-a11y/tabindex-no-positive": 0,
+      "no-alert": 2,
+      "no-console": 2,
+      "no-debugger": 2,
+      "react/forbid-prop-types": [
+        1,
+        {
+          "forbid": [
+            "any"
+          ]
+        }
+      ],
+      "react/jsx-filename-extension": [
+        1,
+        {
+          "extensions": [
+            ".js",
+            ".jsx"
+          ]
+        }
+      ],
+      "react/prefer-stateless-function": [
+        2,
+        {
+          "ignorePureComponents": true
+        }
+      ],
+      "react/sort-comp": ["error", {
+        "order": [
+          "type-annotations",
+          "static-methods",
+          "lifecycle",
+          "/^on.+$/",
+          "/^(get|set)(?!(InitialState$|DefaultProps$|ChildContext$)).+$/",
+          "everything-else",
+          "/^render.+$/",
+          "render"
+        ]
+      }],
+      "semi": 0
+    }
+  },
+  "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
+  "scripts": {
+    "start": "react-native-scripts start",
+    "eject": "react-native-scripts eject",
+    "android": "react-native-scripts android",
+    "ios": "react-native-scripts ios",
+    "test": "node node_modules/jest/bin/jest.js --watch"
+  },
+  "jest": {
+    "preset": "jest-expo"
+  },
+  "dependencies": {
+    "exif-js": "2.1.1",
+    "expo": "14.0.2",
+    "humps": "2.0.0",
+    "immutable": "3.8.1",
+    "lodash": "4.17.4",
+    "react": "15.4.2",
+    "react-native": "0.42.0",
+    "react-redux": "5.0.3",
+    "redux": "3.6.0",
+    "redux-logger": "2.8.2",
+    "redux-saga": "0.14.3",
+    "reselect": "2.5.4"
+  },
+  "devDependencies": {
+    "babel-eslint": "7.1.1",
+    "eslint": "3.17.1",
+    "eslint-config-airbnb": "14.1.0",
+    "eslint-plugin-import": "2.2.0",
+    "eslint-plugin-jsx-a11y": "4.0.0",
+    "eslint-plugin-react": "6.10.0",
+    "react-native-scripts": "0.0.18",
+    "jest-expo": "^0.2.1",
+    "react-test-renderer": "~15.4.0"
+  }
+}
