@@ -1,9 +1,9 @@
 import Immutable from 'immutable'
-import React, { Component, PropTypes } from 'react'
+import React, { PropTypes, PureComponent } from 'react'
 import { Dimensions, Image } from 'react-native'
 import Block from './Block'
 
-export default class ImageBlock extends Component {
+export default class ImageBlock extends PureComponent {
 
   static propTypes = {
     hasContent: PropTypes.bool.isRequired,
