@@ -140,11 +140,8 @@ export function getBlobFromBase64(b64Data, contentType, sliceSize) {
 
 export function processImage({ exifData, file, fileType, maxWidth = 2560, maxHeight = 5000 }) {
   return new Promise((resolve, reject) => {
-    console.log('procews')
     const img = new Image()
-    console.log('what thd asdlfkj', img)
     img.onLoad = () => {
-      console.log('image loaded')
       const orientation = exifData.Orientation
       const canvas = orientImage(img, maxWidth, maxHeight, orientation)
       const src = canvas.toDataURL(fileType || SUPPORTED_IMAGE_TYPES.JPG)

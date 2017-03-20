@@ -8,7 +8,6 @@ export const initialState = Immutable.Map({ completions: Immutable.Map() })
 
 export default (state = initialState, action) => {
   const editorId = get(action, 'payload.editorId')
-  console.log('EDITOR ID in editor reducer', action.type, editorId)
   let editor
   if (editorId) {
     editor = editorMethods.getEditorObject(state.get(`${editorId}`), action)

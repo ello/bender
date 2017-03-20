@@ -120,8 +120,7 @@ function* performUpload(action) {
     // } else {
     // const imageData = yield call(processImage, { ...fileData, file: objectURL })
     if (type === EDITOR.SAVE_ASSET) {
-      const { editorId } = payload
-      yield put(temporaryEditorAssetCreated(file, editorId))
+      yield put(temporaryEditorAssetCreated(file, editorId, width, height))
       // The - 2 should always be consistent. The reason is that when a tmp image
       // gets created at say uid 1 an additional text block is added to the bottom
       // of the editor at uid 2 and the uid of the editor is now sitting at 3
