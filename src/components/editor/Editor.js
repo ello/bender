@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react'
 import {
   Alert,
   Button,
+  Clipboard,
   KeyboardAvoidingView,
   ScrollView,
   View,
@@ -12,14 +13,19 @@ import { ImagePicker, Permissions } from 'expo'
 import {
   addEmptyTextBlock,
   initializeEditor,
+  postPreviews,
   removeBlock,
   saveAsset,
   updateBlock,
 } from '../../actions/editor'
 import { createPost } from '../../actions/posts'
+import EmbedBlock from './EmbedBlock'
 import ImageBlock from './ImageBlock'
 import TextBlock from './TextBlock'
 
+const ACTIVE_SERVICE_REGEXES = [
+  /(?:.+?)?(?:youtube\.com\/v\/|watch\/|\?v=|&v=|youtu\.be\/|\/v=|^youtu\.be\/)([a-zA-Z0-9_-]{11})+/,
+]
 const EDITOR_ID = 'blah'
 const IMAGE_QUALITY = 0.8
 
@@ -67,11 +73,13 @@ class Editor extends Component {
   }
 
   static childContextTypes = {
+    onCheckForEmbeds: PropTypes.func,
     onClickRemoveBlock: PropTypes.func,
   }
 
   getChildContext() {
     return {
+      onCheckForEmbeds: this.onCheckForEmbeds,
       onClickRemoveBlock: this.onClickRemoveBlock,
     }
   }
@@ -82,8 +90,17 @@ class Editor extends Component {
   }
 
   componentDidMount() {
+    // TODO: remove this when we have embeds working
+    Clipboard.setString('https://www.youtube.com/watch?v=gUGda7GdZPQ')
     const { dispatch } = this.props
     dispatch(addEmptyTextBlock(EDITOR_ID))
+  }
+
+  shouldComponentUpdate(nextProps) {
+    return !Immutable.is(this.props.order, nextProps.order) ||
+      ['hasContent', 'hasMedia', 'hasMention', 'isLoading', 'isPosting'].some(prop =>
+        this.props[prop] !== nextProps[prop],
+      )
   }
 
   onPickImageFromLibrary = async () => {
@@ -117,6 +134,16 @@ class Editor extends Component {
     }
   }
 
+  onCheckForEmbeds = (text) => {
+    const { dispatch } = this.props
+    ACTIVE_SERVICE_REGEXES.forEach((regex) => {
+      if (text.match(regex)) {
+        dispatch(postPreviews(text, EDITOR_ID, 0))
+      }
+    })
+  }
+
+
   onClickRemoveBlock = (uid) => {
     const { dispatch } = this.props
     Alert.alert(
@@ -146,6 +173,13 @@ class Editor extends Component {
       uid: block.get('uid'),
     }
     switch (block.get('kind')) {
+      case 'embed':
+        return (
+          <EmbedBlock
+            {...blockProps}
+            source={{ uri: block.getIn(['data', 'thumbnailLargeUrl']) }}
+          />
+        )
       case 'image':
         return (
           <ImageBlock

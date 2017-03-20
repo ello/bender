@@ -1,11 +1,11 @@
-import React, { Component, PropTypes } from 'react'
+import React, { PropTypes, PureComponent } from 'react'
 import {
   Dimensions,
   TextInput,
 } from 'react-native'
 import Block from './Block'
 
-export default class TextBlock extends Component {
+export default class TextBlock extends PureComponent {
 
   static propTypes = {
     data: PropTypes.string,
@@ -18,11 +18,19 @@ export default class TextBlock extends Component {
     data: '',
   }
 
+  static contextTypes = {
+    onCheckForEmbeds: PropTypes.func.isRequired,
+  }
+
   state = {
     viewHeight: 200,
   }
 
   onChangeText = (text) => {
+    if (/^http\S+$/.test(text)) {
+      this.context.onCheckForEmbeds(text)
+    }
+
     const { onChange, uid } = this.props
     onChange({ uid, data: text, kind: 'text' })
   }
