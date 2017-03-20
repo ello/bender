@@ -15,6 +15,7 @@ import {
   initializeEditor,
   postPreviews,
   removeBlock,
+  resetEditor,
   saveAsset,
   updateBlock,
 } from '../../actions/editor'
@@ -160,6 +161,18 @@ class Editor extends Component {
     dispatch(createPost(this.serialize(), EDITOR_ID))
   }
 
+  onResetEditor = () => {
+    const { dispatch } = this.props
+    Alert.alert(
+      'Cancel post?',
+      null,
+      [
+        { text: 'No', style: 'cancel' },
+        { text: 'Yes', onPress: () => dispatch(resetEditor(EDITOR_ID)) },
+      ],
+    )
+  }
+
   getBlockElement(block) {
     const blockProps = {
       data: block.get('data'),
@@ -237,6 +250,10 @@ class Editor extends Component {
     return (
       <View style={{ flex: 1 }}>
         <View style={toolbarStyle}>
+          <Button
+            onPress={this.onResetEditor}
+            title="CANCEL"
+          />
           <Button
             onPress={this.onPickImageFromLibrary}
             title="LIB"
