@@ -93,7 +93,7 @@ class Editor extends Component {
     })
     if (!result.cancelled) {
       const { dispatch } = this.props
-      dispatch(saveAsset(result.uri, EDITOR_ID))
+      dispatch(saveAsset(result.uri, EDITOR_ID, result.width, result.height))
     }
   }
 
@@ -105,7 +105,7 @@ class Editor extends Component {
       })
       if (!result.cancelled) {
         const { dispatch } = this.props
-        dispatch(saveAsset(result.uri, EDITOR_ID))
+        dispatch(saveAsset(result.uri, EDITOR_ID, result.width, result.height))
       }
     }
   }
@@ -117,15 +117,13 @@ class Editor extends Component {
     }
   }
 
-  // TODO: pop a modal to be sure they want to remove the content
   onClickRemoveBlock = (uid) => {
     const { dispatch } = this.props
-    console.log('REMOVE BLOCK', uid)
     Alert.alert(
       'Remove this content?',
       null,
       [
-        { text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+        { text: 'No', style: 'cancel' },
         { text: 'Yes', onPress: () => dispatch(removeBlock(uid, EDITOR_ID)) },
       ],
     )
@@ -152,7 +150,9 @@ class Editor extends Component {
         return (
           <ImageBlock
             {...blockProps}
+            height={block.get('height')}
             source={{ uri: block.get('blob') || block.getIn(['data', 'url']) }}
+            width={block.get('width')}
           />
         )
       case 'text':

@@ -134,12 +134,14 @@ export function resetEditor(editorId) {
   }
 }
 
-export function saveAsset(file, editorId) {
+export function saveAsset(file, editorId, width, height) {
   return {
     type: EDITOR.SAVE_ASSET,
     payload: {
       editorId,
       file,
+      height,
+      width,
     },
   }
 }
@@ -172,12 +174,14 @@ export function setTextToolsCoordinates({ textToolsCoordinates = { top: -200, le
   }
 }
 
-export function temporaryEditorAssetCreated(objectURL, editorId) {
+export function temporaryEditorAssetCreated(objectURL, editorId, width, height) {
   return {
     type: EDITOR.TMP_IMAGE_CREATED,
     payload: {
-      url: objectURL,
       editorId,
+      height,
+      url: objectURL,
+      width,
     },
   }
 }

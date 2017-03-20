@@ -1,15 +1,16 @@
 import Immutable from 'immutable'
 import React, { Component, PropTypes } from 'react'
-import { Image } from 'react-native'
+import { Dimensions, Image } from 'react-native'
 import Block from './Block'
 
 export default class ImageBlock extends Component {
 
   static propTypes = {
-    blob: PropTypes.string,
-    data: PropTypes.object.isRequired,
     hasContent: PropTypes.bool.isRequired,
+    height: PropTypes.number.isRequired,
+    source: PropTypes.object.isRequired,
     uid: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
   }
 
   static defaultProps = {
@@ -17,17 +18,29 @@ export default class ImageBlock extends Component {
     data: Immutable.Map(),
   }
 
-  state = {
-    viewHeight: 20,
+  getImageDimensions() {
+    const { height, width } = this.props
+    const maxWidth = Dimensions.get('window').width - 40 // -40 is for the block padding
+    const ratio = width ? width / height : null
+    const maxCellHeight = 1200
+    const widthConstrainedRelativeHeight = Math.round(maxWidth * (1 / ratio))
+    const hv = Math.min(widthConstrainedRelativeHeight, height, maxCellHeight)
+    const wv = Math.round(hv * ratio)
+    return {
+      width: wv,
+      height: hv,
+      ratio,
+    }
   }
 
   render() {
-    const { blob, data, hasContent, uid } = this.props
+    const { hasContent, source, uid } = this.props
+    const { width, height } = this.getImageDimensions()
     return (
       <Block hasContent={hasContent} uid={uid}>
         <Image
-          source={{ uri: blob || data.get('url') }}
-          style={{ width: 200, height: 200 }}
+          source={source}
+          style={{ width, height }}
         />
       </Block>
     )

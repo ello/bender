@@ -278,6 +278,8 @@ methods.getEditorObject = (state = initialState, action) => {
           kind: 'image',
           data: {},
           isLoading: true,
+          width: action.payload.width,
+          height: action.payload.height,
         },
         state: methods.removeEmptyTextBlock(state),
       })
