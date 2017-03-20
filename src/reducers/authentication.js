@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import Immutable from 'immutable'
+import { REHYDRATE } from 'redux-persist/constants'
 import { AUTHENTICATION, PROFILE } from '../constants/action_types'
 
 export const initialState = Immutable.Map({
@@ -31,6 +32,18 @@ export default (state = initialState, action) => {
         expirationDate: new Date((auth.createdAt + auth.expiresIn) * 1000),
         isLoggedIn: true,
       })
+    case REHYDRATE:
+      auth = action.payload.authentication
+      if (typeof window !== 'undefined' && window.nonImmutableState && window.nonImmutableState.authentication) {
+        auth = Immutable.fromJS(JSON.parse(window.nonImmutableState.authentication))
+        delete window.nonImmutableState.authentication
+      }
+      if (auth) {
+        return auth.set(
+          'expirationDate', new Date((auth.get('createdAt') + auth.get('expiresIn')) * 1000),
+        )
+      }
+      return state
     default:
       return state
   }

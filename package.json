@@ -82,6 +82,9 @@
     "react-redux": "5.0.3",
     "redux": "3.6.0",
     "redux-logger": "2.8.2",
+    "redux-persist": "4.4.2",
+    "redux-persist-immutable": "4.2.0",
+    "redux-persist-transform-immutable": "4.2.0",
     "redux-saga": "0.14.3",
     "reselect": "2.5.4"
   },
