@@ -49,6 +49,7 @@ export default class TextBlock extends PureComponent {
           multiline
           onChangeText={this.onChangeText}
           onContentSizeChange={this.onContentSizeChange}
+          placeholder={!hasContent ? 'Say Ello...' : null}
           style={{ width: Dimensions.get('window').width - 42, height: viewHeight }}
           underlineColorAndroid="transparent"
         />

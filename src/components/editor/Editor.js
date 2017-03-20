@@ -2,10 +2,10 @@ import Immutable from 'immutable'
 import React, { Component, PropTypes } from 'react'
 import {
   Alert,
-  Button,
   Clipboard,
-  KeyboardAvoidingView,
   ScrollView,
+  Text,
+  TouchableOpacity,
   View,
 } from 'react-native'
 import { connect } from 'react-redux'
@@ -46,12 +46,15 @@ function mapStateToProps(state) {
 }
 
 const toolbarStyle = {
-  backgroundColor: '#aaa',
+  backgroundColor: '#eee',
   flexDirection: 'row',
   height: 60,
   justifyContent: 'flex-end',
   padding: 10,
 }
+
+const buttonStyle = { marginLeft: 10 }
+const buttonTextStyle = { backgroundColor: '#000', color: '#fff', paddingHorizontal: 20, paddingVertical: 10 }
 
 class Editor extends Component {
 
@@ -250,31 +253,35 @@ class Editor extends Component {
     return (
       <View style={{ flex: 1 }}>
         <View style={toolbarStyle}>
-          <Button
+          <TouchableOpacity
             disabled={!hasContent}
             onPress={this.onResetEditor}
-            title="CANCEL"
-          />
-          <Button
+            style={buttonStyle}
+          >
+            <Text style={buttonTextStyle}>X</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             onPress={this.onPickImageFromLibrary}
-            title="LIB"
-          />
-          <Button
+            style={buttonStyle}
+          >
+            <Text style={buttonTextStyle}>LIB</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             disabled={isPosting || isLoading || !hasContent}
             onPress={this.onCreatePost}
-            title="POST"
-          />
+            style={buttonStyle}
+          >
+            <Text style={buttonTextStyle}>POST</Text>
+          </TouchableOpacity>
         </View>
-        <KeyboardAvoidingView behavior="position">
-          <ScrollView horizontal={false} style={{ marginBottom: toolbarStyle.height }}>
-            {order ? order.map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
-          </ScrollView>
-        </KeyboardAvoidingView>
+        <ScrollView horizontal={false}>
+          {order ? order.map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
+        </ScrollView>
       </View>
     )
   }
 }
 
 export default connect(mapStateToProps)(Editor)
-// <Button title="CAMERA" onPress={this.onTakePictureWithCamera} />
+// <TouchableOpacity title="CAMERA" onPress={this.onTakePictureWithCamera} />
 
