@@ -1,11 +1,11 @@
 import React from 'react'
 import { Provider } from 'react-redux'
-import Editor from './src/components/editor/Editor'
 import store from './src/store'
+import AppContainer from './src/containers/AppContainer'
 
 const App = () =>
   <Provider store={store}>
-    <Editor />
+    <AppContainer />
   </Provider>
 
 export default App

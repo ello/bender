@@ -49,7 +49,6 @@ const toolbarStyle = {
   flexDirection: 'row',
   height: 60,
   justifyContent: 'flex-end',
-  marginTop: 25,
   padding: 10,
 }
 
@@ -249,7 +248,7 @@ class Editor extends Component {
           />
         </View>
         <KeyboardAvoidingView behavior="position">
-          <ScrollView horizontal={false} style={{ marginBottom: toolbarStyle.height + 25 }}>
+          <ScrollView horizontal={false} style={{ marginBottom: toolbarStyle.height }}>
             {order ? order.map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
           </ScrollView>
         </KeyboardAvoidingView>
