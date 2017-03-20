@@ -27,7 +27,7 @@ export default class App extends PureComponent {
         <AppContainer />
       </Provider>
       :
-      <View><Text>Loading...</Text></View>
+      <View style={{ alignItems: 'center', flex: 1, justifyContent: 'center' }}><Text>Loading...</Text></View>
   }
 }
 
