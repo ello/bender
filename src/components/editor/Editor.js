@@ -12,14 +12,22 @@ import { connect } from 'react-redux'
 import { ImagePicker, Permissions } from 'expo'
 import {
   addEmptyTextBlock,
+  autoCompleteUsers,
   initializeEditor,
+  loadEmojis,
   postPreviews,
   removeBlock,
   resetEditor,
   saveAsset,
+  setIsCompleterActive,
   updateBlock,
 } from '../../actions/editor'
 import { createPost } from '../../actions/posts'
+import { EDITOR } from '../../constants/action_types'
+import { selectCompletions } from '../../selectors/editor'
+import { selectEmojis } from '../../selectors/emoji'
+import { selectIsCompleterActive } from '../../selectors/gui'
+import Completer from '../completers/Completer'
 import EmbedBlock from './EmbedBlock'
 import ImageBlock from './ImageBlock'
 import TextBlock from './TextBlock'
@@ -36,9 +44,12 @@ function mapStateToProps(state) {
   const order = editor.get('order')
   return {
     collection,
+    completions: selectCompletions(state),
+    emojis: selectEmojis(state),
     hasContent: editor.get('hasContent'),
     hasMedia: editor.get('hasMedia'),
     hasMention: editor.get('hasMention'),
+    isCompleterActive: selectIsCompleterActive(state),
     isLoading: editor.get('isLoading'),
     isPosting: editor.get('isPosting'),
     order,
@@ -60,8 +71,11 @@ class Editor extends Component {
 
   static propTypes = {
     collection: PropTypes.object,
+    completions: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
+    emojis: PropTypes.object,
     hasContent: PropTypes.bool,
+    isCompleterActive: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool,
     isPosting: PropTypes.bool,
     order: PropTypes.object,
@@ -69,6 +83,8 @@ class Editor extends Component {
 
   static defaultProps = {
     collection: null,
+    completions: null,
+    emojis: null,
     hasContent: false,
     isLoading: false,
     isPosting: false,
@@ -78,12 +94,18 @@ class Editor extends Component {
   static childContextTypes = {
     onCheckForEmbeds: PropTypes.func,
     onClickRemoveBlock: PropTypes.func,
+    onEmojiCompleter: PropTypes.func,
+    onHideCompleter: PropTypes.func,
+    onUserCompleter: PropTypes.func,
   }
 
   getChildContext() {
     return {
       onCheckForEmbeds: this.onCheckForEmbeds,
       onClickRemoveBlock: this.onClickRemoveBlock,
+      onEmojiCompleter: this.onEmojiCompleter,
+      onHideCompleter: this.onHideCompleter,
+      onUserCompleter: this.onUserCompleter,
     }
   }
 
@@ -101,7 +123,8 @@ class Editor extends Component {
 
   shouldComponentUpdate(nextProps) {
     return !Immutable.is(this.props.order, nextProps.order) ||
-      ['hasContent', 'hasMedia', 'hasMention', 'isLoading', 'isPosting'].some(prop =>
+      !Immutable.is(this.props.completions, nextProps.completions) ||
+      ['hasContent', 'hasMedia', 'hasMention', 'isCompleterActive', 'isLoading', 'isPosting'].some(prop =>
         this.props[prop] !== nextProps[prop],
       )
   }
@@ -181,6 +204,54 @@ class Editor extends Component {
     }
   }
 
+  onHideCompleter = () => {
+    const { completions, dispatch, isCompleterActive } = this.props
+    if (isCompleterActive) {
+      dispatch(setIsCompleterActive({ isActive: false }))
+    }
+    if (completions) {
+      dispatch({ type: EDITOR.CLEAR_AUTO_COMPLETERS })
+    }
+  }
+
+  onEmojiCompleter = ({ word }) => {
+    const { dispatch, emojis, isCompleterActive } = this.props
+    if (!isCompleterActive) {
+      dispatch(setIsCompleterActive({ isActive: true }))
+    }
+    if (emojis && emojis.length) {
+      dispatch({
+        type: EDITOR.EMOJI_COMPLETER_SUCCESS,
+        payload: {
+          response: { emojis },
+          type: 'emoji',
+          word,
+        },
+      })
+    } else {
+      dispatch(loadEmojis('emoji', word))
+    }
+  }
+
+  onUserCompleter = ({ word }) => {
+    const { dispatch, isCompleterActive } = this.props
+    if (!isCompleterActive) {
+      dispatch(setIsCompleterActive({ isActive: true }))
+    }
+    dispatch(autoCompleteUsers('user', word))
+  }
+
+  onCompletion = ({ value }) => {
+    console.log('onCompletion', value)
+  }
+
+  onCancelAutoCompleter = () => {
+    const { dispatch } = this.props
+    dispatch({ type: EDITOR.CLEAR_AUTO_COMPLETERS })
+    this.onHideCompleter()
+    // this.onHideTextTools()
+  }
+
   getBlockElement(block) {
     const blockProps = {
       data: block.get('data'),
@@ -254,7 +325,15 @@ class Editor extends Component {
   }
 
   render() {
-    const { collection, hasContent, isLoading, isPosting, order } = this.props
+    const {
+      collection,
+      completions,
+      hasContent,
+      isCompleterActive,
+      isLoading,
+      isPosting,
+      order,
+    } = this.props
     const isPostingDisabled = isPosting || isLoading || !hasContent
     return (
       <View style={{ flex: 1 }}>
@@ -282,6 +361,13 @@ class Editor extends Component {
         <ScrollView horizontal={false}>
           {order ? order.map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
         </ScrollView>
+        {isCompleterActive && completions && completions.get('data', Immutable.List()).size &&
+          <Completer
+            completions={completions}
+            onCancel={this.onCancelAutoCompleter}
+            onCompletion={this.onCompletion}
+          />
+        }
       </View>
     )
   }
