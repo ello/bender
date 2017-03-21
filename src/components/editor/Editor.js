@@ -165,15 +165,20 @@ class Editor extends Component {
   }
 
   onResetEditor = () => {
-    const { dispatch } = this.props
-    Alert.alert(
-      'Cancel post?',
-      null,
-      [
-        { text: 'No', style: 'cancel' },
-        { text: 'Yes', onPress: () => dispatch(resetEditor(EDITOR_ID)) },
-      ],
-    )
+    const { dispatch, hasContent } = this.props
+    if (!hasContent) {
+      // TODO: make this dismiss the editor to go back to whatever was before it
+      console.log('dismiss editor')
+    } else {
+      Alert.alert(
+        'Cancel post?',
+        null,
+        [
+          { text: 'No', style: 'cancel' },
+          { text: 'Yes', onPress: () => dispatch(resetEditor(EDITOR_ID)) },
+        ],
+      )
+    }
   }
 
   getBlockElement(block) {
@@ -255,11 +260,10 @@ class Editor extends Component {
       <View style={{ flex: 1 }}>
         <View style={toolbarStyle}>
           <TouchableOpacity
-            disabled={!hasContent}
             onPress={this.onResetEditor}
             style={buttonStyle}
           >
-            <Text style={{ ...buttonTextStyle, backgroundColor: !hasContent ? '#aaa' : '#000' }}>X</Text>
+            <Text style={buttonTextStyle}>X</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={this.onPickImageFromLibrary}
