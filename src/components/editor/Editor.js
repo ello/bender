@@ -54,7 +54,7 @@ const toolbarStyle = {
 }
 
 const buttonStyle = { marginLeft: 10 }
-const buttonTextStyle = { backgroundColor: '#000', color: '#fff', paddingHorizontal: 20, paddingVertical: 10 }
+const buttonTextStyle = { backgroundColor: '#000', borderRadius: 20, color: '#fff', paddingHorizontal: 20, paddingVertical: 10 }
 
 class Editor extends Component {
 
@@ -250,6 +250,7 @@ class Editor extends Component {
 
   render() {
     const { collection, hasContent, isLoading, isPosting, order } = this.props
+    const isPostingDisabled = isPosting || isLoading || !hasContent
     return (
       <View style={{ flex: 1 }}>
         <View style={toolbarStyle}>
@@ -258,7 +259,7 @@ class Editor extends Component {
             onPress={this.onResetEditor}
             style={buttonStyle}
           >
-            <Text style={buttonTextStyle}>X</Text>
+            <Text style={{ ...buttonTextStyle, backgroundColor: !hasContent ? '#aaa' : '#000' }}>X</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={this.onPickImageFromLibrary}
@@ -267,11 +268,11 @@ class Editor extends Component {
             <Text style={buttonTextStyle}>LIB</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            disabled={isPosting || isLoading || !hasContent}
+            disabled={isPostingDisabled}
             onPress={this.onCreatePost}
             style={buttonStyle}
           >
-            <Text style={buttonTextStyle}>POST</Text>
+            <Text style={{ ...buttonTextStyle, backgroundColor: isPostingDisabled ? '#aaa' : '#000' }}>POST</Text>
           </TouchableOpacity>
         </View>
         <ScrollView horizontal={false}>
