@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { combineReducers, compose, createStore, applyMiddleware } from 'redux'
-import createLogger from 'redux-logger'
+// import createLogger from 'redux-logger'
 import { autoRehydrate } from 'redux-persist'
 import createSagaMiddleware, { END } from 'redux-saga'
 import * as reducers from './reducers'
@@ -21,14 +21,14 @@ const createNativeAppStore = (initialState = {}) => {
     })
     return newState
   }
-  const logger = createLogger(logConfig)
+  // const logger = createLogger(logConfig)
   const sagaMiddleware = createSagaMiddleware()
 
   const store = compose(
     autoRehydrate(),
     applyMiddleware(
       sagaMiddleware,
-      logger,
+      // logger,
     ),
   )(createStore)(reducer, initialState)
   store.close = () => store.dispatch(END)

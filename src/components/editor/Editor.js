@@ -3,6 +3,7 @@ import React, { Component, PropTypes } from 'react'
 import {
   Alert,
   Clipboard,
+  Dimensions,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -27,7 +28,6 @@ import { EDITOR } from '../../constants/action_types'
 import { selectCompletions } from '../../selectors/editor'
 import { selectEmojis } from '../../selectors/emoji'
 import { selectIsCompleterActive } from '../../selectors/gui'
-import Completer from '../completers/Completer'
 import EmbedBlock from './EmbedBlock'
 import ImageBlock from './ImageBlock'
 import TextBlock from './TextBlock'
@@ -122,8 +122,9 @@ class Editor extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    return !Immutable.is(this.props.order, nextProps.order) ||
+    return !Immutable.is(this.props.collection, nextProps.collection) ||
       !Immutable.is(this.props.completions, nextProps.completions) ||
+      !Immutable.is(this.props.order, nextProps.order) ||
       ['hasContent', 'hasMedia', 'hasMention', 'isCompleterActive', 'isLoading', 'isPosting'].some(prop =>
         this.props[prop] !== nextProps[prop],
       )
@@ -155,6 +156,7 @@ class Editor extends Component {
 
   onChangeText = (vo) => {
     const { collection, dispatch } = this.props
+    console.log('onChangeText', vo)
     if (collection.getIn([vo.uid, 'data']) !== vo.data) {
       dispatch(updateBlock(vo, vo.uid, EDITOR_ID))
     }
@@ -241,10 +243,6 @@ class Editor extends Component {
     dispatch(autoCompleteUsers('user', word))
   }
 
-  onCompletion = ({ value }) => {
-    console.log('onCompletion', value)
-  }
-
   onCancelAutoCompleter = () => {
     const { dispatch } = this.props
     dispatch({ type: EDITOR.CLEAR_AUTO_COMPLETERS })
@@ -284,6 +282,8 @@ class Editor extends Component {
         return (
           <TextBlock
             {...blockProps}
+            completions={this.props.completions}
+            isCompleterActive={this.props.isCompleterActive}
             onChange={this.onChangeText}
           />
         )
@@ -325,11 +325,10 @@ class Editor extends Component {
   }
 
   render() {
+    console.log('EDITOR height', Dimensions.get('window').height)
     const {
       collection,
-      completions,
       hasContent,
-      isCompleterActive,
       isLoading,
       isPosting,
       order,
@@ -361,13 +360,6 @@ class Editor extends Component {
         <ScrollView horizontal={false}>
           {order ? order.map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
         </ScrollView>
-        {isCompleterActive && completions && completions.get('data', Immutable.List()).size &&
-          <Completer
-            completions={completions}
-            onCancel={this.onCancelAutoCompleter}
-            onCompletion={this.onCompletion}
-          />
-        }
       </View>
     )
   }
