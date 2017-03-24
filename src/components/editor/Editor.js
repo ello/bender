@@ -4,6 +4,7 @@ import {
   Alert,
   Clipboard,
   Dimensions,
+  KeyboardAvoidingView,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -31,6 +32,7 @@ import { selectIsCompleterActive } from '../../selectors/gui'
 import EmbedBlock from './EmbedBlock'
 import ImageBlock from './ImageBlock'
 import TextBlock from './TextBlock'
+import Completer, { emojiRegex, userRegex } from '../completers/Completer'
 
 const ACTIVE_SERVICE_REGEXES = [
   /(?:.+?)?(?:youtube\.com\/v\/|watch\/|\?v=|&v=|youtu\.be\/|\/v=|^youtu\.be\/)([a-zA-Z0-9_-]{11})+/,
@@ -96,7 +98,12 @@ class Editor extends Component {
     onClickRemoveBlock: PropTypes.func,
     onEmojiCompleter: PropTypes.func,
     onHideCompleter: PropTypes.func,
+    onSelectionChange: PropTypes.func,
     onUserCompleter: PropTypes.func,
+  }
+
+  state = {
+    completerType: null,
   }
 
   getChildContext() {
@@ -105,6 +112,7 @@ class Editor extends Component {
       onClickRemoveBlock: this.onClickRemoveBlock,
       onEmojiCompleter: this.onEmojiCompleter,
       onHideCompleter: this.onHideCompleter,
+      onSelectionChange: this.onSelectionChange,
       onUserCompleter: this.onUserCompleter,
     }
   }
@@ -250,6 +258,63 @@ class Editor extends Component {
     // this.onHideTextTools()
   }
 
+  onCompletion = ({ value }) => {
+    const { completerType } = this.state
+    const { selectionStart: start, selectionEnd: end, selectionText: text } = this
+    let newValue = value
+    if (completerType === 'user') {
+      newValue = `@${value}`
+    } else if (completerType === 'emoji') {
+      newValue = `:${value}:`
+    }
+    this.onChangeText(this.selectionText.replace(text.slice(start, end), newValue))
+    this.onHideCompleter()
+  }
+
+  onSelectionChange = (start, end, text, uid) => {
+    this.selectionStart = start
+    this.selectionEnd = end
+    this.selectionText = text
+    this.selectionUid = uid
+    // if start === end then this is just a cursor position not a range
+    if (start === end) {
+      const word = this.getWordFromPosition(end)
+      if (word.match(userRegex)) {
+        this.setState({ completerType: 'user' })
+        this.onUserCompleter({ word })
+      } else if (word.match(emojiRegex)) {
+        this.setState({ completerType: 'emoji' })
+        this.onEmojiCompleter({ word })
+      // } else if (e.target.classList.contains('LocationControl')) {
+      //   callMethod('onLocationCompleter', { location: e.target.value })
+      } else {
+        this.setState({ completerType: null })
+        this.onHideCompleter()
+      }
+    }
+  }
+
+  getWordFromPosition(pos) {
+    const letterArr = this.selectionText.split('')
+    const letters = []
+    let index = pos - 1
+    while (index > -1) {
+      const letter = letterArr[index]
+      index -= 1
+      if (!letter) break
+      if (letter.match(/\s/)) {
+        break
+      } else if (letter.match(/:/)) {
+        letters.unshift(letter)
+        break
+      } else {
+        letters.unshift(letter)
+      }
+    }
+    this.selectionStart = index + 1
+    return letters.join('')
+  }
+
   getBlockElement(block) {
     const blockProps = {
       data: block.get('data'),
@@ -282,8 +347,6 @@ class Editor extends Component {
         return (
           <TextBlock
             {...blockProps}
-            completions={this.props.completions}
-            isCompleterActive={this.props.isCompleterActive}
             onChange={this.onChangeText}
           />
         )
@@ -328,7 +391,9 @@ class Editor extends Component {
     console.log('EDITOR height', Dimensions.get('window').height)
     const {
       collection,
+      completions,
       hasContent,
+      isCompleterActive,
       isLoading,
       isPosting,
       order,
@@ -360,6 +425,14 @@ class Editor extends Component {
         <ScrollView horizontal={false}>
           {order ? order.map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
         </ScrollView>
+        <KeyboardAvoidingView behavior="padding">
+          <Completer
+            completions={completions}
+            isCompleterActive={isCompleterActive}
+            onCancel={this.onCancelAutoCompleter}
+            onCompletion={this.onCompletion}
+          />
+        </KeyboardAvoidingView>
       </View>
     )
   }
