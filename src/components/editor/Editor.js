@@ -3,7 +3,6 @@ import React, { Component, PropTypes } from 'react'
 import {
   Alert,
   Clipboard,
-  Dimensions,
   KeyboardAvoidingView,
   ScrollView,
   Text,
@@ -164,7 +163,6 @@ class Editor extends Component {
 
   onChangeText = (vo) => {
     const { collection, dispatch } = this.props
-    console.log('onChangeText', vo)
     if (collection.getIn([vo.uid, 'data']) !== vo.data) {
       dispatch(updateBlock(vo, vo.uid, EDITOR_ID))
     }
@@ -267,7 +265,12 @@ class Editor extends Component {
     } else if (completerType === 'emoji') {
       newValue = `:${value}:`
     }
-    this.onChangeText(this.selectionText.replace(text.slice(start, end), newValue))
+    const vo = {
+      data: this.selectionText.replace(text.slice(start, end), newValue),
+      kind: 'text',
+      uid: this.selectionUid,
+    }
+    this.onChangeText(vo)
     this.onHideCompleter()
   }
 
@@ -388,7 +391,6 @@ class Editor extends Component {
   }
 
   render() {
-    console.log('EDITOR height', Dimensions.get('window').height)
     const {
       collection,
       completions,
@@ -422,7 +424,11 @@ class Editor extends Component {
             <Text style={{ ...buttonTextStyle, backgroundColor: isPostingDisabled ? '#aaa' : '#000' }}>POST</Text>
           </TouchableOpacity>
         </View>
-        <ScrollView horizontal={false}>
+        <ScrollView
+          horizontal={false}
+          keyboardDismissMode="interactive"
+          keyboardShouldPersistTaps="always"
+        >
           {order ? order.map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
         </ScrollView>
         <KeyboardAvoidingView behavior="padding">
