@@ -30,7 +30,7 @@ export default class TextBlock extends PureComponent {
     viewHeight: 200,
   }
 
-  componentDidMount() {
+  onFocus = () => {
     const { data: text, uid } = this.props
     this.context.onSelectionChange(text.length, text.length, text, uid)
   }
@@ -65,6 +65,7 @@ export default class TextBlock extends PureComponent {
             defaultValue={data}
             multiline
             onBlur={this.context.onHideCompleter}
+            onFocus={this.onFocus}
             onChangeText={this.onChangeText}
             onContentSizeChange={this.onContentSizeChange}
             onSelectionChange={this.onInternalSelectionChange}
