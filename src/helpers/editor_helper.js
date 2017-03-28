@@ -2,8 +2,8 @@
 import Immutable from 'immutable'
 import get from 'lodash/get'
 import reduce from 'lodash/reduce'
-// import { suggestEmoji } from '../components/completers/EmojiSuggester'
-// import { userRegex } from '../components/completers/Completer'
+import { suggestEmoji } from '../components/completers/EmojiSuggester'
+import { userRegex } from '../components/completers/Completer'
 import { COMMENT, EDITOR, POST } from '../constants/action_types'
 
 const methods = {}
@@ -23,14 +23,14 @@ const initialState = Immutable.Map({
 methods.getCompletions = (action) => {
   const { payload } = action
   if (payload && payload.response) {
-    const { type = 'user'/* , word */ } = payload
+    const { type = 'user', word } = payload
     if (type === 'user' || type === 'location') {
       if (type === 'location' && !document.activeElement.classList.contains('LocationControl')) {
         return null
       }
       return Immutable.fromJS({ data: payload.response.autocompleteResults, type })
     } else if (type === 'emoji') {
-      // return Immutable.fromJS({ data: suggestEmoji(word, payload.response.emojis), type })
+      return Immutable.fromJS({ data: suggestEmoji(word, payload.response.emojis), type })
     }
   }
   return Immutable.Map()
@@ -74,14 +74,14 @@ methods.hasMedia = (state) => {
 
 methods.hasMention = () => false
 
-// methods.hasMention = (state) => {
-//   const collection = state.get('collection')
-//   const order = state.get('order')
-//   return order.some((uid) => {
-//     const block = collection.get(`${uid}`)
-//     return block && /text/.test(block.get('kind')) && userRegex.test(block.get('data'))
-//   })
-// }
+methods.hasMention = (state) => {
+  const collection = state.get('collection')
+  const order = state.get('order')
+  return order.some((uid) => {
+    const block = collection.get(`${uid}`)
+    return block && /text/.test(block.get('kind')) && userRegex.test(block.get('data'))
+  })
+}
 
 methods.isLoading = (state) => {
   const collection = state.get('collection')
