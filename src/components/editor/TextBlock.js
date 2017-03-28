@@ -2,10 +2,12 @@ import React, { PropTypes, PureComponent } from 'react'
 import {
   Dimensions,
   TextInput,
+  View,
 } from 'react-native'
 import Block from './Block'
 
 export default class TextBlock extends PureComponent {
+
 
   static propTypes = {
     data: PropTypes.string,
@@ -20,19 +22,33 @@ export default class TextBlock extends PureComponent {
 
   static contextTypes = {
     onCheckForEmbeds: PropTypes.func.isRequired,
+    onSelectionChange: PropTypes.func.isRequired,
   }
 
   state = {
+    text: this.props.data,
     viewHeight: 200,
   }
 
+  onFocus = () => {
+    const { data: text, uid } = this.props
+    this.context.onSelectionChange(text.length, text.length, text, uid)
+  }
+
   onChangeText = (text) => {
+    if (text === this.state.text) { return }
     if (/^http\S+$/.test(text)) {
       this.context.onCheckForEmbeds(text)
     }
-
     const { onChange, uid } = this.props
     onChange({ uid, data: text, kind: 'text' })
+    this.setState({ text })
+  }
+
+  onInternalSelectionChange = ({ nativeEvent: { selection: { start, end } } }) => {
+    const { uid } = this.props
+    const { text } = this.state
+    this.context.onSelectionChange(start, end, text, uid)
   }
 
   onContentSizeChange = ({ nativeEvent: { contentSize: { height } } }) => {
@@ -43,17 +59,22 @@ export default class TextBlock extends PureComponent {
     const { data, hasContent, uid } = this.props
     const { viewHeight } = this.state
     return (
-      <Block hasContent={hasContent && data.length > 0} uid={uid}>
-        <TextInput
-          defaultValue={data}
-          multiline
-          onChangeText={this.onChangeText}
-          onContentSizeChange={this.onContentSizeChange}
-          placeholder={!hasContent ? 'Say Ello...' : null}
-          style={{ width: Dimensions.get('window').width - 42, height: viewHeight }}
-          underlineColorAndroid="transparent"
-        />
-      </Block>
+      <View>
+        <Block hasContent={hasContent && data.length > 0} uid={uid}>
+          <TextInput
+            defaultValue={data}
+            multiline
+            onBlur={this.context.onHideCompleter}
+            onFocus={this.onFocus}
+            onChangeText={this.onChangeText}
+            onContentSizeChange={this.onContentSizeChange}
+            onSelectionChange={this.onInternalSelectionChange}
+            placeholder={!hasContent ? 'Say Ello...' : null}
+            style={{ width: Dimensions.get('window').width - 42, height: viewHeight }}
+            underlineColorAndroid="transparent"
+          />
+        </Block>
+      </View>
     )
   }
 }

@@ -3,6 +3,8 @@ import React, { Component, PropTypes } from 'react'
 import {
   Alert,
   Clipboard,
+  Dimensions,
+  Keyboard,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -10,19 +12,28 @@ import {
 } from 'react-native'
 import { connect } from 'react-redux'
 import { ImagePicker, Permissions } from 'expo'
+import debounce from 'lodash/debounce'
 import {
   addEmptyTextBlock,
+  autoCompleteUsers,
   initializeEditor,
+  loadEmojis,
   postPreviews,
   removeBlock,
   resetEditor,
   saveAsset,
+  setIsCompleterActive,
   updateBlock,
 } from '../../actions/editor'
 import { createPost } from '../../actions/posts'
+import { EDITOR } from '../../constants/action_types'
+import { selectCompletions } from '../../selectors/editor'
+import { selectEmojis } from '../../selectors/emoji'
+import { selectIsCompleterActive } from '../../selectors/gui'
 import EmbedBlock from './EmbedBlock'
 import ImageBlock from './ImageBlock'
 import TextBlock from './TextBlock'
+import Completer, { emojiRegex, userRegex } from '../completers/Completer'
 
 const ACTIVE_SERVICE_REGEXES = [
   /(?:.+?)?(?:youtube\.com\/v\/|watch\/|\?v=|&v=|youtu\.be\/|\/v=|^youtu\.be\/)([a-zA-Z0-9_-]{11})+/,
@@ -36,9 +47,12 @@ function mapStateToProps(state) {
   const order = editor.get('order')
   return {
     collection,
+    completions: selectCompletions(state),
+    emojis: selectEmojis(state),
     hasContent: editor.get('hasContent'),
     hasMedia: editor.get('hasMedia'),
     hasMention: editor.get('hasMention'),
+    isCompleterActive: selectIsCompleterActive(state),
     isLoading: editor.get('isLoading'),
     isPosting: editor.get('isPosting'),
     order,
@@ -46,7 +60,6 @@ function mapStateToProps(state) {
 }
 
 const toolbarStyle = {
-  backgroundColor: '#eee',
   flexDirection: 'row',
   height: 60,
   justifyContent: 'flex-end',
@@ -60,8 +73,12 @@ class Editor extends Component {
 
   static propTypes = {
     collection: PropTypes.object,
+    completions: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
+    emojis: PropTypes.object,
     hasContent: PropTypes.bool,
+    hasMention: PropTypes.bool,
+    isCompleterActive: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool,
     isPosting: PropTypes.bool,
     order: PropTypes.object,
@@ -69,7 +86,10 @@ class Editor extends Component {
 
   static defaultProps = {
     collection: null,
+    completions: null,
+    emojis: null,
     hasContent: false,
+    hasMention: false,
     isLoading: false,
     isPosting: false,
     order: null,
@@ -78,18 +98,35 @@ class Editor extends Component {
   static childContextTypes = {
     onCheckForEmbeds: PropTypes.func,
     onClickRemoveBlock: PropTypes.func,
+    onEmojiCompleter: PropTypes.func,
+    onHideCompleter: PropTypes.func,
+    onSelectionChange: PropTypes.func,
+    onUserCompleter: PropTypes.func,
+  }
+
+  state = {
+    completerType: null,
+    scrollViewHeight: null,
   }
 
   getChildContext() {
     return {
       onCheckForEmbeds: this.onCheckForEmbeds,
       onClickRemoveBlock: this.onClickRemoveBlock,
+      onEmojiCompleter: this.onEmojiCompleter,
+      onHideCompleter: this.onHideCompleter,
+      onSelectionChange: this.onSelectionChange,
+      onUserCompleter: this.onUserCompleter,
     }
   }
 
   componentWillMount() {
     const { dispatch } = this.props
     dispatch(initializeEditor(EDITOR_ID, true))
+    this.onEmojiCompleter = debounce(this.onEmojiCompleter, 333)
+    this.onUserCompleter = debounce(this.onUserCompleter, 333)
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide)
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow)
   }
 
   componentDidMount() {
@@ -99,11 +136,31 @@ class Editor extends Component {
     dispatch(addEmptyTextBlock(EDITOR_ID))
   }
 
-  shouldComponentUpdate(nextProps) {
-    return !Immutable.is(this.props.order, nextProps.order) ||
-      ['hasContent', 'hasMedia', 'hasMention', 'isLoading', 'isPosting'].some(prop =>
+  shouldComponentUpdate(nextProps, nextState) {
+    return !Immutable.is(this.props.collection, nextProps.collection) ||
+      !Immutable.is(this.props.completions, nextProps.completions) ||
+      !Immutable.is(this.props.order, nextProps.order) ||
+      ['hasContent', 'hasMedia', 'hasMention', 'isCompleterActive', 'isLoading', 'isPosting'].some(prop =>
         this.props[prop] !== nextProps[prop],
+      ) ||
+      ['scrollViewHeight'].some(prop =>
+        this.state[prop] !== nextState[prop],
       )
+  }
+
+  componentDidUpdate(prevProps) {
+    const prevOrder = prevProps.order
+    const { order } = this.props
+    if (order && prevOrder && order.size > prevOrder.size && this.scrollView) {
+      requestAnimationFrame(() => {
+        this.scrollView.scrollToEnd({ animated: true })
+      })
+    }
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidHideListener.remove()
+    this.keyboardDidShowListener.remove()
   }
 
   onPickImageFromLibrary = async () => {
@@ -168,7 +225,7 @@ class Editor extends Component {
     const { dispatch, hasContent } = this.props
     if (!hasContent) {
       // TODO: make this dismiss the editor to go back to whatever was before it
-      console.log('dismiss editor')
+      // console.log('dismiss editor')
     } else {
       Alert.alert(
         'Cancel post?',
@@ -179,6 +236,114 @@ class Editor extends Component {
         ],
       )
     }
+  }
+
+  onHideCompleter = () => {
+    const { completions, dispatch, isCompleterActive } = this.props
+    if (isCompleterActive) {
+      dispatch(setIsCompleterActive({ isActive: false }))
+    }
+    if (completions) {
+      dispatch({ type: EDITOR.CLEAR_AUTO_COMPLETERS })
+    }
+  }
+
+  onEmojiCompleter = ({ word }) => {
+    const { dispatch, emojis, isCompleterActive } = this.props
+    if (!isCompleterActive) {
+      dispatch(setIsCompleterActive({ isActive: true }))
+    }
+    if (emojis && emojis.length) {
+      dispatch({
+        type: EDITOR.EMOJI_COMPLETER_SUCCESS,
+        payload: {
+          response: { emojis },
+          type: 'emoji',
+          word,
+        },
+      })
+    } else {
+      dispatch(loadEmojis('emoji', word))
+    }
+  }
+
+  onUserCompleter = ({ word }) => {
+    const { dispatch, isCompleterActive } = this.props
+    if (!isCompleterActive) {
+      dispatch(setIsCompleterActive({ isActive: true }))
+    }
+    dispatch(autoCompleteUsers('user', word))
+  }
+
+  onCancelAutoCompleter = () => {
+    const { dispatch } = this.props
+    dispatch({ type: EDITOR.CLEAR_AUTO_COMPLETERS })
+    this.onHideCompleter()
+    // this.onHideTextTools()
+  }
+
+  onCompletion = ({ value }) => {
+    const { completerType } = this.state
+    const { selectionStart: start, selectionEnd: end, selectionText: text } = this
+    let newValue = value
+    if (completerType === 'user') {
+      newValue = `@${value} `
+    } else if (completerType === 'emoji') {
+      newValue = `:${value}: `
+    }
+    const vo = {
+      data: this.selectionText.replace(text.slice(start, end), newValue),
+      kind: 'text',
+      uid: this.selectionUid,
+    }
+    this.onChangeText(vo)
+    this.onHideCompleter()
+  }
+
+  onSelectionChange = (start, end, text, uid) => {
+    this.selectionStart = start
+    this.selectionEnd = end
+    this.selectionText = text
+    this.selectionUid = uid
+    // if start === end then this is just a cursor position not a range
+    if (start === end) {
+      const word = this.getWordFromPosition(this.selectionEnd)
+      if (word.match(userRegex)) {
+        this.setState({ completerType: 'user' })
+        this.onUserCompleter({ word })
+      } else if (word.match(emojiRegex)) {
+        this.setState({ completerType: 'emoji' })
+        this.onEmojiCompleter({ word })
+      // } else if (e.target.classList.contains('LocationControl')) {
+      //   callMethod('onLocationCompleter', { location: e.target.value })
+      } else {
+        this.setState({ completerType: null })
+        this.onHideCompleter()
+      }
+    }
+  }
+
+  getWordFromPosition(pos) {
+    const letterArr = this.selectionText.split('')
+    let endIndex = pos - 1
+    if (endIndex < 0) endIndex = 0
+    const letters = []
+    let index = endIndex
+    while (index > -1) {
+      const letter = letterArr[index]
+      index -= 1
+      if (!letter) break
+      if (letter.match(/\s/)) {
+        break
+      } else if (letter.match(/:/)) {
+        letters.unshift(letter)
+        break
+      } else {
+        letters.unshift(letter)
+      }
+    }
+    this.selectionStart = (endIndex - letters.length) + 1
+    return letters.join('')
   }
 
   getBlockElement(block) {
@@ -221,6 +386,15 @@ class Editor extends Component {
     }
   }
 
+  keyboardDidHide = () => {
+    this.onHideCompleter()
+    this.setState({ scrollViewHeight: (Dimensions.get('window').height - toolbarStyle.height) })
+  }
+
+  keyboardDidShow = ({ endCoordinates: { screenY } }) => {
+    this.setState({ scrollViewHeight: (screenY - toolbarStyle.height) })
+  }
+
   serialize() {
     const { collection, order } = this.props
     const results = []
@@ -254,10 +428,19 @@ class Editor extends Component {
   }
 
   render() {
-    const { collection, hasContent, isLoading, isPosting, order } = this.props
+    const {
+      collection,
+      completions,
+      hasContent,
+      hasMention,
+      isCompleterActive,
+      isLoading,
+      isPosting,
+      order,
+    } = this.props
     const isPostingDisabled = isPosting || isLoading || !hasContent
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: hasMention ? '#ffc' : '#eee' }}>
         <View style={toolbarStyle}>
           <TouchableOpacity
             onPress={this.onResetEditor}
@@ -279,9 +462,20 @@ class Editor extends Component {
             <Text style={{ ...buttonTextStyle, backgroundColor: isPostingDisabled ? '#aaa' : '#000' }}>POST</Text>
           </TouchableOpacity>
         </View>
-        <ScrollView horizontal={false}>
-          {order ? order.map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
-        </ScrollView>
+        <View style={{ height: this.state.scrollViewHeight }}>
+          <ScrollView
+            horizontal={false}
+            ref={comp => (this.scrollView = comp)}
+          >
+            {order ? order.map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
+          </ScrollView>
+          <Completer
+            completions={completions}
+            isCompleterActive={isCompleterActive}
+            onCancel={this.onCancelAutoCompleter}
+            onCompletion={this.onCompletion}
+          />
+        </View>
       </View>
     )
   }

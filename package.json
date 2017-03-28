@@ -73,30 +73,30 @@
   },
   "dependencies": {
     "exif-js": "2.1.1",
-    "expo": "14.0.2",
+    "expo": "15.1.2",
     "humps": "2.0.0",
     "immutable": "3.8.1",
     "lodash": "4.17.4",
     "react": "15.4.2",
-    "react-native": "0.42.0",
+    "react-native": "0.42.3",
     "react-redux": "5.0.3",
     "redux": "3.6.0",
-    "redux-logger": "2.8.2",
-    "redux-persist": "4.4.2",
+    "redux-logger": "3.0.0",
+    "redux-persist": "4.5.0",
     "redux-persist-immutable": "4.2.0",
     "redux-persist-transform-immutable": "4.2.0",
     "redux-saga": "0.14.3",
-    "reselect": "2.5.4"
+    "reselect": "3.0.0"
   },
   "devDependencies": {
-    "babel-eslint": "7.1.1",
-    "eslint": "3.17.1",
+    "babel-eslint": "7.2.1",
+    "eslint": "3.18.0",
     "eslint-config-airbnb": "14.1.0",
     "eslint-plugin-import": "2.2.0",
     "eslint-plugin-jsx-a11y": "4.0.0",
-    "eslint-plugin-react": "6.10.0",
-    "jest-expo": "^0.2.1",
-    "react-native-scripts": "0.0.18",
-    "react-test-renderer": "~15.4.0"
+    "eslint-plugin-react": "6.10.3",
+    "jest-expo": "0.3.1",
+    "react-native-scripts": "0.0.25",
+    "react-test-renderer": "15.4.0"
   }
 }
