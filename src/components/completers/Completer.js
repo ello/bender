@@ -1,6 +1,5 @@
 import React, { PropTypes, PureComponent } from 'react'
 import {
-  Dimensions,
   Image,
   ScrollView,
   Text,
@@ -11,7 +10,7 @@ export const emojiRegex = /\s?:{1}(\w+|\+|-):{0}$/
 export const userRegex = /(\s|^)@{1}\w+/
 
 const scrollViewStyle = {
-  maxHeight: 100,
+  maxHeight: 110,
 }
 
 const completionStyle = {
@@ -48,10 +47,13 @@ export default class Completer extends PureComponent {
 
   render() {
     const { completions, isCompleterActive } = this.props
-    console.log('COMPLETER height', Dimensions.get('window').height)
     if (!isCompleterActive || !completions || !completions.get('data').size) { return null }
     return (
-      <ScrollView style={scrollViewStyle}>
+      <ScrollView
+        horizontal={false}
+        keyboardShouldPersistTaps="handled"
+        style={scrollViewStyle}
+      >
         {completions.get('data').map(completion =>
           <TouchableOpacity
             key={`completion_${completion.get('name')}`}

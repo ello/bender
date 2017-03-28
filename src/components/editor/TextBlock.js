@@ -32,7 +32,6 @@ export default class TextBlock extends PureComponent {
 
   componentDidMount() {
     const { data: text, uid } = this.props
-    console.log('TEXT', text, this.props.data)
     this.context.onSelectionChange(text.length, text.length, text, uid)
   }
 

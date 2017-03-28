@@ -3,6 +3,8 @@ import React, { Component, PropTypes } from 'react'
 import {
   Alert,
   Clipboard,
+  Dimensions,
+  Keyboard,
   KeyboardAvoidingView,
   ScrollView,
   Text,
@@ -11,6 +13,7 @@ import {
 } from 'react-native'
 import { connect } from 'react-redux'
 import { ImagePicker, Permissions } from 'expo'
+import debounce from 'lodash/debounce'
 import {
   addEmptyTextBlock,
   autoCompleteUsers,
@@ -58,7 +61,6 @@ function mapStateToProps(state) {
 }
 
 const toolbarStyle = {
-  backgroundColor: '#eee',
   flexDirection: 'row',
   height: 60,
   justifyContent: 'flex-end',
@@ -76,6 +78,7 @@ class Editor extends Component {
     dispatch: PropTypes.func.isRequired,
     emojis: PropTypes.object,
     hasContent: PropTypes.bool,
+    hasMention: PropTypes.bool,
     isCompleterActive: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool,
     isPosting: PropTypes.bool,
@@ -87,6 +90,7 @@ class Editor extends Component {
     completions: null,
     emojis: null,
     hasContent: false,
+    hasMention: false,
     isLoading: false,
     isPosting: false,
     order: null,
@@ -103,6 +107,7 @@ class Editor extends Component {
 
   state = {
     completerType: null,
+    scrollViewHeight: null,
   }
 
   getChildContext() {
@@ -119,6 +124,10 @@ class Editor extends Component {
   componentWillMount() {
     const { dispatch } = this.props
     dispatch(initializeEditor(EDITOR_ID, true))
+    this.onEmojiCompleter = debounce(this.onEmojiCompleter, 333)
+    this.onUserCompleter = debounce(this.onUserCompleter, 333)
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide)
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow)
   }
 
   componentDidMount() {
@@ -128,13 +137,31 @@ class Editor extends Component {
     dispatch(addEmptyTextBlock(EDITOR_ID))
   }
 
-  shouldComponentUpdate(nextProps) {
+  shouldComponentUpdate(nextProps, nextState) {
     return !Immutable.is(this.props.collection, nextProps.collection) ||
       !Immutable.is(this.props.completions, nextProps.completions) ||
       !Immutable.is(this.props.order, nextProps.order) ||
       ['hasContent', 'hasMedia', 'hasMention', 'isCompleterActive', 'isLoading', 'isPosting'].some(prop =>
         this.props[prop] !== nextProps[prop],
+      ) ||
+      ['scrollViewHeight'].some(prop =>
+        this.state[prop] !== nextState[prop],
       )
+  }
+
+  componentDidUpdate(prevProps) {
+    const prevOrder = prevProps.order
+    const { order } = this.props
+    if (order && prevOrder && order.size > prevOrder.size && this.scrollView) {
+      requestAnimationFrame(() => {
+        this.scrollView.scrollToEnd({ animated: true })
+      })
+    }
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidHideListener.remove()
+    this.keyboardDidShowListener.remove()
   }
 
   onPickImageFromLibrary = async () => {
@@ -199,7 +226,7 @@ class Editor extends Component {
     const { dispatch, hasContent } = this.props
     if (!hasContent) {
       // TODO: make this dismiss the editor to go back to whatever was before it
-      console.log('dismiss editor')
+      // console.log('dismiss editor')
     } else {
       Alert.alert(
         'Cancel post?',
@@ -261,9 +288,9 @@ class Editor extends Component {
     const { selectionStart: start, selectionEnd: end, selectionText: text } = this
     let newValue = value
     if (completerType === 'user') {
-      newValue = `@${value}`
+      newValue = `@${value} `
     } else if (completerType === 'emoji') {
-      newValue = `:${value}:`
+      newValue = `:${value}: `
     }
     const vo = {
       data: this.selectionText.replace(text.slice(start, end), newValue),
@@ -281,7 +308,7 @@ class Editor extends Component {
     this.selectionUid = uid
     // if start === end then this is just a cursor position not a range
     if (start === end) {
-      const word = this.getWordFromPosition(end)
+      const word = this.getWordFromPosition(this.selectionEnd)
       if (word.match(userRegex)) {
         this.setState({ completerType: 'user' })
         this.onUserCompleter({ word })
@@ -299,8 +326,10 @@ class Editor extends Component {
 
   getWordFromPosition(pos) {
     const letterArr = this.selectionText.split('')
+    let endIndex = pos - 1
+    if (endIndex < 0) endIndex = 0
     const letters = []
-    let index = pos - 1
+    let index = endIndex
     while (index > -1) {
       const letter = letterArr[index]
       index -= 1
@@ -314,7 +343,7 @@ class Editor extends Component {
         letters.unshift(letter)
       }
     }
-    this.selectionStart = index + 1
+    this.selectionStart = (endIndex - letters.length) + 1
     return letters.join('')
   }
 
@@ -358,6 +387,16 @@ class Editor extends Component {
     }
   }
 
+  keyboardDidHide = () => {
+    this.onHideCompleter()
+    console.log("Dimensions.get('window').height", Dimensions.get('window').height - toolbarStyle.height)
+    this.setState({ scrollViewHeight: Dimensions.get('window').height - toolbarStyle.height })
+  }
+
+  keyboardDidShow = () => {
+    this.setState({ scrollViewHeight: null })
+  }
+
   serialize() {
     const { collection, order } = this.props
     const results = []
@@ -395,14 +434,16 @@ class Editor extends Component {
       collection,
       completions,
       hasContent,
+      hasMention,
       isCompleterActive,
       isLoading,
       isPosting,
       order,
     } = this.props
     const isPostingDisabled = isPosting || isLoading || !hasContent
+    console.log('this.state.scrollViewHeight', this.state.scrollViewHeight)
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: hasMention ? '#ffc' : '#eee' }}>
         <View style={toolbarStyle}>
           <TouchableOpacity
             onPress={this.onResetEditor}
@@ -424,14 +465,16 @@ class Editor extends Component {
             <Text style={{ ...buttonTextStyle, backgroundColor: isPostingDisabled ? '#aaa' : '#000' }}>POST</Text>
           </TouchableOpacity>
         </View>
-        <ScrollView
-          horizontal={false}
-          keyboardDismissMode="interactive"
-          keyboardShouldPersistTaps="always"
+        <KeyboardAvoidingView
+          behavior="height"
+          style={{ height: this.state.scrollViewHeight, paddingBottom: toolbarStyle.height }}
         >
-          {order ? order.map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
-        </ScrollView>
-        <KeyboardAvoidingView behavior="padding">
+          <ScrollView
+            horizontal={false}
+            ref={comp => (this.scrollView = comp)}
+          >
+            {order ? order.map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
+          </ScrollView>
           <Completer
             completions={completions}
             isCompleterActive={isCompleterActive}

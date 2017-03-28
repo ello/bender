@@ -2,7 +2,6 @@ import React, { PropTypes } from 'react'
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native'
 
 const viewStyle = {
-  backgroundColor: '#eee',
   padding: 10,
   width: Dimensions.get('window').width,
 }
@@ -15,12 +14,19 @@ const subViewStyle = {
   width: Dimensions.get('window').width - 20,
 }
 
-const closeXStyle = {
+const closeBtnStyle = {
+  alignItems: 'center',
   height: 30,
+  justifyContent: 'center',
   position: 'absolute',
-  right: -15,
-  top: 3,
+  right: 0,
+  top: 0,
   width: 30,
+}
+
+const closeTextStyle = {
+  color: '#aaa',
+  fontSize: 22,
 }
 
 const Block = ({ children, hasContent, uid }, { onClickRemoveBlock }) =>
@@ -30,9 +36,9 @@ const Block = ({ children, hasContent, uid }, { onClickRemoveBlock }) =>
       {hasContent &&
         <TouchableOpacity
           onPress={() => onClickRemoveBlock(uid)}
-          style={closeXStyle}
+          style={closeBtnStyle}
         >
-          <Text style={{ color: '#aaa' }}>X</Text>
+          <Text style={closeTextStyle}>&times;</Text>
         </TouchableOpacity>
       }
     </View>
