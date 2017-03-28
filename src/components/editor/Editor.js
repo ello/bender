@@ -5,7 +5,6 @@ import {
   Clipboard,
   Dimensions,
   Keyboard,
-  KeyboardAvoidingView,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -389,12 +388,11 @@ class Editor extends Component {
 
   keyboardDidHide = () => {
     this.onHideCompleter()
-    console.log("Dimensions.get('window').height", Dimensions.get('window').height - toolbarStyle.height)
-    this.setState({ scrollViewHeight: Dimensions.get('window').height - toolbarStyle.height })
+    this.setState({ scrollViewHeight: (Dimensions.get('window').height - toolbarStyle.height) })
   }
 
-  keyboardDidShow = () => {
-    this.setState({ scrollViewHeight: null })
+  keyboardDidShow = ({ endCoordinates: { screenY } }) => {
+    this.setState({ scrollViewHeight: (screenY - toolbarStyle.height) })
   }
 
   serialize() {
@@ -441,7 +439,6 @@ class Editor extends Component {
       order,
     } = this.props
     const isPostingDisabled = isPosting || isLoading || !hasContent
-    console.log('this.state.scrollViewHeight', this.state.scrollViewHeight)
     return (
       <View style={{ flex: 1, backgroundColor: hasMention ? '#ffc' : '#eee' }}>
         <View style={toolbarStyle}>
@@ -465,10 +462,7 @@ class Editor extends Component {
             <Text style={{ ...buttonTextStyle, backgroundColor: isPostingDisabled ? '#aaa' : '#000' }}>POST</Text>
           </TouchableOpacity>
         </View>
-        <KeyboardAvoidingView
-          behavior="height"
-          style={{ height: this.state.scrollViewHeight, paddingBottom: toolbarStyle.height }}
-        >
+        <View style={{ height: this.state.scrollViewHeight }}>
           <ScrollView
             horizontal={false}
             ref={comp => (this.scrollView = comp)}
@@ -481,7 +475,7 @@ class Editor extends Component {
             onCancel={this.onCancelAutoCompleter}
             onCompletion={this.onCompletion}
           />
-        </KeyboardAvoidingView>
+        </View>
       </View>
     )
   }
