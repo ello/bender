@@ -17,7 +17,7 @@ const createNativeAppStore = (initialState = {}) => {
   logConfig.stateTransformer = (state) => {
     const newState = {}
     Object.keys(state).forEach((key) => {
-      if ([].includes(key)) {
+      if (['json'].includes(key)) {
         newState[key] = state[key].toJS()
       }
     })

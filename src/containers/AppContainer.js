@@ -1,9 +1,14 @@
 import Immutable from 'immutable'
 import React, { PropTypes, PureComponent } from 'react'
-import { StatusBar, View } from 'react-native'
+import { Navigator, StatusBar, Text, View } from 'react-native'
 import Editor from '../components/editor/Editor'
 import ImagePickerContainer from './ImagePickerContainer'
 import ModalContainer from './ModalContainer'
+
+const routes = [
+  { title: 'Editor', index: 0 },
+  { title: 'Discover', index: 1 },
+]
 
 class AppContainer extends PureComponent {
 

@@ -20,7 +20,7 @@ export const selectStreamPostIdOrToken = state => state.stream.getIn(['payload',
 
 export const selectStreamResultPath = createSelector(
   [selectMeta, selectPathname], (meta, pathname) =>
-    meta.resultKey || pathname,
+    meta.resultKey || pathname || '/',
 )
 
 export const selectStreamUnfilteredResult = createSelector(
