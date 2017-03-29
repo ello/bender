@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 import { selectParamsUsername } from './params'
-// import { selectPathname, selectPropsQueryType } from './routing'
+import { selectPathname, selectPropsQueryType } from './routing'
 
 // state.gui.xxx
 export const selectActiveNotificationsType = state => state.gui.get('activeNotificationsType')
@@ -98,20 +98,20 @@ export const selectScrollOffset = createSelector(
   [selectInnerHeight], innerHeight => Math.round(innerHeight - 80),
 )
 
-// const NO_LAYOUT_TOOLS = [
-//   /^\/[\w-]+\/post\/.+/,
-//   /^\/discover\/all\b/,
-//   /^\/notifications\b/,
-//   /^\/settings\b/,
-//   /^\/onboarding\b/,
-//   /^\/[\w-]+\/following\b/,
-//   /^\/[\w-]+\/followers\b/,
-// ]
+const NO_LAYOUT_TOOLS = [
+  /^\/[\w-]+\/post\/.+/,
+  /^\/discover\/all\b/,
+  /^\/notifications\b/,
+  /^\/settings\b/,
+  /^\/onboarding\b/,
+  /^\/[\w-]+\/following\b/,
+  /^\/[\w-]+\/followers\b/,
+]
 
-// export const selectIsLayoutToolHidden = createSelector(
-//   [selectPathname, selectPropsQueryType], (pathname, queryType) => {
-//     const isUserSearch = queryType === 'users' && /^\/search\b/.test(pathname)
-//     return isUserSearch || NO_LAYOUT_TOOLS.some(pagex => pagex.test(pathname))
-//   },
-// )
+export const selectIsLayoutToolHidden = createSelector(
+  [selectPathname, selectPropsQueryType], (pathname, queryType) => {
+    const isUserSearch = queryType === 'users' && /^\/search\b/.test(pathname)
+    return isUserSearch || NO_LAYOUT_TOOLS.some(pagex => pagex.test(pathname))
+  },
+)
 

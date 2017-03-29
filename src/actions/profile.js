@@ -1,8 +1,8 @@
 import { LOAD_STREAM, PROFILE } from '../constants/action_types'
 import * as MAPPING_TYPES from '../constants/mapping_types'
 import * as api from '../networking/api'
-// import * as StreamFilters from '../components/streams/StreamFilters'
-// import * as StreamRenderables from '../components/streams/StreamRenderables'
+import * as StreamFilters from '../components/streams/StreamFilters'
+import * as StreamRenderables from '../components/streams/StreamRenderables'
 // import { ErrorState } from '../components/errors/Errors'
 // import { trackEvent } from '../actions/analytics'
 // import store from '../store'
@@ -93,11 +93,11 @@ export function availableToggles() {
     meta: {
       mappingType: MAPPING_TYPES.SETTINGS,
       renderStream: {
-        // asList: StreamRenderables.profileToggles,
-        // asGrid: StreamRenderables.profileToggles,
+        asList: StreamRenderables.profileToggles,
+        asGrid: StreamRenderables.profileToggles,
         // asError: <ErrorState />,
       },
-      // resultFilter: StreamFilters.settingsToggles,
+      resultFilter: StreamFilters.settingsToggles,
       resultKey: '/settings',
       updateKey: '/settings',
     },
@@ -174,10 +174,10 @@ export function blockedUsers() {
       defaultMode: 'list',
       mappingType: MAPPING_TYPES.USERS,
       renderStream: {
-        // asList: StreamRenderables.usersAsCompact,
-        // asGrid: StreamRenderables.usersAsCompact,
+        asList: StreamRenderables.usersAsCompact,
+        asGrid: StreamRenderables.usersAsCompact,
       },
-      // resultFilter: StreamFilters.userResults,
+      resultFilter: StreamFilters.userResults,
       resultKey: '/settings/blocked',
       updateKey: '/profile/blocked',
     },
@@ -194,10 +194,10 @@ export function mutedUsers() {
       defaultMode: 'list',
       mappingType: MAPPING_TYPES.USERS,
       renderStream: {
-        // asList: StreamRenderables.usersAsCompact,
-        // asGrid: StreamRenderables.usersAsCompact,
+        asList: StreamRenderables.usersAsCompact,
+        asGrid: StreamRenderables.usersAsCompact,
       },
-      // resultFilter: StreamFilters.userResults,
+      resultFilter: StreamFilters.userResults,
       resultKey: '/settings/muted',
       updateKey: '/profile/muted',
     },
