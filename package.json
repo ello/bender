@@ -86,7 +86,8 @@
     "redux-persist-immutable": "4.2.0",
     "redux-persist-transform-immutable": "4.2.0",
     "redux-saga": "0.14.3",
-    "reselect": "3.0.0"
+    "reselect": "3.0.0",
+    "url-regex": "3.2.0"
   },
   "devDependencies": {
     "babel-eslint": "7.2.1",
