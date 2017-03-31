@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native'
 import { connect } from 'react-redux'
-import { ImagePicker, Permissions } from 'expo'
+import ImagePicker from 'react-native-image-picker'
 import debounce from 'lodash/debounce'
 import {
   addEmptyTextBlock,
@@ -39,7 +39,6 @@ const ACTIVE_SERVICE_REGEXES = [
   /(?:.+?)?(?:youtube\.com\/v\/|watch\/|\?v=|&v=|youtu\.be\/|\/v=|^youtu\.be\/)([a-zA-Z0-9_-]{11})+/,
 ]
 const EDITOR_ID = 'blah'
-const IMAGE_QUALITY = 0.8
 
 function mapStateToProps(state) {
   const editor = state.editor.get(EDITOR_ID, Immutable.Map())
@@ -163,28 +162,22 @@ class Editor extends Component {
     this.keyboardDidShowListener.remove()
   }
 
-  onPickImageFromLibrary = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      quality: IMAGE_QUALITY,
+  onPickImageFromLibrary = () => {
+    ImagePicker.launchImageLibrary({}, (response) => {
+      if (!response.didCancel) {
+        const { dispatch } = this.props
+        dispatch(saveAsset(response.uri, EDITOR_ID, response.width, response.height))
+      }
     })
-    if (!result.cancelled) {
-      const { dispatch } = this.props
-      dispatch(saveAsset(result.uri, EDITOR_ID, result.width, result.height))
-    }
   }
 
-  onTakePictureWithCamera = async () => {
-    const { status } = await Permissions.askAsync(Permissions.CAMERA)
-    if (status === 'granted') {
-      const result = await ImagePicker.launchCameraAsync({
-        quality: IMAGE_QUALITY,
-      })
-      if (!result.cancelled) {
+  onTakePictureWithCamera = () => {
+    ImagePicker.launchCamera({}, (response) => {
+      if (!response.didCancel) {
         const { dispatch } = this.props
-        dispatch(saveAsset(result.uri, EDITOR_ID, result.width, result.height))
+        dispatch(saveAsset(response.uri, EDITOR_ID, response.width, response.height))
       }
-    }
+    })
   }
 
   onChangeText = (vo) => {
@@ -448,6 +441,9 @@ class Editor extends Component {
           >
             <Text style={buttonTextStyle}>X</Text>
           </TouchableOpacity>
+          <TouchableOpacity title="CAMERA" onPress={this.onTakePictureWithCamera} >
+            <Text style={buttonTextStyle}>CAM</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={this.onPickImageFromLibrary}
             style={buttonStyle}
@@ -482,5 +478,4 @@ class Editor extends Component {
 }
 
 export default connect(mapStateToProps)(Editor)
-// <TouchableOpacity title="CAMERA" onPress={this.onTakePictureWithCamera} />
 
