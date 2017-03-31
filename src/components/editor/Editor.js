@@ -5,11 +5,8 @@ import {
   Clipboard,
   Dimensions,
   Keyboard,
-  KeyboardAvoidingView,
-  Modal,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native'
@@ -17,6 +14,7 @@ import { connect } from 'react-redux'
 import { ImagePicker, Permissions } from 'expo'
 import debounce from 'lodash/debounce'
 import { trackEvent } from '../../actions/analytics'
+import { closeModal, openModal } from '../../actions/modals'
 import {
   addEmptyTextBlock,
   autoCompleteUsers,
@@ -38,8 +36,8 @@ import { selectIsCompleterActive } from '../../selectors/gui'
 import EmbedBlock from './EmbedBlock'
 import ImageBlock from './ImageBlock'
 import TextBlock from './TextBlock'
-import { isValidURL } from '../forms/Validators'
 import Completer, { emojiRegex, userRegex } from '../completers/Completer'
+import BuyLinkDialog from '../dialogs/BuyLinkDialog'
 
 const ACTIVE_SERVICE_REGEXES = [
   /(?:.+?)?(?:youtube\.com\/v\/|watch\/|\?v=|&v=|youtu\.be\/|\/v=|^youtu\.be\/)([a-zA-Z0-9_-]{11})+/,
@@ -102,29 +100,6 @@ const toolbarStyle = {
 }
 const buttonStyle = { marginLeft: 10 }
 const buttonTextStyle = { backgroundColor: '#000', borderRadius: 20, color: '#fff', paddingHorizontal: 20, paddingVertical: 10 }
-const modalStyle = {
-  backgroundColor: 'rgba(0, 0, 0, 0.8)',
-  flex: 1,
-  justifyContent: 'center',
-  paddingHorizontal: 20,
-}
-const textInputStyle = {
-  backgroundColor: '#fff',
-  borderWidth: 1,
-  color: '#000',
-  height: 44,
-  paddingHorizontal: 10,
-  marginBottom: 10,
-}
-const modalButtonViewStyle = {
-  flexDirection: 'row',
-  justifyContent: 'flex-start',
-  marginLeft: 0,
-  marginRight: 10,
-}
-const modalButtonStyle = {
-  marginRight: 10,
-}
 
 class Editor extends Component {
 
@@ -167,9 +142,7 @@ class Editor extends Component {
   }
 
   state = {
-    buyLinkText: '',
     completerType: null,
-    isBuyLinkModalActive: false,
     scrollViewHeight: null,
   }
 
@@ -207,7 +180,7 @@ class Editor extends Component {
       ['hasContent', 'hasMedia', 'hasMention', 'isCompleterActive', 'isLoading', 'isPosting'].some(prop =>
         this.props[prop] !== nextProps[prop],
       ) ||
-      ['buyLinkText', 'isBuyLinkModalActive', 'scrollViewHeight'].some(prop =>
+      ['scrollViewHeight'].some(prop =>
         this.state[prop] !== nextState[prop],
       )
   }
@@ -227,31 +200,25 @@ class Editor extends Component {
     this.keyboardDidShowListener.remove()
   }
 
-  onLaunchBuyLinkModal = () => {
-    console.log('onLaunchBuyLinkModal')
-    this.setState({ isBuyLinkModalActive: true })
-  }
-
-  onCloseModal = () => {
-    this.setState({ isBuyLinkModalActive: false })
-  }
-
-  onAddBuyLink = () => {
+  onAddBuyLink = ({ value }) => {
     const { dispatch, editorId } = this.props
-    dispatch(updateBuyLink(editorId, this.state.buyLinkText))
-    this.setState({ buyLinkText: '' })
+    dispatch(updateBuyLink(editorId, value))
     this.onCloseModal()
   }
 
-  onRemoveBuyLink = () => {
-    this.setState({ buyLinkText: '' })
-    requestAnimationFrame(() => {
-      this.onAddBuyLink()
-    })
+  onLaunchBuyLinkModal = () => {
+    const { buyLink, dispatch } = this.props
+    dispatch(openModal(
+      <BuyLinkDialog
+        onConfirm={this.onAddBuyLink}
+        onDismiss={this.onCloseModal}
+        text={buyLink}
+      />))
   }
 
-  onBuyLinkTextChange = (buyLinkText) => {
-    this.setState({ buyLinkText })
+  onCloseModal = () => {
+    const { dispatch } = this.props
+    dispatch(closeModal())
   }
 
   onPickImageFromLibrary = async () => {
@@ -534,9 +501,7 @@ class Editor extends Component {
       isPosting,
       order,
     } = this.props
-    const { buyLinkText, isBuyLinkModalActive } = this.state
     const isPostingDisabled = isPosting || isLoading || !hasContent
-    const isBuyLinkSubmitDisabled = !isValidURL(buyLinkText)
     let buyLinkBgColor = !hasMedia ? '#aaa' : '#000'
     if (buyLink && buyLink.length) { buyLinkBgColor = '#00d100' }
     return (
@@ -559,7 +524,7 @@ class Editor extends Component {
             onPress={this.onPickImageFromLibrary}
             style={buttonStyle}
           >
-            <Text style={buttonTextStyle}>&#x1f4f7;</Text>
+            <Text style={buttonTextStyle}>&#128194;</Text>
           </TouchableOpacity>
           <TouchableOpacity
             disabled={isPostingDisabled}
@@ -583,46 +548,6 @@ class Editor extends Component {
             onCompletion={this.onCompletion}
           />
         </View>
-        <Modal
-          animationType="fade"
-          onRequestClose={this.onCloseModal}
-          transparent
-          visible={isBuyLinkModalActive}
-        >
-          <KeyboardAvoidingView behavior="padding" style={modalStyle}>
-            <Text style={{ color: '#fff', fontSize: 24, marginBottom: 20 }}>Sell your work</Text>
-            <TextInput
-              defaultValue={buyLink}
-              onChangeText={this.onBuyLinkTextChange}
-              placeholder="Product detail link"
-              style={textInputStyle}
-              underlineColorAndroid="transparent"
-            />
-            <View style={modalButtonViewStyle}>
-              <TouchableOpacity
-                disabled={isBuyLinkSubmitDisabled}
-                onPress={this.onAddBuyLink}
-                style={modalButtonStyle}
-              >
-                <Text style={{ ...buttonTextStyle, backgroundColor: isBuyLinkSubmitDisabled ? '#aaa' : '#00d100' }}>Submit</Text>
-              </TouchableOpacity>
-              {buyLink && buyLink.length &&
-                <TouchableOpacity
-                  onPress={this.onRemoveBuyLink}
-                  style={modalButtonStyle}
-                >
-                  <Text style={buttonTextStyle}>Remove</Text>
-                </TouchableOpacity>
-              }
-              <TouchableOpacity
-                onPress={this.onCloseModal}
-                style={modalButtonStyle}
-              >
-                <Text style={buttonTextStyle}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
-        </Modal>
       </View>
     )
   }
