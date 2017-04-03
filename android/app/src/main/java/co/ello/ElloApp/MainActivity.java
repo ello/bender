@@ -254,6 +254,14 @@ public class MainActivity
         registerForGCM();
     }
 
+    @JavascriptInterface
+    public void launchEditor() {
+      if (webAppReady) {
+        Intent intent = new Intent(this, ReactNativeActivity.class);
+        startActivity(intent);
+      }
+    }
+
     private void setupRegisterDeviceReceiver() {
         registerDeviceReceiver = new BroadcastReceiver() {
             @Override
