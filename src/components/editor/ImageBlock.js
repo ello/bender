@@ -30,6 +30,15 @@ export default class ImageBlock extends PureComponent {
     linkURL: null,
   }
 
+  state = {
+    width: 0,
+  }
+
+  // this is to trigger a render to get the dimensions again on orientation change
+  onLayout = ({ nativeEvent: { layout: { width } } }) => {
+    this.setState({ width })
+  }
+
   getImageDimensions() {
     const { height, width } = this.props
     const maxWidth = Dimensions.get('window').width - 40 // -40 is for the block padding
@@ -50,7 +59,7 @@ export default class ImageBlock extends PureComponent {
     const { width, height } = this.getImageDimensions()
     return (
       <Block hasContent={hasContent} uid={uid}>
-        <View style={{ paddingTop: 20 }}>
+        <View style={{ paddingTop: 20 }} onLayout={this.onLayout}>
           <Image
             source={source}
             style={{ width, height }}

@@ -1,9 +1,5 @@
 import React, { PropTypes, PureComponent } from 'react'
-import {
-  Dimensions,
-  TextInput,
-  View,
-} from 'react-native'
+import { TextInput, View } from 'react-native'
 import Block from './Block'
 
 export default class TextBlock extends PureComponent {
@@ -70,7 +66,7 @@ export default class TextBlock extends PureComponent {
             onContentSizeChange={this.onContentSizeChange}
             onSelectionChange={this.onInternalSelectionChange}
             placeholder={!hasContent ? 'Say Ello...' : null}
-            style={{ width: Dimensions.get('window').width - 42, height: viewHeight }}
+            style={{ height: viewHeight }}
             underlineColorAndroid="transparent"
           />
         </Block>

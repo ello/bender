@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react'
-import { Dimensions, Text, TouchableOpacity, View } from 'react-native'
+import { Text, TouchableOpacity, View } from 'react-native'
 
 const viewStyle = {
   padding: 10,
-  width: Dimensions.get('window').width,
+  flex: 1,
 }
 
 const subViewStyle = {
@@ -11,7 +11,7 @@ const subViewStyle = {
   borderStyle: 'dashed',
   borderWidth: 1,
   padding: 10,
-  width: Dimensions.get('window').width - 20,
+  flex: 1,
 }
 
 const closeBtnStyle = {
