@@ -13,6 +13,8 @@ import {
 import { connect } from 'react-redux'
 import { ImagePicker, Permissions } from 'expo'
 import debounce from 'lodash/debounce'
+import { trackEvent } from '../../actions/analytics'
+import { closeModal, openModal } from '../../actions/modals'
 import {
   addEmptyTextBlock,
   autoCompleteUsers,
@@ -24,6 +26,7 @@ import {
   saveAsset,
   setIsCompleterActive,
   updateBlock,
+  updateBuyLink,
 } from '../../actions/editor'
 import { createPost } from '../../actions/posts'
 import { EDITOR } from '../../constants/action_types'
@@ -34,20 +37,50 @@ import EmbedBlock from './EmbedBlock'
 import ImageBlock from './ImageBlock'
 import TextBlock from './TextBlock'
 import Completer, { emojiRegex, userRegex } from '../completers/Completer'
+import BuyLinkDialog from '../dialogs/BuyLinkDialog'
 
 const ACTIVE_SERVICE_REGEXES = [
   /(?:.+?)?(?:youtube\.com\/v\/|watch\/|\?v=|&v=|youtu\.be\/|\/v=|^youtu\.be\/)([a-zA-Z0-9_-]{11})+/,
 ]
-const EDITOR_ID = 'blah'
 const IMAGE_QUALITY = 0.8
 
-function mapStateToProps(state) {
-  const editor = state.editor.get(EDITOR_ID, Immutable.Map())
+const editorUniqueIdentifiers = {}
+export function getEditorId(post, comment, isComment, isZero) {
+  const prefix = isComment ? 'commentEditor' : 'postEditor'
+  let modelId = ''
+  if (post && post.size) {
+    modelId = post.get('id')
+  } else if (comment && comment.size) {
+    modelId = `${comment.get('postId')}_${comment.get('id')}`
+  } else if (isZero) {
+    modelId = 'Zero'
+  } else {
+    modelId = '0'
+  }
+  const fullPrefix = `${prefix}${modelId}`
+  if ({}.hasOwnProperty.call(editorUniqueIdentifiers, fullPrefix)) {
+    return editorUniqueIdentifiers[fullPrefix]
+  }
+  return fullPrefix
+}
+
+
+function mapStateToProps(state, props) {
+  const { comment, isComment, isZero, post } = props
+  const editorId = getEditorId(post, comment, isComment, isZero)
+  const editor = state.editor.get(editorId, Immutable.Map())
   const collection = editor.get('collection')
   const order = editor.get('order')
+  let buyLink
+  const firstBlock = collection && order ? collection.get(`${order.first()}`) : null
+  if (firstBlock) {
+    buyLink = firstBlock.get('linkUrl')
+  }
   return {
+    buyLink,
     collection,
     completions: selectCompletions(state),
+    editorId,
     emojis: selectEmojis(state),
     hasContent: editor.get('hasContent'),
     hasMedia: editor.get('hasMedia'),
@@ -65,18 +98,20 @@ const toolbarStyle = {
   justifyContent: 'flex-end',
   padding: 10,
 }
-
 const buttonStyle = { marginLeft: 10 }
 const buttonTextStyle = { backgroundColor: '#000', borderRadius: 20, color: '#fff', paddingHorizontal: 20, paddingVertical: 10 }
 
 class Editor extends Component {
 
   static propTypes = {
+    buyLink: PropTypes.string,
     collection: PropTypes.object,
     completions: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
+    editorId: PropTypes.string.isRequired,
     emojis: PropTypes.object,
     hasContent: PropTypes.bool,
+    hasMedia: PropTypes.bool,
     hasMention: PropTypes.bool,
     isCompleterActive: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool,
@@ -85,10 +120,12 @@ class Editor extends Component {
   }
 
   static defaultProps = {
+    buyLink: null,
     collection: null,
     completions: null,
     emojis: null,
     hasContent: false,
+    hasMedia: false,
     hasMention: false,
     isLoading: false,
     isPosting: false,
@@ -121,8 +158,8 @@ class Editor extends Component {
   }
 
   componentWillMount() {
-    const { dispatch } = this.props
-    dispatch(initializeEditor(EDITOR_ID, true))
+    const { dispatch, editorId } = this.props
+    dispatch(initializeEditor(editorId, true))
     this.onEmojiCompleter = debounce(this.onEmojiCompleter, 333)
     this.onUserCompleter = debounce(this.onUserCompleter, 333)
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide)
@@ -132,8 +169,8 @@ class Editor extends Component {
   componentDidMount() {
     // TODO: remove this when we have embeds working
     Clipboard.setString('https://www.youtube.com/watch?v=gUGda7GdZPQ')
-    const { dispatch } = this.props
-    dispatch(addEmptyTextBlock(EDITOR_ID))
+    const { dispatch, editorId } = this.props
+    dispatch(addEmptyTextBlock(editorId))
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -163,14 +200,35 @@ class Editor extends Component {
     this.keyboardDidShowListener.remove()
   }
 
+  onAddBuyLink = ({ value }) => {
+    const { dispatch, editorId } = this.props
+    dispatch(updateBuyLink(editorId, value))
+    this.onCloseModal()
+  }
+
+  onLaunchBuyLinkModal = () => {
+    const { buyLink, dispatch } = this.props
+    dispatch(openModal(
+      <BuyLinkDialog
+        onConfirm={this.onAddBuyLink}
+        onDismiss={this.onCloseModal}
+        text={buyLink}
+      />))
+  }
+
+  onCloseModal = () => {
+    const { dispatch } = this.props
+    dispatch(closeModal())
+  }
+
   onPickImageFromLibrary = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       quality: IMAGE_QUALITY,
     })
     if (!result.cancelled) {
-      const { dispatch } = this.props
-      dispatch(saveAsset(result.uri, EDITOR_ID, result.width, result.height))
+      const { dispatch, editorId } = this.props
+      dispatch(saveAsset(result.uri, editorId, result.width, result.height))
     }
   }
 
@@ -181,48 +239,51 @@ class Editor extends Component {
         quality: IMAGE_QUALITY,
       })
       if (!result.cancelled) {
-        const { dispatch } = this.props
-        dispatch(saveAsset(result.uri, EDITOR_ID, result.width, result.height))
+        const { dispatch, editorId } = this.props
+        dispatch(saveAsset(result.uri, editorId, result.width, result.height))
       }
     }
   }
 
   onChangeText = (vo) => {
-    const { collection, dispatch } = this.props
+    const { collection, dispatch, editorId } = this.props
     if (collection.getIn([vo.uid, 'data']) !== vo.data) {
-      dispatch(updateBlock(vo, vo.uid, EDITOR_ID))
+      dispatch(updateBlock(vo, vo.uid, editorId))
     }
   }
 
   onCheckForEmbeds = (text) => {
-    const { dispatch } = this.props
+    const { dispatch, editorId } = this.props
     ACTIVE_SERVICE_REGEXES.forEach((regex) => {
       if (text.match(regex)) {
-        dispatch(postPreviews(text, EDITOR_ID, 0))
+        dispatch(postPreviews(text, editorId, 0))
       }
     })
   }
 
 
   onClickRemoveBlock = (uid) => {
-    const { dispatch } = this.props
+    const { dispatch, editorId } = this.props
     Alert.alert(
       'Remove this content?',
       null,
       [
         { text: 'No', style: 'cancel' },
-        { text: 'Yes', onPress: () => dispatch(removeBlock(uid, EDITOR_ID)) },
+        { text: 'Yes', onPress: () => dispatch(removeBlock(uid, editorId)) },
       ],
     )
   }
 
   onCreatePost = () => {
-    const { dispatch } = this.props
-    dispatch(createPost(this.serialize(), EDITOR_ID))
+    const { buyLink, dispatch, editorId } = this.props
+    if (buyLink && buyLink.length) {
+      dispatch(trackEvent('added_buy_button'))
+    }
+    dispatch(createPost(this.serialize(), editorId))
   }
 
   onResetEditor = () => {
-    const { dispatch, hasContent } = this.props
+    const { dispatch, editorId, hasContent } = this.props
     if (!hasContent) {
       // TODO: make this dismiss the editor to go back to whatever was before it
       // console.log('dismiss editor')
@@ -232,7 +293,7 @@ class Editor extends Component {
         null,
         [
           { text: 'No', style: 'cancel' },
-          { text: 'Yes', onPress: () => dispatch(resetEditor(EDITOR_ID)) },
+          { text: 'Yes', onPress: () => dispatch(resetEditor(editorId)) },
         ],
       )
     }
@@ -349,7 +410,7 @@ class Editor extends Component {
   getBlockElement(block) {
     const blockProps = {
       data: block.get('data'),
-      editorId: EDITOR_ID,
+      editorId: this.props.editorId,
       hasContent: this.props.hasContent,
       key: block.get('uid'),
       kind: block.get('kind'),
@@ -429,9 +490,11 @@ class Editor extends Component {
 
   render() {
     const {
+      buyLink,
       collection,
       completions,
       hasContent,
+      hasMedia,
       hasMention,
       isCompleterActive,
       isLoading,
@@ -439,6 +502,8 @@ class Editor extends Component {
       order,
     } = this.props
     const isPostingDisabled = isPosting || isLoading || !hasContent
+    let buyLinkBgColor = !hasMedia ? '#aaa' : '#000'
+    if (buyLink && buyLink.length) { buyLinkBgColor = '#00d100' }
     return (
       <View style={{ flex: 1, backgroundColor: hasMention ? '#ffc' : '#eee' }}>
         <View style={toolbarStyle}>
@@ -446,20 +511,27 @@ class Editor extends Component {
             onPress={this.onResetEditor}
             style={buttonStyle}
           >
-            <Text style={buttonTextStyle}>X</Text>
+            <Text style={buttonTextStyle}>&times;</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            disabled={!hasMedia}
+            onPress={this.onLaunchBuyLinkModal}
+            style={buttonStyle}
+          >
+            <Text style={{ ...buttonTextStyle, backgroundColor: buyLinkBgColor }}>$</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={this.onPickImageFromLibrary}
             style={buttonStyle}
           >
-            <Text style={buttonTextStyle}>LIB</Text>
+            <Text style={buttonTextStyle}>&#128194;</Text>
           </TouchableOpacity>
           <TouchableOpacity
             disabled={isPostingDisabled}
             onPress={this.onCreatePost}
             style={buttonStyle}
           >
-            <Text style={{ ...buttonTextStyle, backgroundColor: isPostingDisabled ? '#aaa' : '#000' }}>POST</Text>
+            <Text style={{ ...buttonTextStyle, backgroundColor: isPostingDisabled ? '#aaa' : '#00d100' }}>POST</Text>
           </TouchableOpacity>
         </View>
         <View style={{ height: this.state.scrollViewHeight }}>
