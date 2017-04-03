@@ -1,6 +1,6 @@
 import Immutable from 'immutable'
 import React, { Component, PropTypes } from 'react'
-import { Image, Text, View } from 'react-native'
+import { Image, View } from 'react-native'
 import { connect } from 'react-redux'
 import { push, replace } from 'react-router-redux'
 // import { bindActionCreators } from 'redux'
@@ -75,6 +75,7 @@ import {
 // } from '../components/posts/PostRenderables'
 // import { PostTools, WatchTool } from '../components/posts/PostTools'
 // import { isLink } from '../lib/jello'
+import TextRegion from '../components/regions/TextRegion'
 
 export function makeMapStateToProps() {
   return (state, props) =>
@@ -327,7 +328,7 @@ class PostContainer extends Component {
     }
   }
 
-  onClickRegion = (e) => {
+  onClickRegion = () => {
     // const { dispatch, isGridMode, detailPath } = this.props
     // const { classList, dataset } = e.target
     // // Get the raw value instead of the property value which is always absolute
@@ -459,9 +460,6 @@ class PostContainer extends Component {
           justifyContent: 'center',
         }}
       >
-        <Text key={`post_${post.get('id')}`} style={{ backgroundColor: '#aaa', padding: 5 }}>
-          {`${post.get('id')} - ${post.get('token')}`}
-        </Text>
         {post.get('content').map((block, index) => {
           // console.log('block', block)
           switch (block.get('kind')) {
@@ -474,7 +472,7 @@ class PostContainer extends Component {
                 />
               )
             case 'text':
-              return <Text key={`post_${post.get('id')}_${index + 1}`}>{block.get('data')}</Text>
+              return <TextRegion key={`post_${post.get('id')}_${index + 1}`} text={block.get('data')} />
             default:
               return null
           }
