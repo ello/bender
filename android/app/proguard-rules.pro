@@ -64,3 +64,7 @@
 -dontwarn java.nio.file.*
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 -dontwarn okio.**
+
+# WebView JS interfaces
+-keep class * extends android.webkit.WebChromeClient { *; }
+-dontwarn im.delight.android.webview.**

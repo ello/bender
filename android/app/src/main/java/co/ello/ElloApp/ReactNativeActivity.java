@@ -1,8 +1,8 @@
-package com.ello;
+package co.ello.ElloApp;
 
 import com.facebook.react.ReactActivity;
 
-public class MainActivity extends ReactActivity {
+public class ReactNativeActivity extends ReactActivity {
 
     /**
      * Returns the name of the main component registered from JavaScript.
