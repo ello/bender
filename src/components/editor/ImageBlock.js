@@ -1,21 +1,42 @@
-import Immutable from 'immutable'
 import React, { PropTypes, PureComponent } from 'react'
-import { Dimensions, Image } from 'react-native'
+import { Dimensions, Image, Text, View } from 'react-native'
 import Block from './Block'
+
+const textStyle = {
+  backgroundColor: '#00d100',
+  borderRadius: 15,
+  color: '#fff',
+  height: 30,
+  paddingLeft: 10,
+  paddingTop: 4,
+  position: 'absolute',
+  right: 10,
+  top: 30,
+  width: 30,
+}
 
 export default class ImageBlock extends PureComponent {
 
   static propTypes = {
     hasContent: PropTypes.bool.isRequired,
     height: PropTypes.number.isRequired,
+    linkURL: PropTypes.string,
     source: PropTypes.object.isRequired,
     uid: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
   }
 
   static defaultProps = {
-    blob: null,
-    data: Immutable.Map(),
+    linkURL: null,
+  }
+
+  state = {
+    width: 0,
+  }
+
+  // this is to trigger a render to get the dimensions again on orientation change
+  onLayout = ({ nativeEvent: { layout: { width } } }) => {
+    this.setState({ width })
   }
 
   getImageDimensions() {
@@ -34,14 +55,19 @@ export default class ImageBlock extends PureComponent {
   }
 
   render() {
-    const { hasContent, source, uid } = this.props
+    const { hasContent, linkURL, source, uid } = this.props
     const { width, height } = this.getImageDimensions()
     return (
       <Block hasContent={hasContent} uid={uid}>
-        <Image
-          source={source}
-          style={{ width, height }}
-        />
+        <View style={{ paddingTop: 20 }} onLayout={this.onLayout}>
+          <Image
+            source={source}
+            style={{ width, height }}
+          />
+          {linkURL &&
+            <Text style={textStyle}>$</Text>
+          }
+        </View>
       </Block>
     )
   }
