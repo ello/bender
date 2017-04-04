@@ -255,9 +255,10 @@ public class MainActivity
     }
 
     @JavascriptInterface
-    public void launchEditor() {
+    public void launchEditor(String authJson) {
       if (webAppReady) {
         Intent intent = new Intent(this, ReactNativeActivity.class);
+          intent.putExtra("AUTH_JSON", authJson);
         startActivity(intent);
       }
     }
