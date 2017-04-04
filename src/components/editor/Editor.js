@@ -221,20 +221,20 @@ class Editor extends Component {
     dispatch(closeModal())
   }
 
-    onPickImageFromLibrary = () => {
-        ImagePicker.launchImageLibrary({}, (response) => {
-                                       if (!response.didCancel) {
-                                       const { dispatch } = this.props
-                                       dispatch(saveAsset(response.uri, EDITOR_ID, response.width, response.height))
-                                       }
-                                       })
-    }
+  onPickImageFromLibrary = () => {
+    ImagePicker.launchImageLibrary({}, (response) => {
+      if (!response.didCancel) {
+        const { dispatch } = this.props
+        dispatch(saveAsset(response.uri, this.props.editorId, response.width, response.height))
+      }
+    })
+  }
 
   onTakePictureWithCamera = () => {
     ImagePicker.launchCamera({}, (response) => {
       if (!response.didCancel) {
         const { dispatch } = this.props
-        dispatch(saveAsset(response.uri, EDITOR_ID, response.width, response.height))
+        dispatch(saveAsset(response.uri, this.props.editorId, response.width, response.height))
       }
     })
   }
@@ -507,15 +507,15 @@ class Editor extends Component {
           >
             <Text style={buttonTextStyle}>&times;</Text>
           </TouchableOpacity>
-          <TouchableOpacity title="CAMERA" onPress={this.onTakePictureWithCamera} >
-            <Text style={buttonTextStyle}>CAM</Text>
-          </TouchableOpacity>
           <TouchableOpacity
             disabled={!hasMedia}
             onPress={this.onLaunchBuyLinkModal}
             style={buttonStyle}
           >
             <Text style={{ ...buttonTextStyle, backgroundColor: buyLinkBgColor }}>$</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={this.onTakePictureWithCamera} style={buttonStyle}>
+            <Text style={buttonTextStyle}>&#x1f4f7;</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={this.onPickImageFromLibrary}
