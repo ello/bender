@@ -9,3 +9,5 @@ logs
 *.apk
 local.properties
 *.rawproto
+/.vscode
+/jsconfig.json
