@@ -86,7 +86,7 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 25
     buildToolsVersion '25.0.0'
 
     defaultConfig {
@@ -139,12 +139,11 @@ dependencies {
     compile project(':react-native-config')
     compile project(':react-native-image-picker')
     compile fileTree(dir: "libs", include: ["*.jar"])
-    compile "com.android.support:appcompat-v7:23.0.1"
+    compile "com.android.support:appcompat-v7:25.0.0"
     compile "com.facebook.react:react-native:+"  // From node_modules
-
-    // apt 'com.google.guava:guava:19.0'
-    // apt 'com.google.dagger:dagger-compiler:2.6'
-    // compile 'com.google.dagger:dagger:2.6'
+    apt 'com.google.guava:guava:19.0'
+    apt 'com.google.dagger:dagger-compiler:2.6'
+    compile 'com.google.dagger:dagger:2.6'
     compile 'com.nispok:snackbar:2.11.+'
     // compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.google.android.gms:play-services-gcm:9.2.0'
@@ -153,16 +152,16 @@ dependencies {
     // compile "com.android.support:design:23.3.0"
     compile 'org.xwalk:xwalk_core_library:23.53.589.4'
 
-    // testApt 'com.google.guava:guava:19.0'
-    // testApt 'com.google.dagger:dagger-compiler:2.3'
-    // testCompile 'junit:junit:4.10'
-    // testCompile 'org.assertj:assertj-core:1.7.0'
-    // testCompile 'org.robolectric:robolectric:3.1'
-    // testCompile 'org.robolectric:shadows-support-v4:3.0'
-    // testCompile 'org.mockito:mockito-core:2.0.54-beta'
-    // testCompile 'com.google.dagger:dagger:2.3'
-    // testCompile 'org.khronos:opengl-api:gl1.1-android-2.1_r1' // required for robolectric 3.1 to work
-    // provided 'javax.annotation:jsr250-api:1.0'
+    testApt 'com.google.guava:guava:19.0'
+    testApt 'com.google.dagger:dagger-compiler:2.6'
+    testCompile 'junit:junit:4.10'
+    testCompile 'org.assertj:assertj-core:1.7.0'
+    testCompile 'org.robolectric:robolectric:3.3.2'
+    testCompile 'org.robolectric:shadows-support-v4:3.0'
+    testCompile 'org.mockito:mockito-core:2.0.54-beta'
+    testCompile 'com.google.dagger:dagger:2.6'
+    testCompile 'org.khronos:opengl-api:gl1.1-android-2.1_r1' // required for robolectric 3.1 to work
+    provided 'javax.annotation:jsr250-api:1.0'
 }
 
 // Run this once to be able to run the application with BUCK
