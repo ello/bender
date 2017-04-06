@@ -1,3 +1,28 @@
+![Ello + Android = Love](https://cloud.githubusercontent.com/assets/12459/13925727/0dc96a7a-ef4f-11e5-9fb0-b23a73551e7f.jpg)
+
+# Ello Android
+Ello's open source Android app
+
+The app is a very simple wrapper around our React based web application. We handle a few of the rough edge cases but leave nearly all the functionality of the web app intact. Over time we will likely move portions of the experience over to native Android UI.
+
+## Notes
+
+When creating the apk to upload to the Google Play Store it must be aligned.
+`zipalign -f -v 4 app-release-unaligned.apk app-release-aligned.apk`
+
+### Google Cloud Messages
+There are two GCM applications, production and staging. API token registration on production links the device token to production, API token registrations on staging servers links the device token to staging.
+
+To test GCM in development use AWS' [Publish a message](https://console.aws.amazon.com/sns/v2/home?region=us-east-1#/publish) tool. 
+* Find the target ARN by searching for your device token in the corresponding SNS application's endpoint list
+* Use JSON as the message format
+* Bender expects a `body`, `title` and `web_url` paramaters in the payload.
+```
+{
+"GCM":"{\"data\":{\"title\":\"Fake Title\",\"body\":\"fake body\",\"web_url\":\"http://fake.url\"}}"
+}
+```
+
 This project was bootstrapped with [Create React Native App](https://github.com/react-community/create-react-native-app).
 
 Below you'll find information about performing common tasks. The most recent version of this guide is available [here](https://github.com/react-community/create-react-native-app/blob/master/react-native-scripts/template/README.md).
