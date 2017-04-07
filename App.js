@@ -1,5 +1,5 @@
-import React, { PropTypes, PureComponent } from 'react'
 import Immutable from 'immutable'
+import React, { PropTypes, PureComponent } from 'react'
 import { AsyncStorage, Text, View } from 'react-native'
 import { Provider } from 'react-redux'
 import { persistStore } from 'redux-persist'
@@ -11,7 +11,7 @@ const whitelist = ['authentication', 'editor', 'gui', 'json', 'profile']
 export default class App extends PureComponent {
 
   static propTypes = {
-    AUTH_JSON: PropTypes.string.isRequired,
+    jsState: PropTypes.string.isRequired,
   }
 
   state = {
@@ -19,10 +19,10 @@ export default class App extends PureComponent {
   }
 
   componentWillMount() {
-    console.log(this.props)
-    this.store = createNativeAppStore({
-      authentication: Immutable.fromJS(JSON.parse(this.props.AUTH_JSON)),
-    })
+    const state = JSON.parse(this.props.jsState)
+    const immutableState = {}
+    Object.keys(state).forEach(key => (immutableState[key] = Immutable.fromJS(state[key])))
+    this.store = createNativeAppStore(immutableState)
     persistStore(
       this.store,
       { storage: AsyncStorage, transforms: [immutableTransform()], whitelist },
@@ -33,7 +33,7 @@ export default class App extends PureComponent {
   render() {
     return this.state.rehydrated ?
       <Provider store={this.store}>
-        <AppContainer />
+        <AppContainer {...this.props} />
       </Provider>
       :
       <View style={{ alignItems: 'center', flex: 1, justifyContent: 'center' }}><Text>Loading...</Text></View>
