@@ -14,6 +14,7 @@ import com.google.android.gms.gcm.GcmListenerService;
 import co.ello.ElloApp.ElloPreferences;
 import co.ello.ElloApp.MainActivity;
 import co.ello.ElloApp.R;
+import co.ello.ElloApp.ReactNativeActivity;
 
 public class ElloGcmListenerService extends GcmListenerService {
     private static final String TAG = ElloGcmListenerService.class.getSimpleName();
@@ -26,7 +27,7 @@ public class ElloGcmListenerService extends GcmListenerService {
         String webUrl = data.getString("web_url");
 
         if(title != null && body != null && webUrl != null) {
-            if(!MainActivity.inBackground){
+            if(!MainActivity.inBackground || !ReactNativeActivity.inBackground){
                 broadcastPushReceived(title, body, webUrl);
             }
             else{

@@ -6,6 +6,7 @@ import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -14,6 +15,7 @@ import android.Manifest;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -36,15 +38,12 @@ import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
 
-import java.io.File;
 import java.util.Date;
 
 import co.ello.ElloApp.PushNotifications.RegistrationIntentService;
 
 // Using a 3rd party Snackbar because we can't extend
 // AppCompatActivity, thanks a lot XWalkActivity
-
-
 public class MainActivity
         extends XWalkActivity
         implements SwipeRefreshLayout.OnRefreshListener
@@ -257,9 +256,9 @@ public class MainActivity
     @JavascriptInterface
     public void launchEditor(String authJson) {
       if (webAppReady) {
-        Intent intent = new Intent(this, ReactNativeActivity.class);
+          Intent intent = new Intent(this, ReactNativeActivity.class);
           intent.putExtra("AUTH_JSON", authJson);
-        startActivity(intent);
+          startActivity(intent);
       }
     }
 
@@ -291,7 +290,7 @@ public class MainActivity
                 String body = intent.getExtras().getString("body");
                 final String webUrl = intent.getExtras().getString("web_url");
 
-                if (title != null && body != null && webUrl != null ) {
+                if (!inBackground && title != null && body != null && webUrl != null ) {
                     // Using a 3rd party Snackbar because we can't extend
                     // AppCompatActivity, thanks a lot XWalkActivity
                     Snackbar snackbar = Snackbar.with(context)
@@ -319,9 +318,16 @@ public class MainActivity
         }
 
         Uri data = getIntent().getData();
-
         Intent get = getIntent();
         String webUrl = get.getStringExtra("web_url");
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplication());
+        String webURLFromReact = sharedPreferences.getString(ElloPreferences.PUSH_PATH_FROM_REACT, null);
+        if (webURLFromReact != null) {
+            path = webURLFromReact;
+            sharedPreferences.edit().putString(ElloPreferences.PUSH_PATH_FROM_REACT, null).apply();
+            isDeepLink = true;
+        }
         if (isXWalkReady && webUrl != null) {
             path = webUrl;
             loadPage(path);
