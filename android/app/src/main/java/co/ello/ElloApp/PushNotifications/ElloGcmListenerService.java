@@ -50,7 +50,8 @@ public class ElloGcmListenerService extends GcmListenerService {
                 (NotificationCompat.Builder) new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_stat_gcm)
                         .setContentTitle(title)
-                        .setContentText(body);
+                        .setContentText(body)
+                        .setAutoCancel(true);
 
         Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
         resultIntent.putExtra("web_url", webUrl);
