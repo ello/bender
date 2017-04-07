@@ -380,30 +380,30 @@ export default function json(state = initialState, action = { type: '' }) {
     case ACTION_TYPES.RELATIONSHIPS.UPDATE_REQUEST:
     case ACTION_TYPES.RELATIONSHIPS.UPDATE_SUCCESS:
       return relationshipMethods.updateRelationship(state, action)
-    case REHYDRATE: {
-      // only keep the items that have been deleted
-      // so we can still filter them out if needed
-      let keepers = initialState
-      if (action.payload.json) {
-        if (typeof window !== 'undefined' && window.__INITIAL_STATE__) {
-          return action.payload.json
-        }
-        action.payload.json.keySeq().forEach((collection) => {
-          if (/deleted_/.test(collection)) {
-            keepers = keepers.set(collection, action.payload.json.get(collection))
-          }
-        })
-      }
-      if (action.payload.profile) {
-        let curUser = action.payload.profile
-        if (curUser) {
-          curUser = curUser.deleteIn(['avatar', 'tmp'])
-            .deleteIn(['coverImage', 'tmp'])
-          keepers = keepers.setIn([MAPPING_TYPES.USERS, curUser.get('id')], curUser)
-        }
-      }
-      return keepers
-    }
+    // case REHYDRATE: {
+    //   // only keep the items that have been deleted
+    //   // so we can still filter them out if needed
+    //   let keepers = initialState
+    //   if (action.payload.json) {
+    //     if (typeof window !== 'undefined' && window.__INITIAL_STATE__) {
+    //       return action.payload.json
+    //     }
+    //     action.payload.json.keySeq().forEach((collection) => {
+    //       if (/deleted_/.test(collection)) {
+    //         keepers = keepers.set(collection, action.payload.json.get(collection))
+    //       }
+    //     })
+    //   }
+    //   if (action.payload.profile) {
+    //     let curUser = action.payload.profile
+    //     if (curUser) {
+    //       curUser = curUser.deleteIn(['avatar', 'tmp'])
+    //         .deleteIn(['coverImage', 'tmp'])
+    //       keepers = keepers.setIn([MAPPING_TYPES.USERS, curUser.get('id')], curUser)
+    //     }
+    //   }
+    //   return keepers
+    // }
     case LOCATION_CHANGE:
       path = action.payload.pathname
       return state

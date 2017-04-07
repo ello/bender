@@ -19,28 +19,38 @@ export default class ImageBlock extends PureComponent {
 
   static propTypes = {
     hasContent: PropTypes.bool.isRequired,
-    height: PropTypes.number.isRequired,
+    height: PropTypes.number,
     linkURL: PropTypes.string,
     source: PropTypes.object.isRequired,
     uid: PropTypes.number.isRequired,
-    width: PropTypes.number.isRequired,
+    width: PropTypes.number,
   }
 
   static defaultProps = {
+    height: 0,
     linkURL: null,
+    width: 0,
   }
 
-  state = {
-    width: 0,
+  componentWillMount() {
+    this.state = {
+      height: this.props.height,
+      layoutWidth: 0,
+      width: this.props.width,
+    }
   }
 
   // this is to trigger a render to get the dimensions again on orientation change
   onLayout = ({ nativeEvent: { layout: { width } } }) => {
-    this.setState({ width })
+    this.setState({ layoutWidth: width })
+  }
+
+  onLoad = ({ nativeEvent: { source: { width, height } } }) => {
+    this.setState({ width, height })
   }
 
   getImageDimensions() {
-    const { height, width } = this.props
+    const { height, width } = this.state
     const maxWidth = Dimensions.get('window').width - 40 // -40 is for the block padding
     const ratio = width ? width / height : null
     const maxCellHeight = 1200
@@ -61,6 +71,7 @@ export default class ImageBlock extends PureComponent {
       <Block hasContent={hasContent} uid={uid}>
         <View style={{ paddingTop: 20 }} onLayout={this.onLayout}>
           <Image
+            onLoad={this.onLoad}
             source={source}
             style={{ width, height }}
           />

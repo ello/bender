@@ -224,6 +224,7 @@ class Editor extends Component {
     order: PropTypes.object,
     post: PropTypes.object,
     repostContent: PropTypes.object,
+    submitText: PropTypes.string,
   }
 
   static defaultProps = {
@@ -248,6 +249,7 @@ class Editor extends Component {
     order: null,
     post: null,
     repostContent: Immutable.List(),
+    submitText: 'Post',
   }
 
   static childContextTypes = {
@@ -671,6 +673,7 @@ class Editor extends Component {
       isPosting,
       order,
       repostContent,
+      submitText,
     } = this.props
     let buyLinkBgColor = !hasMedia ? '#aaa' : '#000'
     if (buyLink && buyLink.length) { buyLinkBgColor = '#00d100' }
@@ -708,7 +711,7 @@ class Editor extends Component {
             onPress={this.onSubmitPost}
             style={buttonStyle}
           >
-            <Text style={{ ...buttonTextStyle, backgroundColor: isPostingDisabled ? '#aaa' : '#00d100' }}>POST</Text>
+            <Text style={{ ...buttonTextStyle, backgroundColor: isPostingDisabled ? '#aaa' : '#00d100' }}>{submitText}</Text>
           </TouchableOpacity>
         </View>
         <View style={{ height: this.state.scrollViewHeight }}>
