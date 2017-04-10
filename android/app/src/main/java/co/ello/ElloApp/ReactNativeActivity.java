@@ -17,6 +17,7 @@ import com.nispok.snackbar.listeners.ActionClickListener;
 
 public class ReactNativeActivity extends ReactActivity {
 
+    private final static String TAG = ReactNativeActivity.class.getSimpleName();
     private BroadcastReceiver pushReceivedReceiver;
     public static Boolean inBackground = true;
 
@@ -58,7 +59,10 @@ public class ReactNativeActivity extends ReactActivity {
             protected Bundle getLaunchOptions() {
                 Intent intent = getIntent();
                 Bundle initialProps = new Bundle();
-                initialProps.putString("AUTH_JSON", intent.getExtras().getString("AUTH_JSON"));
+                initialProps.putString("jsState", intent.getExtras().getString("jsState"));
+                initialProps.putString("comment", intent.getExtras().getString("comment"));
+                initialProps.putString("isComment", intent.getExtras().getString("isComment"));
+                initialProps.putString("post", intent.getExtras().getString("post"));
                 return initialProps;
             }
         };

@@ -1,10 +1,13 @@
 import Immutable from 'immutable'
 import React, { Component, PropTypes } from 'react'
 import {
+  ActivityIndicator,
   Alert,
+  BackAndroid,
   Clipboard,
   Dimensions,
   Keyboard,
+  Modal,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -14,8 +17,14 @@ import { connect } from 'react-redux'
 import ImagePicker from 'react-native-image-picker'
 import debounce from 'lodash/debounce'
 import { trackEvent } from '../../actions/analytics'
+import {
+  createComment,
+  toggleEditing as toggleCommentEditing,
+  updateComment,
+} from '../../actions/comments'
 import { closeModal, openModal } from '../../actions/modals'
 import {
+  addBlock,
   addEmptyTextBlock,
   autoCompleteUsers,
   initializeEditor,
@@ -28,13 +37,29 @@ import {
   updateBlock,
   updateBuyLink,
 } from '../../actions/editor'
-import { createPost } from '../../actions/posts'
+import {
+  createPost,
+  toggleEditing,
+  toggleReposting,
+  updatePost,
+} from '../../actions/posts'
 import { EDITOR } from '../../constants/action_types'
 import { selectCompletions } from '../../selectors/editor'
 import { selectEmojis } from '../../selectors/emoji'
 import { selectIsCompleterActive } from '../../selectors/gui'
+import {
+  selectPost,
+  selectPostIsEmpty,
+  selectPostIsOwn,
+} from '../../selectors/post'
+import {
+  selectHasAutoWatchEnabled,
+  selectIsOwnPage,
+  selectProfileIsFeatured,
+} from '../../selectors/profile'
 import EmbedBlock from './EmbedBlock'
 import ImageBlock from './ImageBlock'
+import RepostBlock from './RepostBlock'
 import TextBlock from './TextBlock'
 import Completer, { emojiRegex, userRegex } from '../completers/Completer'
 import BuyLinkDialog from '../dialogs/BuyLinkDialog'
@@ -42,7 +67,6 @@ import BuyLinkDialog from '../dialogs/BuyLinkDialog'
 const ACTIVE_SERVICE_REGEXES = [
   /(?:.+?)?(?:youtube\.com\/v\/|watch\/|\?v=|&v=|youtu\.be\/|\/v=|^youtu\.be\/)([a-zA-Z0-9_-]{11})+/,
 ]
-const IMAGE_QUALITY = 0.8
 
 const editorUniqueIdentifiers = {}
 export function getEditorId(post, comment, isComment, isZero) {
@@ -64,31 +88,74 @@ export function getEditorId(post, comment, isComment, isZero) {
   return fullPrefix
 }
 
-
 function mapStateToProps(state, props) {
-  const { comment, isComment, isZero, post } = props
-  const editorId = getEditorId(post, comment, isComment, isZero)
+  const { autoPopulate, comment, isComment } = props
+  const post = selectPost(state, props)
+  const editorId = getEditorId(post, comment, isComment, false)
   const editor = state.editor.get(editorId, Immutable.Map())
   const collection = editor.get('collection')
   const order = editor.get('order')
+  const isPostEmpty = selectPostIsEmpty(state, props)
   let buyLink
   const firstBlock = collection && order ? collection.get(`${order.first()}`) : null
   if (firstBlock) {
     buyLink = firstBlock.get('linkUrl')
   }
+  let blocks
+  let repostContent
+  let submitText
+  if (autoPopulate) {
+    blocks = Immutable.fromJS([{ kind: 'text', data: autoPopulate }])
+    submitText = 'Post'
+  } else if (isComment) {
+    if (comment && comment.get('isEditing')) {
+      submitText = 'Update'
+      blocks = comment.get('body')
+    } else {
+      submitText = 'Comment'
+    }
+  } else if (isPostEmpty) {
+    submitText = 'Post'
+  } else if (post.get('isReposting')) {
+    submitText = 'Repost'
+    if (post.get('repostId')) {
+      repostContent = post.get('repostContent')
+    } else {
+      repostContent = post.get('content')
+    }
+  } else if (post.get('isEditing')) {
+    submitText = 'Update'
+    if (post.get('repostContent') && post.get('repostContent').size) {
+      repostContent = post.get('repostContent')
+    }
+    if (post.get('body')) {
+      blocks = post.get('body')
+    }
+  }
   return {
+    allowsAutoWatch: selectHasAutoWatchEnabled(state),
+    blocks,
     buyLink,
     collection,
+    comment,
     completions: selectCompletions(state),
     editorId,
     emojis: selectEmojis(state),
     hasContent: editor.get('hasContent'),
     hasMedia: editor.get('hasMedia'),
     hasMention: editor.get('hasMention'),
+    isComment,
     isCompleterActive: selectIsCompleterActive(state),
+    isFeatured: selectProfileIsFeatured(state),
     isLoading: editor.get('isLoading'),
+    isOwnPage: selectIsOwnPage(state),
+    isOwnPost: selectPostIsOwn(state, props),
+    isPostEmpty,
     isPosting: editor.get('isPosting'),
     order,
+    post,
+    repostContent,
+    submitText,
   }
 }
 
@@ -98,14 +165,44 @@ const toolbarStyle = {
   justifyContent: 'flex-end',
   padding: 10,
 }
-const buttonStyle = { marginLeft: 10 }
-const buttonTextStyle = { backgroundColor: '#000', borderRadius: 20, color: '#fff', paddingHorizontal: 20, paddingVertical: 10 }
+const buttonStyle = {
+  marginLeft: 10,
+}
+const buttonTextStyle = {
+  backgroundColor: '#000',
+  borderRadius: 20,
+  color: '#fff',
+  paddingHorizontal: 20,
+  paddingVertical: 10,
+}
+const activityIndicatorViewStyle = {
+  alignItems: 'center',
+  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  flex: 1,
+  justifyContent: 'center',
+  paddingHorizontal: 20,
+}
+const postingTextStyle = {
+  backgroundColor: '#000',
+  borderRadius: 20,
+  color: '#fff',
+  marginBottom: 20,
+  paddingHorizontal: 20,
+  paddingVertical: 10,
+}
 
 class Editor extends Component {
 
   static propTypes = {
+    allowsAutoWatch: PropTypes.bool,
+    // this is used to prepopulate text for zero states
+    // which are currently just disabled in the webapp
+    // when the user agent is ello android
+    // autoPopulate: PropTypes.string,
+    blocks: PropTypes.object,
     buyLink: PropTypes.string,
     collection: PropTypes.object,
+    comment: PropTypes.object,
     completions: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
     editorId: PropTypes.string.isRequired,
@@ -113,23 +210,46 @@ class Editor extends Component {
     hasContent: PropTypes.bool,
     hasMedia: PropTypes.bool,
     hasMention: PropTypes.bool,
+    isComment: PropTypes.bool,
     isCompleterActive: PropTypes.bool.isRequired,
+    isFeatured: PropTypes.bool,
     isLoading: PropTypes.bool,
+    isOwnPage: PropTypes.bool,
+    // this is only used for reply all functionality
+    // which is not implemented currently
+    // isOwnPost: PropTypes.bool,
+    isPostEmpty: PropTypes.bool.isRequired,
     isPosting: PropTypes.bool,
+    onSubmit: PropTypes.func,
     order: PropTypes.object,
+    post: PropTypes.object,
+    repostContent: PropTypes.object,
+    submitText: PropTypes.string,
   }
 
   static defaultProps = {
+    allowsAutoWatch: false,
+    autoPopulate: null,
+    blocks: Immutable.List(),
     buyLink: null,
     collection: null,
+    comment: null,
     completions: null,
     emojis: null,
     hasContent: false,
     hasMedia: false,
     hasMention: false,
+    isComment: false,
+    isFeatured: false,
     isLoading: false,
+    isOwnPage: false,
+    isOwnPost: false,
     isPosting: false,
+    onSubmit: null,
     order: null,
+    post: null,
+    repostContent: Immutable.List(),
+    submitText: 'Post',
   }
 
   static childContextTypes = {
@@ -158,12 +278,21 @@ class Editor extends Component {
   }
 
   componentWillMount() {
-    const { dispatch, editorId } = this.props
-    dispatch(initializeEditor(editorId, true))
+    const { blocks, dispatch, editorId, post, repostContent } = this.props
+    dispatch(initializeEditor(editorId, !(post.get('isEditing') || post.get('isReposting'))))
+    if (repostContent.size) {
+      dispatch(addBlock({ kind: 'repost', data: repostContent }, editorId))
+    }
+    if (blocks.size) {
+      blocks.forEach((block) => {
+        dispatch(addBlock(block.toJS(), editorId, false))
+      })
+    }
     this.onEmojiCompleter = debounce(this.onEmojiCompleter, 333)
     this.onUserCompleter = debounce(this.onUserCompleter, 333)
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide)
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow)
+    BackAndroid.addEventListener('hardwareBackPress', this.handleHardwareBackPress)
   }
 
   componentDidMount() {
@@ -189,15 +318,15 @@ class Editor extends Component {
     const prevOrder = prevProps.order
     const { order } = this.props
     if (order && prevOrder && order.size > prevOrder.size && this.scrollView) {
-      requestAnimationFrame(() => {
-        this.scrollView.scrollToEnd({ animated: true })
-      })
+      this.scrollView.scrollToEnd({ animated: true })
     }
+    if (prevProps.isPosting && !this.props.isPosting) { BackAndroid.exitApp() }
   }
 
   componentWillUnmount() {
     this.keyboardDidHideListener.remove()
     this.keyboardDidShowListener.remove()
+    BackAndroid.removeEventListener('hardwareBackPress', this.handleHardwareBackPress)
   }
 
   onAddBuyLink = ({ value }) => {
@@ -255,7 +384,6 @@ class Editor extends Component {
     })
   }
 
-
   onClickRemoveBlock = (uid) => {
     const { dispatch, editorId } = this.props
     Alert.alert(
@@ -268,29 +396,16 @@ class Editor extends Component {
     )
   }
 
-  onCreatePost = () => {
-    const { buyLink, dispatch, editorId } = this.props
-    if (buyLink && buyLink.length) {
-      dispatch(trackEvent('added_buy_button'))
-    }
-    dispatch(createPost(this.serialize(), editorId))
-  }
-
   onResetEditor = () => {
-    const { dispatch, editorId, hasContent } = this.props
-    if (!hasContent) {
-      // TODO: make this dismiss the editor to go back to whatever was before it
-      // console.log('dismiss editor')
-    } else {
-      Alert.alert(
-        'Cancel post?',
-        null,
-        [
-          { text: 'No', style: 'cancel' },
-          { text: 'Yes', onPress: () => dispatch(resetEditor(editorId)) },
-        ],
-      )
-    }
+    const { dispatch, editorId } = this.props
+    Alert.alert(
+      'Cancel post?',
+      null,
+      [
+        { text: 'No', style: 'cancel' },
+        { text: 'Yes', onPress: () => dispatch(resetEditor(editorId)) },
+      ],
+    )
   }
 
   onHideCompleter = () => {
@@ -378,6 +493,57 @@ class Editor extends Component {
     }
   }
 
+  onSubmitPost = () => {
+    const data = this.serialize()
+    const {
+      allowsAutoWatch,
+      buyLink,
+      comment,
+      dispatch,
+      editorId,
+      isComment,
+      isFeatured,
+      isOwnPage,
+      isPostEmpty,
+      onSubmit,
+      post,
+    } = this.props
+    if (buyLink && buyLink.length) {
+      dispatch(trackEvent('added_buy_button'))
+    }
+    if (isComment) {
+      if (comment && comment.get('isEditing')) {
+        dispatch(toggleCommentEditing(comment, false))
+        dispatch(updateComment(comment, data, editorId))
+      } else {
+        dispatch(createComment(allowsAutoWatch, data, editorId, post.get('id')))
+        dispatch(trackEvent('published_comment'))
+      }
+    } else if (isPostEmpty) {
+      // dispatch(closeOmnibar())
+      dispatch(createPost(data, editorId))
+      dispatch(trackEvent('published_post', { isFeatured }))
+    } else if (post.get('isEditing')) {
+      dispatch(toggleEditing(post, false))
+      dispatch(updatePost(post, data, editorId))
+      dispatch(trackEvent('edited_post'))
+    } else if (post.get('isReposting')) {
+      dispatch(toggleReposting(post, false))
+      const repostId = post.get('repostId') || post.get('id')
+      const repostedFromId = post.get('repostId') ? post.get('id') : null
+      dispatch(createPost(data, editorId,
+        repostId, repostedFromId),
+      )
+      dispatch(trackEvent('published_repost', { isFeatured }))
+    }
+    if (onSubmit) { onSubmit() }
+    // if on own page scroll down to top of post content
+    if (isOwnPage && !isComment) {
+      const { onClickScrollToContent } = this.context
+      onClickScrollToContent()
+    }
+  }
+
   getWordFromPosition(pos) {
     const letterArr = this.selectionText.split('')
     let endIndex = pos - 1
@@ -429,6 +595,10 @@ class Editor extends Component {
             width={block.get('width')}
           />
         )
+      case 'repost':
+        return (
+          <RepostBlock {...blockProps} onRemoveBlock={null} />
+        )
       case 'text':
         return (
           <TextBlock
@@ -448,6 +618,12 @@ class Editor extends Component {
 
   keyboardDidShow = ({ endCoordinates: { screenY } }) => {
     this.setState({ scrollViewHeight: (screenY - toolbarStyle.height) })
+  }
+
+  handleHardwareBackPress = () => {
+    const { isPosting, isLoading } = this.props
+    if (isPosting || isLoading) { return true }
+    return false
   }
 
   serialize() {
@@ -484,9 +660,11 @@ class Editor extends Component {
 
   render() {
     const {
+      blocks,
       buyLink,
       collection,
       completions,
+      editorId,
       hasContent,
       hasMedia,
       hasMention,
@@ -494,19 +672,24 @@ class Editor extends Component {
       isLoading,
       isPosting,
       order,
+      repostContent,
+      submitText,
     } = this.props
-    const isPostingDisabled = isPosting || isLoading || !hasContent
     let buyLinkBgColor = !hasMedia ? '#aaa' : '#000'
     if (buyLink && buyLink.length) { buyLinkBgColor = '#00d100' }
+    const isPostingDisabled = isPosting || isLoading || !hasContent
+    const key = `${editorId}_${(blocks ? blocks.size : '') + (repostContent ? repostContent.size : '')}`
     return (
-      <View style={{ flex: 1, backgroundColor: hasMention ? '#ffc' : '#eee' }}>
+      <View key={key} style={{ flex: 1, backgroundColor: hasMention ? '#ffc' : '#eee' }}>
         <View style={toolbarStyle}>
-          <TouchableOpacity
-            onPress={this.onResetEditor}
-            style={buttonStyle}
-          >
-            <Text style={buttonTextStyle}>&times;</Text>
-          </TouchableOpacity>
+          {hasContent &&
+            <TouchableOpacity
+              onPress={this.onResetEditor}
+              style={buttonStyle}
+            >
+              <Text style={buttonTextStyle}>&times;</Text>
+            </TouchableOpacity>
+          }
           <TouchableOpacity
             disabled={!hasMedia}
             onPress={this.onLaunchBuyLinkModal}
@@ -525,10 +708,10 @@ class Editor extends Component {
           </TouchableOpacity>
           <TouchableOpacity
             disabled={isPostingDisabled}
-            onPress={this.onCreatePost}
+            onPress={this.onSubmitPost}
             style={buttonStyle}
           >
-            <Text style={{ ...buttonTextStyle, backgroundColor: isPostingDisabled ? '#aaa' : '#00d100' }}>POST</Text>
+            <Text style={{ ...buttonTextStyle, backgroundColor: isPostingDisabled ? '#aaa' : '#00d100' }}>{submitText}</Text>
           </TouchableOpacity>
         </View>
         <View style={{ height: this.state.scrollViewHeight }}>
@@ -536,7 +719,7 @@ class Editor extends Component {
             horizontal={false}
             ref={comp => (this.scrollView = comp)}
           >
-            {order ? order.map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
+            {order ? order.valueSeq().map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
           </ScrollView>
           <Completer
             completions={completions}
@@ -545,6 +728,21 @@ class Editor extends Component {
             onCompletion={this.onCompletion}
           />
         </View>
+        <Modal
+          animationType="fade"
+          onRequestClose={() => {}}
+          transparent
+          visible={isPosting}
+        >
+          <View style={activityIndicatorViewStyle}>
+            <Text style={postingTextStyle}>Posting...</Text>
+            <ActivityIndicator
+              animating
+              color="#fff"
+              size="large"
+            />
+          </View>
+        </Modal>
       </View>
     )
   }
