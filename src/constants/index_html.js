@@ -16,7 +16,7 @@ export default `
       body {
         position: relative;
         margin: 0;
-        background-color: white;
+        background-color: transparent;
         overflow-x: hidden;
       }
       ::-moz-selection {

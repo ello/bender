@@ -278,8 +278,8 @@ class Editor extends Component {
   }
 
   componentWillMount() {
-    const { blocks, dispatch, editorId, repostContent } = this.props
-    dispatch(initializeEditor(editorId, true))
+    const { blocks, dispatch, editorId, post, repostContent } = this.props
+    dispatch(initializeEditor(editorId, !(post.get('isEditing') || post.get('isReposting'))))
     if (repostContent.size) {
       dispatch(addBlock({ kind: 'repost', data: repostContent }, editorId))
     }

@@ -254,7 +254,7 @@ public class MainActivity
     }
 
     @JavascriptInterface
-    public void launchEditor(String jsState, String post, Boolean isComment, String comment) {
+    public void launchEditor(String jsState, String post, String isComment, String comment) {
         if (webAppReady) {
             Intent intent = new Intent(this, ReactNativeActivity.class);
             intent.putExtra("jsState", jsState);

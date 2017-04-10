@@ -8,7 +8,7 @@ class AppContainer extends PureComponent {
 
   static propTypes = {
     comment: PropTypes.string,
-    isComment: PropTypes.bool,
+    isComment: PropTypes.string,
     post: PropTypes.string,
   }
 
@@ -22,7 +22,7 @@ class AppContainer extends PureComponent {
     const { comment, isComment, post } = this.props
     const editorProps = {
       comment: comment ? Immutable.fromJS(JSON.parse(comment)) : Immutable.Map(),
-      isComment,
+      isComment: isComment === 'true',
       post: post ? Immutable.fromJS(JSON.parse(post)) : Immutable.Map(),
     }
     return (

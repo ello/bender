@@ -17,6 +17,7 @@ import com.nispok.snackbar.listeners.ActionClickListener;
 
 public class ReactNativeActivity extends ReactActivity {
 
+    private final static String TAG = ReactNativeActivity.class.getSimpleName();
     private BroadcastReceiver pushReceivedReceiver;
     public static Boolean inBackground = true;
 
