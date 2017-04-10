@@ -254,12 +254,15 @@ public class MainActivity
     }
 
     @JavascriptInterface
-    public void launchEditor(String authJson) {
-      if (webAppReady) {
-          Intent intent = new Intent(this, ReactNativeActivity.class);
-          intent.putExtra("AUTH_JSON", authJson);
-          startActivity(intent);
-      }
+    public void launchEditor(String jsState, String post, String isComment, String comment) {
+        if (webAppReady) {
+            Intent intent = new Intent(this, ReactNativeActivity.class);
+            intent.putExtra("jsState", jsState);
+            intent.putExtra("comment", comment);
+            intent.putExtra("isComment", isComment);
+            intent.putExtra("post", post);
+            startActivity(intent);
+        }
     }
 
     private void setupRegisterDeviceReceiver() {
