@@ -1,7 +1,6 @@
 import Immutable from 'immutable'
 import React, { PropTypes, PureComponent } from 'react'
 import { Dimensions, Image, View } from 'react-native'
-import Block from './Block'
 import TextRegion from '../regions/TextRegion'
 
 function getImageDimensions() {
@@ -52,8 +51,6 @@ export default class EmbedBlock extends PureComponent {
 
   static propTypes = {
     data: PropTypes.object,
-    hasContent: PropTypes.bool.isRequired,
-    uid: PropTypes.number.isRequired,
   }
 
   static defaultProps = {
@@ -67,13 +64,12 @@ export default class EmbedBlock extends PureComponent {
   }
 
   render() {
-    const { data, hasContent, uid } = this.props
+    const { data } = this.props
+    // TODO: add lock icon to this type of block
     return (
-      <Block hasContent={hasContent} uid={uid}>
-        <View style={{ paddingTop: 20 }} onLayout={this.onLayout}>
-          {data.valueSeq().map((block, i) => getBlockElement(block, i))}
-        </View>
-      </Block>
+      <View style={{ flex: 1, borderColor: '#aaa', borderWidth: 1, margin: 10, padding: 10 }} onLayout={this.onLayout}>
+        {data.valueSeq().map((block, i) => getBlockElement(block, i))}
+      </View>
     )
   }
 }

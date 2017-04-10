@@ -27,7 +27,9 @@ export default class App extends PureComponent {
       this.store,
       { storage: AsyncStorage, transforms: [immutableTransform()], whitelist },
       () => this.setState({ rehydrated: true }),
-    )
+    ).purge()
+    // TODO: figure out what is happening on rehydrate as it seems to kill
+    // certain things about the data like the fact that a post isReposting
   }
 
   render() {

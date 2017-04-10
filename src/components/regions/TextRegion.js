@@ -22,7 +22,7 @@ export default class TextRegion extends PureComponent {
         onNavigationStateChange={this.onNavigationStateChange}
         scrollEnabled={false}
         source={{ html: indexHtml.replace('{{post-content}}', this.props.text) }}
-        style={{ flex: 1, height: this.state.height }}
+        style={{ flex: 1, height: this.state.height, backgroundColor: 'transparent' }}
       />
     )
   }
