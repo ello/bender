@@ -1,3 +1,13 @@
 node_modules/
 .expo/
 npm-debug.*
+.gradle
+generated
+intermediates
+tmp
+logs
+*.apk
+local.properties
+*.rawproto
+/.vscode
+/jsconfig.json

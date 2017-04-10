@@ -3,15 +3,7 @@ import Immutable from 'immutable'
 import { REHYDRATE } from 'redux-persist/constants'
 import { AUTHENTICATION, PROFILE } from '../constants/action_types'
 
-export const initialState = Immutable.Map({
-  accessToken: '***REMOVED***',
-  createdAt: 1490024322,
-  expirationDate: new Date('Mon Mar 20 2017 11:38:42 GMT-0600 (MDT)'),
-  expiresIn: 7200,
-  isLoggedIn: true,
-  refreshToken: '***REMOVED***',
-  tokenType: 'bearer',
-})
+export const initialState = Immutable.Map({})
 
 export default (state = initialState, action) => {
   let auth

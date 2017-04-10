@@ -60,12 +60,10 @@
       "semi": 0
     }
   },
-  "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
   "scripts": {
-    "start": "react-native-scripts start",
-    "eject": "react-native-scripts eject",
-    "android": "react-native-scripts android",
-    "ios": "react-native-scripts ios",
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
     "test": "node node_modules/jest/bin/jest.js --watch"
   },
   "jest": {
@@ -73,12 +71,13 @@
   },
   "dependencies": {
     "exif-js": "2.1.1",
-    "expo": "15.1.2",
     "humps": "2.0.0",
     "immutable": "3.8.1",
     "lodash": "4.17.4",
     "react": "15.4.2",
     "react-native": "0.42.3",
+    "react-native-config": "0.3.1",
+    "react-native-image-picker": "^0.26.2",
     "react-redux": "5.0.3",
     "react-router-redux": "4.0.8",
     "redux": "3.6.0",
@@ -98,7 +97,6 @@
     "eslint-plugin-jsx-a11y": "4.0.0",
     "eslint-plugin-react": "6.10.3",
     "jest-expo": "0.3.1",
-    "react-native-scripts": "0.0.25",
     "react-test-renderer": "15.4.0"
   }
 }
