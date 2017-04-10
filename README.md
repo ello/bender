@@ -29,19 +29,19 @@ Below you'll find information about performing common tasks. The most recent ver
 
 ## Project Setup
 
-1. Make sure you have yarn installed `brew install yarn`
-- Run `yarn`
-- Get a correct `.env` setup and update for the server you want to test against
-- Connect an android device in debug mode to your machine or launch an emulator
-- Run `yarn android`
-- If you see an error about the target SDK being off you may need to go and
+* Make sure you have yarn installed `brew install yarn`
+* Run `yarn`
+* Get a correct `.env` setup and update for the server you want to test against
+* Connect an android device in debug mode to your machine or launch an emulator
+* Run `yarn android`
+* If you see an error about the target SDK being off you may need to go and
   update the build.gradle files for the associated 3rd party projects to match
   your main app's buildToolsVersion in your project's build.gradle and run `yarn
   android` again
-- You might get asked to allow overlays when initially launching the react
+* You might get asked to allow overlays when initially launching the react
   native view.. you should allow this and then hit back to get to the actual
   view underneath.
-- While in a React Native view, shake the device or press `cmd+m` on the emulator
+* While in a React Native view, shake the device or press `cmd+m` on the emulator
   to launch the react-native debug tools. We recommend using Live Reload and the
   remote JS debugger.
 
