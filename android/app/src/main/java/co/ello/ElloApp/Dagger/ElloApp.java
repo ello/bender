@@ -3,6 +3,7 @@ package co.ello.ElloApp.Dagger;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.honaf.dialog.MyDialogPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -43,6 +44,7 @@ public class ElloApp extends Application implements ReactApplication {
                     new MainReactPackage(),
                     new ReactNativeConfigPackage(),
                     new ImagePickerPackage(),
+                    new MyDialogPackage(),
                     new SvgPackage()
             );
         }

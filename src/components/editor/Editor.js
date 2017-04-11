@@ -14,6 +14,7 @@ import {
   View,
 } from 'react-native'
 import { connect } from 'react-redux'
+import Dialog from 'react-native-dialog'
 import ImagePicker from 'react-native-image-picker'
 import debounce from 'lodash/debounce'
 import Svg, { Line } from 'react-native-svg'
@@ -374,6 +375,25 @@ class Editor extends Component {
     })
   }
 
+  onShowImageOptions = () => {
+    const options = [
+      'Take Photo',
+      'Photo Library',
+    ]
+    Dialog.showActionSheetWithOptions({
+      options,
+      cancelButtonIndex: options.length - 1,
+      destructiveButtonIndex: 0,
+    },
+      (buttonIndex) => {
+        if (buttonIndex === 0) {
+          this.onTakePictureWithCamera()
+        } else if (buttonIndex === 1) {
+          this.onPickImageFromLibrary()
+        }
+      })
+  }
+
   onChangeText = (vo) => {
     const { collection, dispatch, editorId } = this.props
     if (collection.getIn([vo.uid, 'data']) !== vo.data) {
@@ -706,14 +726,8 @@ class Editor extends Component {
           >
             <Text style={{ ...buttonTextStyle, backgroundColor: buyLinkBgColor }}>$</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={this.onTakePictureWithCamera} style={buttonStyle}>
+          <TouchableOpacity onPress={this.onShowImageOptions} style={buttonStyle}>
             <Text style={buttonTextStyle}>&#x1f4f7;</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={this.onPickImageFromLibrary}
-            style={buttonStyle}
-          >
-            <Text style={buttonTextStyle}>&#128194;</Text>
           </TouchableOpacity>
           <TouchableOpacity
             disabled={isPostingDisabled}
