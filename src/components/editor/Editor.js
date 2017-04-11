@@ -197,6 +197,12 @@ const moneyCheckMarkWrapperStyle = {
 
 class Editor extends Component {
 
+  static navigationOptions = {
+    tabBar: {
+      label: 'Editor',
+    },
+  }
+
   static propTypes = {
     allowsAutoWatch: PropTypes.bool,
     // this is used to prepopulate text for zero states

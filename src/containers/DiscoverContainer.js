@@ -42,6 +42,13 @@ function mapStateToProps(state, props) {
 }
 
 class DiscoverContainer extends PureComponent {
+
+  static navigationOptions = {
+    tabBar: {
+      label: 'Discover',
+    },
+  }
+
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     paramsType: PropTypes.string.isRequired,

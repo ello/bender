@@ -1,14 +1,49 @@
 import Immutable from 'immutable'
 import React, { PropTypes, PureComponent } from 'react'
-import { Navigator, StatusBar, View } from 'react-native'
+import { Navigator, StatusBar, Text, View } from 'react-native'
+import { TabNavigator } from 'react-navigation'
 import Editor from '../components/editor/Editor'
 import ImagePickerContainer from './ImagePickerContainer'
+import DiscoverContainer from './DiscoverContainer'
+import FollowingContainer from './FollowingContainer'
 import ModalContainer from './ModalContainer'
+import NotificationsContainer from './NotificationsContainer'
+import ProfileContainer from './ProfileContainer'
 
-const routes = [
-  { title: 'Editor', index: 0, comp: Editor },
-  { title: 'Discover', index: 1, comp: DiscoverContainer },
-]
+const ElloTabBar = TabNavigator(
+  {
+    Following: {
+      screen: FollowingContainer,
+    },
+    Discover: {
+      screen: DiscoverContainer,
+    },
+    Editor: {
+      screen: Editor,
+    },
+    Notifications: {
+      screen: NotificationsContainer,
+    },
+    Profile: {
+      screen: ProfileContainer,
+    },
+  },
+  {
+    initialRouteName: 'Editor',
+    tabBarPosition: 'bottom',
+    tabBarOptions: {
+      activeBackgroundColor: '#f0f',
+      activeTintColor: '#000',
+      inactiveBackgroundColor: '#fff',
+      inactiveTintColor: '#ccc',
+      showLabel: true,
+      style: {
+        backgroundColor: '#fff',
+        height: 50,
+      },
+    },
+  },
+)
 
 class AppContainer extends PureComponent {
 
@@ -39,6 +74,7 @@ class AppContainer extends PureComponent {
         <StatusBar hidden />
         {initialRoute === 'editor' && <Editor {...editorProps} />}
         {initialRoute === 'imagePicker' && <ImagePickerContainer kind={kind} />}
+        <ElloTabBar />
         <ModalContainer />
       </View>
     )
