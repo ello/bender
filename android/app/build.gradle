@@ -136,7 +136,6 @@ repositories {
 }
 
 dependencies {
-    compile project(':react-native-svg')
     compile project(':react-native-config')
     compile project(':react-native-image-picker')
     compile project(':react-native-svg')
