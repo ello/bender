@@ -17,7 +17,6 @@ import { connect } from 'react-redux'
 import Dialog from 'react-native-dialog'
 import ImagePicker from 'react-native-image-picker'
 import debounce from 'lodash/debounce'
-import Svg, { Line } from 'react-native-svg'
 import { trackEvent } from '../../actions/analytics'
 import {
   createComment,
@@ -59,6 +58,7 @@ import {
   selectIsOwnPage,
   selectProfileIsFeatured,
 } from '../../selectors/profile'
+import { DismissIcon } from '../assets/Icons'
 import EmbedBlock from './EmbedBlock'
 import ImageBlock from './ImageBlock'
 import RepostBlock from './RepostBlock'
@@ -713,10 +713,7 @@ class Editor extends Component {
               onPress={this.onResetEditor}
               style={dismissButtonStyle}
             >
-              <Svg height="20" width="20">
-                <Line stroke="#aaa" strokeWidth="1.25" x1="6" x2="14" y1="6" y2="14" />
-                <Line stroke="#aaa" strokeWidth="1.25" x1="14" x2="6" y1="6" y2="14" />
-              </Svg>
+              <DismissIcon />
             </TouchableOpacity>
           }
           <TouchableOpacity
