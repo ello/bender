@@ -141,7 +141,8 @@ dependencies {
     compile project(':react-native-dialog')
     compile project(':react-native-config')
     compile project(':react-native-image-picker')
-    compile "com.android.support:appcompat-v7:23.0.1"
+    compile project(':react-native-svg')
+    compile "com.android.support:appcompat-v7:25.0.0"
     compile "com.facebook.react:react-native:+"  // From node_modules
     apt 'com.google.guava:guava:19.0'
     apt 'com.google.dagger:dagger-compiler:2.6'
