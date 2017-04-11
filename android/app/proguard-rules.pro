@@ -68,3 +68,5 @@
 # WebView JS interfaces
 -keep class * extends android.webkit.WebChromeClient { *; }
 -dontwarn im.delight.android.webview.**
+
+-keep class co.Ello.BuildConfig { *; }
