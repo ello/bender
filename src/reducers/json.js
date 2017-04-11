@@ -383,7 +383,7 @@ export default function json(state = initialState, action = { type: '' }) {
     case REHYDRATE: {
       // only keep the items that have been deleted
       // so we can still filter them out if needed
-      return action.payload.json
+      return action.payload.json || state
       // let keepers = initialState
       // if (action.payload.json) {
       //   if (typeof window !== 'undefined' && window.__INITIAL_STATE__) {
