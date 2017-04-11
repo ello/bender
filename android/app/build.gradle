@@ -86,13 +86,13 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 23
     buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "co.ello.ElloApp"
         minSdkVersion 21
-        targetSdkVersion 25
+        targetSdkVersion 23
         versionCode 24
         versionName "1.3"
         ndk {
@@ -133,13 +133,15 @@ repositories {
     maven {
         url 'https://download.01.org/crosswalk/releases/crosswalk/android/maven2'
     }
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
+    compile fileTree(dir: "libs", include: ["*.jar"])
+    compile project(':react-native-dialog')
     compile project(':react-native-config')
     compile project(':react-native-image-picker')
-    compile fileTree(dir: "libs", include: ["*.jar"])
-    compile "com.android.support:appcompat-v7:25.0.0"
+    compile "com.android.support:appcompat-v7:23.0.1"
     compile "com.facebook.react:react-native:+"  // From node_modules
     apt 'com.google.guava:guava:19.0'
     apt 'com.google.dagger:dagger-compiler:2.6'
