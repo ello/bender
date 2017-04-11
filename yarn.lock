@@ -3467,11 +3467,11 @@ react-native-config@0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/react-native-config/-/react-native-config-0.3.1.tgz#981d98eee2c4e467397cd9306f5b6958c501c6e8"
 
-react-native-dialog@^1.0.7:
+react-native-dialog@1.0.7:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/react-native-dialog/-/react-native-dialog-1.0.7.tgz#5be6b84c47e1f7843555b9c6f0b516a89f5b06e2"
 
-react-native-image-picker@^0.26.2:
+react-native-image-picker@0.26.2:
   version "0.26.2"
   resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-0.26.2.tgz#1280627d61438027284c97d0a8892b7d3777f2e3"
 
