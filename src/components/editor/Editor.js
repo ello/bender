@@ -17,6 +17,7 @@ import { connect } from 'react-redux'
 import Dialog from 'react-native-dialog'
 import ImagePicker from 'react-native-image-picker'
 import debounce from 'lodash/debounce'
+import Svg, { Line } from 'react-native-svg'
 import { trackEvent } from '../../actions/analytics'
 import {
   createComment,
@@ -168,6 +169,11 @@ const toolbarStyle = {
 }
 const buttonStyle = {
   marginLeft: 10,
+}
+const dismissButtonStyle = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
 }
 const buttonTextStyle = {
   backgroundColor: '#000',
@@ -705,9 +711,12 @@ class Editor extends Component {
           {hasContent &&
             <TouchableOpacity
               onPress={this.onResetEditor}
-              style={buttonStyle}
+              style={dismissButtonStyle}
             >
-              <Text style={buttonTextStyle}>&times;</Text>
+              <Svg height="20" width="20">
+                <Line stroke="#aaa" strokeWidth="1.25" x1="6" x2="14" y1="6" y2="14" />
+                <Line stroke="#aaa" strokeWidth="1.25" x1="14" x2="6" y1="6" y2="14" />
+              </Svg>
             </TouchableOpacity>
           }
           <TouchableOpacity

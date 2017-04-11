@@ -10,6 +10,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.imagepicker.ImagePickerPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
+import com.horcrux.svg.SvgPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,10 +41,11 @@ public class ElloApp extends Application implements ReactApplication {
         @Override
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
-                new MainReactPackage(),
-                new MyDialogPackage(),
-                new ReactNativeConfigPackage(),
-                new ImagePickerPackage()
+                    new MainReactPackage(),
+                    new ReactNativeConfigPackage(),
+                    new ImagePickerPackage(),
+                    new MyDialogPackage(),
+                    new SvgPackage()
             );
         }
     };
