@@ -37,7 +37,7 @@ export function getStreamAction(type) {
 function mapStateToProps(state, props) {
   return {
     paramsType: selectParamsType(state, props),
-    pathname: selectPropsPathname(state, props),
+    pathname: selectPropsPathname(state, props) || '/',
   }
 }
 

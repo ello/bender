@@ -41,7 +41,7 @@ function makeMapStateToProps() {
       innerHeight: selectInnerHeight(state),
       innerWidth: selectInnerWidth(state),
       isLoggedIn: selectIsLoggedIn(state),
-      isGridMode: selectIsGridMode(state),
+      isGridMode: selectIsGridMode(state) || false,
       omnibar: selectOmnibar(state),
       result: selectStreamFilteredResult(state, props),
       resultPath: selectStreamResultPath(state, props),
@@ -285,7 +285,6 @@ class StreamContainer extends Component {
     const { className, columnCount, isGridMode, isPostHeaderHidden,
       paginatorCentered, paginatorText, paginatorTo, result, stream } = this.props
     const { action, hidePaginator, renderType } = this.state
-    console.log('result', result ? result.toJS() : 'blah')
     if (!action) { return null }
     if (!result.get('ids').size) {
       switch (renderType) {
