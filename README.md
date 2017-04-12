@@ -13,7 +13,7 @@ When creating the apk to upload to the Google Play Store it must be aligned.
 ### Google Cloud Messages
 There are two GCM applications, production and staging. API token registration on production links the device token to production, API token registrations on staging servers links the device token to staging.
 
-To test GCM in development use AWS' [Publish a message](https://console.aws.amazon.com/sns/v2/home?region=us-east-1#/publish) tool. 
+To test GCM in development use AWS' [Publish a message](https://console.aws.amazon.com/sns/v2/home?region=us-east-1#/publish) tool.
 * Find the target ARN by searching for your device token in the corresponding SNS application's endpoint list
 * Use JSON as the message format
 * Bender expects a `body`, `title` and `web_url` paramaters in the payload.
@@ -47,7 +47,7 @@ Below you'll find information about performing common tasks. The most recent ver
 
 ## Generating a signed APK for the play store
 * Follow the instructions in the `ello-android-release-key.keystore` entry in the 1Password Engineering vault
-* Copy the `ello-android-release-key.keystore` file from related items in the 1Password note above to your `bender/android/app` direcotry.
+* Copy the `ello-android-release-key.keystore` file from related items in the 1Password note above to your `bender/android/app` directory
 * Add keys to `~/.gradle/gradle.properties`
   - ELLO_RELEASE_STORE_FILE=XXXXXX
   - ELLO_RELEASE_KEY_ALIAS=XXXXXX
