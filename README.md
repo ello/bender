@@ -45,3 +45,12 @@ Below you'll find information about performing common tasks. The most recent ver
   to launch the react-native debug tools. We recommend using Live Reload and the
   remote JS debugger.
 
+## Generating a signed APK for the play store
+* Follow the instructions in the `ello-android-release-key.keystore` entry in the 1Password Engineering vault
+* Copy the `ello-android-release-key.keystore` file from related items in the 1Password note above to your `bender/android/app` direcotry.
+* Add keys to `~/.gradle/gradle.properties`
+  - ELLO_RELEASE_STORE_FILE=XXXXXX
+  - ELLO_RELEASE_KEY_ALIAS=XXXXXX
+  - ELLO_RELEASE_STORE_PASSWORD=XXXXXX
+  - ELLO_RELEASE_KEY_PASSWORD=XXXXXX
+* From the root of this project `cd android && ./gradlew assembleRelease`
