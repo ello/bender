@@ -450,7 +450,6 @@ class PostContainer extends Component {
     //   )
     // }
 
-    console.log('create post', post.toJS())
     // const isRepostAnimating = isReposting && !postBody
     return (
       <View
@@ -461,7 +460,6 @@ class PostContainer extends Component {
         }}
       >
         {post.get('content').map((block, index) => {
-          // console.log('block', block)
           switch (block.get('kind')) {
             case 'image':
               return (

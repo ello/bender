@@ -61,7 +61,6 @@ export const postsAsGrid = (postIds, columnCount, isPostHeaderHidden) => {
 }
 
 export const postsAsList = (postIds, columnCount, isPostHeaderHidden) => {
-  console.log('postsAsList', postIds)
   const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 })
   return (
     <ListView

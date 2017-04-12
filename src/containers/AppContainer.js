@@ -29,7 +29,9 @@ const ElloTabBar = TabNavigator(
     },
   },
   {
+    backBehavior: 'none',
     initialRouteName: 'Editor',
+    // lazyLoad: true,
     tabBarPosition: 'bottom',
     tabBarOptions: {
       activeBackgroundColor: '#f0f',
