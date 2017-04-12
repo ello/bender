@@ -10,14 +10,12 @@ import {
   Modal,
   ScrollView,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native'
 import { connect } from 'react-redux'
 import Dialog from 'react-native-dialog'
 import ImagePicker from 'react-native-image-picker'
 import debounce from 'lodash/debounce'
-import Svg, { Line } from 'react-native-svg'
 import { trackEvent } from '../../actions/analytics'
 import {
   createComment,
@@ -59,6 +57,8 @@ import {
   selectIsOwnPage,
   selectProfileIsFeatured,
 } from '../../selectors/profile'
+import { CameraIcon, DismissIcon, MiniCheckMark, MoneyIcon } from '../assets/Icons'
+import { IconButton, PostButton } from '../buttons/Buttons'
 import EmbedBlock from './EmbedBlock'
 import ImageBlock from './ImageBlock'
 import RepostBlock from './RepostBlock'
@@ -164,23 +164,19 @@ function mapStateToProps(state, props) {
 const toolbarStyle = {
   flexDirection: 'row',
   height: 60,
+}
+const toolbarLeftStyle = {
+  flex: 1,
+  flexDirection: 'row',
+  justifyContent: 'flex-start',
+}
+const toolbarRightStyle = {
+  flex: 1,
+  flexDirection: 'row',
   justifyContent: 'flex-end',
-  padding: 10,
 }
-const buttonStyle = {
-  marginLeft: 10,
-}
-const dismissButtonStyle = {
-  position: 'absolute',
-  top: 0,
-  left: 0,
-}
-const buttonTextStyle = {
-  backgroundColor: '#000',
-  borderRadius: 20,
-  color: '#fff',
-  paddingHorizontal: 20,
-  paddingVertical: 10,
+const footerStyle = {
+  height: 44,
 }
 const activityIndicatorViewStyle = {
   alignItems: 'center',
@@ -196,6 +192,11 @@ const postingTextStyle = {
   marginBottom: 20,
   paddingHorizontal: 20,
   paddingVertical: 10,
+}
+const moneyCheckMarkWrapperStyle = {
+  position: 'absolute',
+  top: -2,
+  right: 0,
 }
 
 class Editor extends Component {
@@ -270,7 +271,7 @@ class Editor extends Component {
 
   state = {
     completerType: null,
-    scrollViewHeight: null,
+    scrollViewHeight: Dimensions.get('window').height - (toolbarStyle.height + footerStyle.height),
   }
 
   getChildContext() {
@@ -639,11 +640,11 @@ class Editor extends Component {
 
   keyboardDidHide = () => {
     this.onHideCompleter()
-    this.setState({ scrollViewHeight: (Dimensions.get('window').height - toolbarStyle.height) })
+    this.setState({ scrollViewHeight: (Dimensions.get('window').height - (toolbarStyle.height + footerStyle.height)) })
   }
 
   keyboardDidShow = ({ endCoordinates: { screenY } }) => {
-    this.setState({ scrollViewHeight: (screenY - toolbarStyle.height) })
+    this.setState({ scrollViewHeight: (screenY - (toolbarStyle.height + footerStyle.height)) })
   }
 
   handleHardwareBackPress = () => {
@@ -701,41 +702,31 @@ class Editor extends Component {
       repostContent,
       submitText,
     } = this.props
-    let buyLinkBgColor = !hasMedia ? '#aaa' : '#000'
-    if (buyLink && buyLink.length) { buyLinkBgColor = '#00d100' }
     const isPostingDisabled = isPosting || isLoading || !hasContent
     const key = `${editorId}_${(blocks ? blocks.size : '') + (repostContent ? repostContent.size : '')}`
     return (
       <View key={key} style={{ flex: 1, backgroundColor: hasMention ? '#ffc' : '#eee' }}>
         <View style={toolbarStyle}>
-          {hasContent &&
-            <TouchableOpacity
-              onPress={this.onResetEditor}
-              style={dismissButtonStyle}
-            >
-              <Svg height="20" width="20">
-                <Line stroke="#aaa" strokeWidth="1.25" x1="6" x2="14" y1="6" y2="14" />
-                <Line stroke="#aaa" strokeWidth="1.25" x1="14" x2="6" y1="6" y2="14" />
-              </Svg>
-            </TouchableOpacity>
-          }
-          <TouchableOpacity
-            disabled={!hasMedia}
-            onPress={this.onLaunchBuyLinkModal}
-            style={buttonStyle}
-          >
-            <Text style={{ ...buttonTextStyle, backgroundColor: buyLinkBgColor }}>$</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={this.onShowImageOptions} style={buttonStyle}>
-            <Text style={buttonTextStyle}>&#x1f4f7;</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            disabled={isPostingDisabled}
-            onPress={this.onSubmitPost}
-            style={buttonStyle}
-          >
-            <Text style={{ ...buttonTextStyle, backgroundColor: isPostingDisabled ? '#aaa' : '#00d100' }}>{submitText}</Text>
-          </TouchableOpacity>
+          <View style={toolbarLeftStyle}>
+            {hasContent &&
+              <IconButton onPress={this.onResetEditor}>
+                <DismissIcon />
+              </IconButton>
+            }
+          </View>
+          <View style={toolbarRightStyle}>
+            <IconButton disabled={!hasMedia} onPress={this.onLaunchBuyLinkModal}>
+              {buyLink && buyLink.length &&
+                <View style={moneyCheckMarkWrapperStyle}>
+                  <MiniCheckMark modifier="inPostActions" />
+                </View>
+              }
+              <MoneyIcon />
+            </IconButton>
+            <IconButton onPress={this.onShowImageOptions}>
+              <CameraIcon />
+            </IconButton>
+          </View>
         </View>
         <View style={{ height: this.state.scrollViewHeight }}>
           <ScrollView
@@ -750,6 +741,11 @@ class Editor extends Component {
             onCancel={this.onCancelAutoCompleter}
             onCompletion={this.onCompletion}
           />
+        </View>
+        <View style={footerStyle}>
+          <PostButton disabled={isPostingDisabled} onPress={this.onSubmitPost}>
+            {submitText}
+          </PostButton>
         </View>
         <Modal
           animationType="fade"
