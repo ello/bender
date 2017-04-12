@@ -1,5 +1,7 @@
 import React, { PropTypes } from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
+import { View } from 'react-native'
+import { IconButton } from '../buttons/Buttons'
+import { DismissIcon } from '../assets/Icons'
 
 const viewStyle = {
   padding: 10,
@@ -15,18 +17,9 @@ const subViewStyle = {
 }
 
 const closeBtnStyle = {
-  alignItems: 'center',
-  height: 30,
-  justifyContent: 'center',
   position: 'absolute',
-  right: 0,
-  top: 0,
-  width: 30,
-}
-
-const closeTextStyle = {
-  color: '#aaa',
-  fontSize: 22,
+  right: -10,
+  top: -5,
 }
 
 const Block = ({ children, hasContent, uid }, { onClickRemoveBlock }) =>
@@ -34,12 +27,11 @@ const Block = ({ children, hasContent, uid }, { onClickRemoveBlock }) =>
     <View style={subViewStyle}>
       {children}
       {hasContent &&
-        <TouchableOpacity
-          onPress={() => onClickRemoveBlock(uid)}
-          style={closeBtnStyle}
-        >
-          <Text style={closeTextStyle}>&times;</Text>
-        </TouchableOpacity>
+        <View style={closeBtnStyle}>
+          <IconButton onPress={() => onClickRemoveBlock(uid)}>
+            <DismissIcon />
+          </IconButton>
+        </View>
       }
     </View>
   </View>
