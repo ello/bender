@@ -4,7 +4,9 @@ const thousand = 1000.0
 
 export function numberToHuman(number, showZero = true, precision = 1) {
   if (number === 0 && !showZero) { return '' }
-  const roundingFactor = 10 ** precision
+  // `10 ** precision` causes :app:bundleReleaseJsAndAssets to fail, use `Math.pow()` instead.
+  // http://stackoverflow.com/questions/41903731/react-native-bundling-syntaxerror-unexpected-token-operator
+  const roundingFactor = Math.pow(10, precision) // eslint-disable-line
   let num
   let suffix
   if (number >= billion) {
