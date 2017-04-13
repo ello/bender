@@ -357,41 +357,21 @@ class Editor extends Component {
     dispatch(closeModal())
   }
 
-  onPickImageFromLibrary = () => {
-    ImagePicker.launchImageLibrary({}, (response) => {
-      if (!response.didCancel) {
-        const { dispatch } = this.props
-        dispatch(saveAsset(response.uri, this.props.editorId, response.width, response.height))
-      }
-    })
-  }
-
-  onTakePictureWithCamera = () => {
-    ImagePicker.launchCamera({}, (response) => {
-      if (!response.didCancel) {
-        const { dispatch } = this.props
-        dispatch(saveAsset(response.uri, this.props.editorId, response.width, response.height))
-      }
-    })
-  }
-
   onShowImageOptions = () => {
-    const options = [
-      'Take Photo',
-      'Photo Library',
-    ]
-    Dialog.showActionSheetWithOptions({
-      options,
-      cancelButtonIndex: options.length - 1,
-      destructiveButtonIndex: 0,
-    },
-      (buttonIndex) => {
-        if (buttonIndex === 0) {
-          this.onTakePictureWithCamera()
-        } else if (buttonIndex === 1) {
-          this.onPickImageFromLibrary()
-        }
-      })
+    const options = {
+      title: '',
+      takePhotoButtonTitle: 'Take Photo',
+      chooseFromLibraryButtonTitle: 'Photo Library',
+      quality: 0.9,
+      maxWidth: 1200.0,
+      maxHeight: 3600,
+    }
+    ImagePicker.showImagePicker(options, (response) => {
+      if (!response.didCancel && !response.error) {
+        const { dispatch } = this.props
+        dispatch(saveAsset(response.uri, this.props.editorId, response.width, response.height))
+      }
+    })
   }
 
   onChangeText = (vo) => {
