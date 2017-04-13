@@ -13,7 +13,6 @@ import {
   View,
 } from 'react-native'
 import { connect } from 'react-redux'
-import Dialog from 'react-native-dialog'
 import ImagePicker from 'react-native-image-picker'
 import debounce from 'lodash/debounce'
 import { trackEvent } from '../../actions/analytics'
