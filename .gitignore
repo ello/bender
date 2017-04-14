@@ -16,3 +16,4 @@ android/app/build/
 android/app/ello-android-release-key.keystore
 android/app/app.iml
 android/android.iml
+android/Ello.iml
