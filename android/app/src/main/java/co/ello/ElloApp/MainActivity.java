@@ -53,6 +53,8 @@ public class MainActivity
 
     protected Reachability reachability;
 
+    protected SharedPreferences sharedPreferences;
+
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public static Boolean inBackground = true;
     public XWalkView xWalkView;
@@ -71,6 +73,8 @@ public class MainActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        sharedPreferences = getApplicationContext().getSharedPreferences(ElloPreferences.PREFERENCES_KEY, Context.MODE_PRIVATE);
 
         ConnectivityManager manager = (ConnectivityManager) getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
         reachability = new Reachability(manager);
@@ -120,9 +124,11 @@ public class MainActivity
     @Override
     protected void onResume() {
         super.onResume();
+        String reloadFromReact = sharedPreferences.getString(ElloPreferences.RELOAD_FROM_REACT, null);
 
-        if(shouldHardRefresh()) {
+        if(shouldHardRefresh() || reloadFromReact.equals("true")) {
             shouldReload = true;
+            sharedPreferences.edit().putString(ElloPreferences.RELOAD_FROM_REACT, null).apply();
         }
 
         inBackground = false;
@@ -323,9 +329,8 @@ public class MainActivity
         Uri data = getIntent().getData();
         Intent get = getIntent();
         String webUrl = get.getStringExtra("web_url");
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplication());
         String webURLFromReact = sharedPreferences.getString(ElloPreferences.PUSH_PATH_FROM_REACT, null);
+
         if (webURLFromReact != null) {
             path = webURLFromReact;
             sharedPreferences.edit().putString(ElloPreferences.PUSH_PATH_FROM_REACT, null).apply();
