@@ -15,7 +15,6 @@ import {
 import { connect } from 'react-redux'
 import ImagePicker from 'react-native-image-picker'
 import debounce from 'lodash/debounce'
-import { trackEvent } from '../../actions/analytics'
 import {
   createComment,
   toggleEditing as toggleCommentEditing,
@@ -51,11 +50,7 @@ import {
   selectPostIsEmpty,
   selectPostIsOwn,
 } from '../../selectors/post'
-import {
-  selectHasAutoWatchEnabled,
-  selectIsOwnPage,
-  selectProfileIsFeatured,
-} from '../../selectors/profile'
+import { selectHasAutoWatchEnabled, selectIsOwnPage } from '../../selectors/profile'
 import { CameraIcon, DismissIcon, MiniCheckMark, MoneyIcon } from '../assets/Icons'
 import { IconButton, PostButton } from '../buttons/Buttons'
 import EmbedBlock from './EmbedBlock'
@@ -147,7 +142,6 @@ function mapStateToProps(state, props) {
     hasMention: editor.get('hasMention'),
     isComment,
     isCompleterActive: selectIsCompleterActive(state),
-    isFeatured: selectProfileIsFeatured(state),
     isLoading: editor.get('isLoading'),
     isOwnPage: selectIsOwnPage(state),
     isOwnPost: selectPostIsOwn(state, props),
@@ -219,7 +213,6 @@ class Editor extends Component {
     hasMention: PropTypes.bool,
     isComment: PropTypes.bool,
     isCompleterActive: PropTypes.bool.isRequired,
-    isFeatured: PropTypes.bool,
     isLoading: PropTypes.bool,
     isOwnPage: PropTypes.bool,
     // this is only used for reply all functionality
@@ -247,7 +240,6 @@ class Editor extends Component {
     hasMedia: false,
     hasMention: false,
     isComment: false,
-    isFeatured: false,
     isLoading: false,
     isOwnPage: false,
     isOwnPost: false,
@@ -503,20 +495,15 @@ class Editor extends Component {
     const data = this.serialize()
     const {
       allowsAutoWatch,
-      buyLink,
       comment,
       dispatch,
       editorId,
       isComment,
-      isFeatured,
       isOwnPage,
       isPostEmpty,
       onSubmit,
       post,
     } = this.props
-    if (buyLink && buyLink.length) {
-      dispatch(trackEvent('added_buy_button'))
-    }
     if (isComment) {
       if (comment && comment.get('isEditing')) {
         dispatch(toggleCommentEditing(comment, false))
@@ -527,7 +514,6 @@ class Editor extends Component {
     } else if (isPostEmpty) {
       // dispatch(closeOmnibar())
       dispatch(createPost(data, editorId))
-      dispatch(trackEvent('published_post', { isFeatured }))
     } else if (post.get('isEditing')) {
       dispatch(toggleEditing(post, false))
       dispatch(updatePost(post, data, editorId))
@@ -538,7 +524,6 @@ class Editor extends Component {
       dispatch(createPost(data, editorId,
         repostId, repostedFromId),
       )
-      dispatch(trackEvent('published_repost', { isFeatured }))
     }
     if (onSubmit) { onSubmit() }
     // if on own page scroll down to top of post content
