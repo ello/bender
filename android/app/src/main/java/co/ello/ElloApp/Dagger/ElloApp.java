@@ -10,6 +10,7 @@ import com.facebook.soloader.SoLoader;
 import com.imagepicker.ImagePickerPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.horcrux.svg.SvgPackage;
+import in.sriraman.sharedpreferences.RNSharedPreferencesReactPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +44,8 @@ public class ElloApp extends Application implements ReactApplication {
                     new MainReactPackage(),
                     new ReactNativeConfigPackage(),
                     new ImagePickerPackage(),
-                    new SvgPackage()
+                    new SvgPackage(),
+                    new RNSharedPreferencesReactPackage()
             );
         }
     };

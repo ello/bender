@@ -1,6 +1,7 @@
 package co.ello.ElloApp.PushNotifications;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -24,7 +25,7 @@ public class RegistrationIntentService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplication());
+        sharedPreferences = getApplicationContext().getSharedPreferences(ElloPreferences.PREFERENCES_KEY, Context.MODE_PRIVATE);
     }
 
 

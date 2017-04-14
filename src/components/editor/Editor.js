@@ -12,6 +12,7 @@ import {
   Text,
   View,
 } from 'react-native'
+import SharedPreferences from 'react-native-shared-preferences'
 import { connect } from 'react-redux'
 import ImagePicker from 'react-native-image-picker'
 import debounce from 'lodash/debounce'
@@ -327,7 +328,10 @@ class Editor extends Component {
     if (order && prevOrder && order.size > prevOrder.size && this.scrollView) {
       this.scrollView.scrollToEnd({ animated: true })
     }
-    if (prevProps.isPosting && !this.props.isPosting) { BackAndroid.exitApp() }
+    if (prevProps.isPosting && !this.props.isPosting) {
+      SharedPreferences.setItem('reloadFromReact', 'true')
+      BackAndroid.exitApp()
+    }
   }
 
   componentWillUnmount() {

@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
@@ -86,7 +87,7 @@ public class ReactNativeActivity extends ReactActivity {
                             .actionListener(new ActionClickListener() {
                                 @Override
                                 public void onActionClicked(Snackbar snackbar) {
-                                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplication());
+                                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(ElloPreferences.PREFERENCES_KEY, Context.MODE_PRIVATE); //PreferenceManager.getDefaultSharedPreferences(getApplication());
                                     sharedPreferences.edit().putString(ElloPreferences.PUSH_PATH_FROM_REACT, webUrl).apply();
                                     finish();
                                 }
