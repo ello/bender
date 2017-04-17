@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -12,6 +13,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.Manifest;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +25,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.WindowManager;
 import android.webkit.ValueCallback;
@@ -46,7 +53,7 @@ import co.ello.ElloApp.PushNotifications.RegistrationIntentService;
 // AppCompatActivity, thanks a lot XWalkActivity
 public class MainActivity
         extends XWalkActivity
-        implements SwipeRefreshLayout.OnRefreshListener
+        implements SwipeRefreshLayout.OnRefreshListener, SensorEventListener
 {
     private final static String TAG = MainActivity.class.getSimpleName();
     private final static int MY_PERMISSIONS_REQUEST_CAMERA = 333;
@@ -69,6 +76,9 @@ public class MainActivity
     private BroadcastReceiver pushReceivedReceiver;
     private Boolean isXWalkReady = false;
     private Date lastReloaded;
+    private SensorManager sensorManager;
+    private static int count = 0;
+    private long lastUpdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +86,12 @@ public class MainActivity
 
         sharedPreferences = getApplicationContext().getSharedPreferences(ElloPreferences.PREFERENCES_KEY, Context.MODE_PRIVATE);
 
+        path = sharedPreferences.getString(ElloPreferences.WEBAPP_DOMAIN, BuildConfig.ELLO_DOMAIN);
         ConnectivityManager manager = (ConnectivityManager) getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
         reachability = new Reachability(manager);
+
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        lastUpdate = System.currentTimeMillis();
 
         lastReloaded = new Date();
         setContentView(R.layout.activity_main);
@@ -145,7 +159,22 @@ public class MainActivity
             shouldReload = false;
             reloadXWalk();
         }
+        Boolean isStaff = sharedPreferences.getBoolean(ElloPreferences.IS_STAFF, false);
+        if (isStaff) {
+            registerSensorListener();
+        }
         deepLinkWhenPresent();
+    }
+
+    private void registerSensorListener() {
+        if(webAppReady) {
+            sensorManager.registerListener(this,
+                    sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                    SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+    private void unregisterSensorListener() {
+        sensorManager.unregisterListener(this);
     }
 
     private boolean shouldHardRefresh() {
@@ -215,6 +244,8 @@ public class MainActivity
             xWalkView.onHide();
         }
         super.onPause();
+        Boolean isStaff = sharedPreferences.getBoolean(ElloPreferences.IS_STAFF, false);
+        unregisterSensorListener();
     }
 
     @Override
@@ -257,6 +288,18 @@ public class MainActivity
             progress.dismiss();
         }
         registerForGCM();
+    }
+
+    @JavascriptInterface
+    public void setIsStaff(String isStaffString) {
+        Boolean isStaff = isStaffString.equals("true");
+        if (isStaff) {
+            registerSensorListener();
+        }
+        else {
+            unregisterSensorListener();
+        }
+        sharedPreferences.edit().putBoolean(ElloPreferences.IS_STAFF, isStaff).apply();
     }
 
     @JavascriptInterface
@@ -465,6 +508,54 @@ public class MainActivity
                 return true;
             }
         }
+    }
+
+    // SensorEventListener methods, should only be available to staff users
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        Boolean isStaff = sharedPreferences.getBoolean(ElloPreferences.IS_STAFF, false);
+        if (isStaff && event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+
+            long curTime = System.currentTimeMillis();
+            if ((curTime - lastUpdate) > 100) {
+
+                float x = event.values[0];
+                float y = event.values[1];
+                float z = event.values[2];
+
+                double acceleration = Math.sqrt(Math.pow(x, 2) +
+                        Math.pow(y, 2) +
+                        Math.pow(z, 2)) - SensorManager.GRAVITY_EARTH;
+
+                if (Math.abs(acceleration) > 5) {
+                    lastUpdate = curTime;
+                    count++;
+                    if (count == 10) {
+                        count = 0;
+                        launchWebappDomainDialog();
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
+    protected void launchWebappDomainDialog() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        final CharSequence[] domainNames = {"Stage 1", "Stage 2", "Ninja", "Prod"};
+        final String[] webappDomains = {BuildConfig.STAGE_1_ELLO_DOMAIN,
+                BuildConfig.STAGE_2_ELLO_DOMAIN, BuildConfig.NINJA_ELLO_DOMAIN, BuildConfig.PROD_ELLO_DOMAIN};
+        alertDialogBuilder.setItems(domainNames, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                path = webappDomains[which];
+                sharedPreferences.edit().putBoolean(ElloPreferences.IS_STAFF, false).apply();
+                sharedPreferences.edit().putString(ElloPreferences.WEBAPP_DOMAIN, path).apply();
+                loadPage(path);
+            }
+        });
+        alertDialogBuilder.create().show();
     }
 
     class ElloUIClient extends XWalkUIClient {
