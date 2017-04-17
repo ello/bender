@@ -126,7 +126,7 @@ public class MainActivity
         super.onResume();
         String reloadFromReact = sharedPreferences.getString(ElloPreferences.RELOAD_FROM_REACT, null);
 
-        if(shouldHardRefresh() || reloadFromReact.equals("true")) {
+        if(shouldHardRefresh() || (reloadFromReact != null && reloadFromReact.equals("true"))) {
             shouldReload = true;
             sharedPreferences.edit().putString(ElloPreferences.RELOAD_FROM_REACT, null).apply();
         }
