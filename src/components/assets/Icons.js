@@ -1,6 +1,6 @@
 // @flow
 import React from 'react'
-import Svg, { G, Path, Polygon, Polyline } from 'react-native-svg'
+import Svg, { G, Path, Polygon, Polyline, Rect } from 'react-native-svg'
 
 type Props = {
   children : React.Element<*>,
@@ -91,4 +91,13 @@ export const PencilIcon = ({ disabled, ...rest }: any) =>
       <Polygon stroke="none" fill={disabled ? '#aaa' : '#fff'} points="9.6312 6.0648 5.8012 9.8508 6.5902 10.6488 10.4202 6.8628" />
     </G>
   </SvgIcon>
+
+export const LockIcon = ({ ...rest }: any) => (
+  <SvgIcon {...rest}>
+    <G x={0} y={0}>
+      <Rect {...baseStroke} x="6.5" y="8.8" width="7" height="6.6" />
+      <Path {...baseStroke} d="M12,8.8V7c0-1.1-0.9-2-2-2S8,5.9,8,7v1.8" />
+    </G>
+  </SvgIcon>
+)
 

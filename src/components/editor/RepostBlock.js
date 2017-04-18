@@ -2,6 +2,13 @@ import Immutable from 'immutable'
 import React, { PropTypes, PureComponent } from 'react'
 import { Dimensions, Image, View } from 'react-native'
 import TextRegion from '../regions/TextRegion'
+import { LockIcon } from '../assets/Icons'
+
+const lockStyle = {
+  position: 'absolute',
+  top: 0,
+  right: 0,
+}
 
 function getImageDimensions() {
   const maxWidth = Dimensions.get('window').width - 40 // -40 is for the block padding
@@ -65,9 +72,9 @@ export default class EmbedBlock extends PureComponent {
 
   render() {
     const { data } = this.props
-    // TODO: add lock icon to this type of block
     return (
       <View style={{ flex: 1, borderColor: '#aaa', borderWidth: 1, margin: 10, padding: 10 }} onLayout={this.onLayout}>
+        <LockIcon style={lockStyle} />
         {data.valueSeq().map((block, i) => getBlockElement(block, i))}
       </View>
     )
