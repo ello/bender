@@ -31,7 +31,7 @@ function getBlockElement(block, uid) {
         <Image
           key={`repostEmbed_${uid}`}
           source={{ uri: data.get('thumbnailLargeUrl') }}
-          style={{ width, height }}
+          style={{ width, height, marginBottom: 10 }}
         />
       )
     case 'image':
@@ -39,7 +39,7 @@ function getBlockElement(block, uid) {
         <Image
           key={`repostImage_${uid}`}
           source={{ uri: data.get('url') }}
-          style={{ width, height }}
+          style={{ width, height, marginBottom: 10 }}
         />
       )
     case 'text':
