@@ -2,21 +2,71 @@
 /* eslint-disable import/prefer-default-export */
 import React, { PureComponent } from 'react'
 // $FlowFixMe
-import { StyleSheet, TouchableNativeFeedback, View } from 'react-native'
+import { StyleSheet, Text, TouchableNativeFeedback, View } from 'react-native'
 import type { JSO } from '../../types/flowtypes'
 
-type BaseIconButtonProps = {
+// -------------------------------------
+// Base Button
+
+type BaseButtonProps = {
   children: React.Element<*> | null,
   disabled?: boolean,
+  normal?: boolean,
   size: string,
   styles: {
     base: JSO,
-    large: JSO,
+    large?: JSO,
     medium: JSO,
-    small: JSO,
+    small?: JSO,
     normal: JSO,
     disabled: JSO,
   },
+}
+
+const pattern = (/^is|^in|^has/)
+
+class BaseButton extends PureComponent {
+  props: BaseButtonProps
+
+  static defaultProps = {
+    disabled: false,
+    children: null,
+    size: 'medium',
+    normal: true,
+  }
+
+  getStyleModifiers() {
+    const { styles } = this.props
+    const modifiersAndSituations = Object.keys(this.props).map(prop =>
+      pattern.test(prop) && this.props[prop] !== false && prop,
+    ).filter(value => value)
+
+    return ['normal', ...modifiersAndSituations, 'disabled'].map(prop =>
+      // TODO: $FlowFixMe - the meta nature is blowing this thing up
+      (this.props[prop] !== false && styles && styles[prop]),
+    ).filter(value => value)
+  }
+
+  render() {
+    const { children, disabled, size, styles, ...props } = this.props
+    const style = [styles.base, styles[size], ...this.getStyleModifiers()]
+    return (
+      <View style={style} >
+        <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple('rgba(0, 0, 0, .12)', true)} delayPressIn={0} disabled={disabled} {...props} >
+          <View style={[styles.base, styles[size]]}>
+            {children}
+          </View>
+        </TouchableNativeFeedback>
+      </View>
+    )
+  }
+}
+
+// -------------------------------------
+// Icon Buttons
+
+type Props = {
+  children: React.Element<*>,
 }
 
 const baseIconButtonStyle = {
@@ -41,43 +91,6 @@ const baseIconButtonStyle = {
   },
 }
 
-class BaseIconButton extends PureComponent {
-  props: BaseIconButtonProps
-
-  static defaultProps = {
-    disabled: false,
-    children: null,
-    size: 'medium',
-  }
-
-  getStyleModifer() {
-    const { disabled } = this.props
-    if (disabled) {
-      return 'disabled'
-    }
-    return 'normal'
-  }
-
-  render() {
-    const { children, disabled, size, styles, ...props } = this.props
-    return (
-      <View style={[styles.base, styles[size], styles[this.getStyleModifer()]]} >
-        <TouchableNativeFeedback background={TouchableNativeFeedback.Ripple('rgba(0, 0, 0, .12)', true)} delayPressIn={0} disabled={disabled} {...props} >
-          <View style={[styles.base, styles[size]]}>
-            {children}
-          </View>
-        </TouchableNativeFeedback>
-      </View>
-    )
-  }
-}
-
-// -------------------------------------
-
-type Props = {
-  children: React.Element<*>,
-}
-
 const floatingButtonStyles = {
   ...baseIconButtonStyle,
   normal: {
@@ -93,12 +106,10 @@ const floatingButtonStyles = {
 }
 
 export const FloatingButton = ({ children, ...props }: Props) => (
-  <BaseIconButton styles={floatingButtonStyles} {...props} >
+  <BaseButton styles={floatingButtonStyles} {...props} >
     {children}
-  </BaseIconButton>
+  </BaseButton>
 )
-
-// -------------------------------------
 
 const iconButtonStyles = StyleSheet.create({
   ...baseIconButtonStyle,
@@ -109,8 +120,48 @@ const iconButtonStyles = StyleSheet.create({
 })
 
 export const IconButton = ({ children, ...props }: Props) => (
-  <BaseIconButton styles={iconButtonStyles} {...props} >
+  <BaseButton styles={iconButtonStyles} {...props} >
     {children}
-  </BaseIconButton>
+  </BaseButton>
+)
+
+// -------------------------------------
+// Raised Buttons (Ello's version)
+
+const raisedButtonStyle = StyleSheet.create({
+  base: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  medium: {
+    height: 40,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  normal: {
+    backgroundColor: '#000',
+  },
+  disabled: {
+    backgroundColor: 'transparent',
+  },
+  isGreen: {
+    backgroundColor: '#00d100',
+  },
+  isLightGrey: {
+    backgroundColor: '#aaa',
+  },
+  inDialog: {
+    marginLeft: 10,
+  },
+})
+
+const raisedTextStyle = {
+  color: '#fff',
+}
+
+export const RaisedButton = ({ children, ...props }: Props) => (
+  <BaseButton styles={raisedButtonStyle} {...props} >
+    <Text style={raisedTextStyle}>{children}</Text>
+  </BaseButton>
 )
 

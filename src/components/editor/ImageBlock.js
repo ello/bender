@@ -4,8 +4,8 @@ import Block from './Block'
 
 const textStyle = {
   position: 'absolute',
-  top: 10,
-  right: 10,
+  top: 20,
+  right: 20,
   width: 20,
   height: 20,
   lineHeight: 18,
