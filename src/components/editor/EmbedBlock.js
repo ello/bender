@@ -38,7 +38,7 @@ export default class EmbedBlock extends PureComponent {
     const { width, height } = getEmbedImageDimensions()
     return (
       <Block hasContent={hasContent} uid={uid}>
-        <View style={{ paddingTop: 20 }} onLayout={this.onLayout}>
+        <View style={{ paddingVertical: 20 }} onLayout={this.onLayout}>
           <Image
             onLayout={this.onLayout}
             resizeMode="cover"
