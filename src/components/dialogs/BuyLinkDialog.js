@@ -1,6 +1,7 @@
 import React, { PropTypes, PureComponent } from 'react'
-import { Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Text, TextInput, View } from 'react-native'
 import { isValidURL } from '../forms/Validators'
+import { RaisedButton } from '../buttons/Buttons'
 
 const textInputStyle = {
   backgroundColor: '#fff',
@@ -12,14 +13,8 @@ const textInputStyle = {
 }
 const modalButtonViewStyle = {
   flexDirection: 'row',
-  justifyContent: 'flex-start',
-  marginLeft: 0,
-  marginRight: 10,
+  justifyContent: 'flex-end',
 }
-const modalButtonStyle = {
-  marginRight: 10,
-}
-const buttonTextStyle = { backgroundColor: '#000', borderRadius: 20, color: '#fff', paddingHorizontal: 20, paddingVertical: 10 }
 
 export default class BuyLinkDialog extends PureComponent {
 
@@ -52,7 +47,7 @@ export default class BuyLinkDialog extends PureComponent {
   render() {
     const { onDismiss, text } = this.props
     const { buyLinkText } = this.state
-    const isBuyLinkSubmitDisabled = !isValidURL(buyLinkText)
+    const isSubmitDisabled = !isValidURL(buyLinkText)
     return (
       <View>
         <Text style={{ color: '#fff', fontSize: 24, marginBottom: 20 }}>Sell your work</Text>
@@ -64,30 +59,22 @@ export default class BuyLinkDialog extends PureComponent {
           underlineColorAndroid="transparent"
         />
         <View style={modalButtonViewStyle}>
-          <TouchableOpacity
-            disabled={isBuyLinkSubmitDisabled}
-            onPress={this.onSubmit}
-            style={modalButtonStyle}
-          >
-            <Text style={{ ...buttonTextStyle, backgroundColor: isBuyLinkSubmitDisabled ? '#aaa' : '#00d100' }}>Submit</Text>
-          </TouchableOpacity>
+          <RaisedButton isLightGrey inDialog onPress={onDismiss}>
+            Cancel
+          </RaisedButton>
           {text && text.length &&
-            <TouchableOpacity
-              onPress={this.onRemoveBuyLink}
-              style={modalButtonStyle}
-            >
-              <Text style={buttonTextStyle}>Remove</Text>
-            </TouchableOpacity>
+            <RaisedButton isLightGrey inDialog onPress={this.onRemoveBuyLink}>
+              Remove
+            </RaisedButton>
           }
-          <TouchableOpacity
-            onPress={onDismiss}
-            style={modalButtonStyle}
-          >
-            <Text style={buttonTextStyle}>Cancel</Text>
-          </TouchableOpacity>
+          <RaisedButton isGreen inDialog disabled={isSubmitDisabled} onPress={this.onSubmit} >
+            Submit
+          </RaisedButton>
         </View>
       </View>
     )
   }
 }
+
+// <style={{ ...buttonTextStyle, backgroundColor: isBuyLinkSubmitDisabled ? '#aaa' : '#00d100' }}
 

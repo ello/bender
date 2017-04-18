@@ -52,8 +52,8 @@ import {
   selectPostIsOwn,
 } from '../../selectors/post'
 import { selectHasAutoWatchEnabled, selectIsOwnPage } from '../../selectors/profile'
-import { CameraIcon, DismissIcon, MiniCheckMark, MoneyIcon } from '../assets/Icons'
-import { IconButton, PostButton } from '../buttons/Buttons'
+import { CameraIcon, CheckMark, DismissIcon, MoneyIcon, PencilIcon } from '../assets/Icons'
+import { FloatingButton, IconButton } from '../buttons/Buttons'
 import EmbedBlock from './EmbedBlock'
 import ImageBlock from './ImageBlock'
 import RepostBlock from './RepostBlock'
@@ -100,28 +100,19 @@ function mapStateToProps(state, props) {
   }
   let blocks
   let repostContent
-  let submitText
   if (autoPopulate) {
     blocks = Immutable.fromJS([{ kind: 'text', data: autoPopulate }])
-    submitText = 'Post'
   } else if (isComment) {
     if (comment && comment.get('isEditing')) {
-      submitText = 'Update'
       blocks = comment.get('body')
-    } else {
-      submitText = 'Comment'
     }
-  } else if (isPostEmpty) {
-    submitText = 'Post'
   } else if (post.get('isReposting')) {
-    submitText = 'Repost'
     if (post.get('repostId')) {
       repostContent = post.get('repostContent')
     } else {
       repostContent = post.get('content')
     }
   } else if (post.get('isEditing')) {
-    submitText = 'Update'
     if (post.get('repostContent') && post.get('repostContent').size) {
       repostContent = post.get('repostContent')
     }
@@ -151,13 +142,13 @@ function mapStateToProps(state, props) {
     order,
     post,
     repostContent,
-    submitText,
   }
 }
 
 const toolbarStyle = {
   flexDirection: 'row',
-  height: 60,
+  height: 56,
+  marginVertical: 10,
 }
 const toolbarLeftStyle = {
   flex: 1,
@@ -168,9 +159,7 @@ const toolbarRightStyle = {
   flex: 1,
   flexDirection: 'row',
   justifyContent: 'flex-end',
-}
-const footerStyle = {
-  height: 44,
+  paddingRight: 10,
 }
 const activityIndicatorViewStyle = {
   alignItems: 'center',
@@ -189,8 +178,8 @@ const postingTextStyle = {
 }
 const moneyCheckMarkWrapperStyle = {
   position: 'absolute',
-  top: -2,
-  right: 0,
+  top: 5,
+  right: 5,
 }
 
 class Editor extends Component {
@@ -225,7 +214,6 @@ class Editor extends Component {
     order: PropTypes.object,
     post: PropTypes.object,
     repostContent: PropTypes.object,
-    submitText: PropTypes.string,
   }
 
   static defaultProps = {
@@ -249,7 +237,6 @@ class Editor extends Component {
     order: null,
     post: null,
     repostContent: Immutable.List(),
-    submitText: 'Post',
   }
 
   static childContextTypes = {
@@ -263,7 +250,7 @@ class Editor extends Component {
 
   state = {
     completerType: null,
-    scrollViewHeight: Dimensions.get('window').height - (toolbarStyle.height + footerStyle.height),
+    scrollViewHeight: Dimensions.get('window').height - (toolbarStyle.height),
   }
 
   getChildContext() {
@@ -606,11 +593,11 @@ class Editor extends Component {
 
   keyboardDidHide = () => {
     this.onHideCompleter()
-    this.setState({ scrollViewHeight: (Dimensions.get('window').height - (toolbarStyle.height + footerStyle.height)) })
+    this.setState({ scrollViewHeight: (Dimensions.get('window').height - (toolbarStyle.height)) })
   }
 
   keyboardDidShow = ({ endCoordinates: { screenY } }) => {
-    this.setState({ scrollViewHeight: (screenY - (toolbarStyle.height + footerStyle.height)) })
+    this.setState({ scrollViewHeight: (screenY - (toolbarStyle.height)) })
   }
 
   handleHardwareBackPress = () => {
@@ -666,7 +653,6 @@ class Editor extends Component {
       isPosting,
       order,
       repostContent,
-      submitText,
     } = this.props
     const isPostingDisabled = isPosting || isLoading || !hasContent
     const key = `${editorId}_${(blocks ? blocks.size : '') + (repostContent ? repostContent.size : '')}`
@@ -674,24 +660,28 @@ class Editor extends Component {
       <View key={key} style={{ flex: 1, backgroundColor: hasMention ? '#ffc' : '#eee' }}>
         <View style={toolbarStyle}>
           <View style={toolbarLeftStyle}>
-            {hasContent &&
+            {/* disable the dismiss `x` until persisting is working */}
+            {hasContent && false &&
               <IconButton onPress={this.onResetEditor}>
                 <DismissIcon />
               </IconButton>
             }
-          </View>
-          <View style={toolbarRightStyle}>
+            <IconButton onPress={this.onShowImageOptions}>
+              <CameraIcon />
+            </IconButton>
             <IconButton disabled={!hasMedia} onPress={this.onLaunchBuyLinkModal}>
               {buyLink && buyLink.length &&
                 <View style={moneyCheckMarkWrapperStyle}>
-                  <MiniCheckMark modifier="inPostActions" />
+                  <CheckMark size="small" modifier="green" />
                 </View>
               }
               <MoneyIcon />
             </IconButton>
-            <IconButton onPress={this.onShowImageOptions}>
-              <CameraIcon />
-            </IconButton>
+          </View>
+          <View style={toolbarRightStyle}>
+            <FloatingButton size="large" disabled={isPostingDisabled} onPress={this.onSubmitPost}>
+              <PencilIcon disabled={isPostingDisabled} />
+            </FloatingButton>
           </View>
         </View>
         <View style={{ height: this.state.scrollViewHeight }}>
@@ -701,18 +691,13 @@ class Editor extends Component {
           >
             {order ? order.valueSeq().map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
           </ScrollView>
-          <Completer
-            completions={completions}
-            isCompleterActive={isCompleterActive}
-            onCancel={this.onCancelAutoCompleter}
-            onCompletion={this.onCompletion}
-          />
         </View>
-        <View style={footerStyle}>
-          <PostButton disabled={isPostingDisabled} onPress={this.onSubmitPost}>
-            {submitText}
-          </PostButton>
-        </View>
+        <Completer
+          completions={completions}
+          isCompleterActive={isCompleterActive}
+          onCancel={this.onCancelAutoCompleter}
+          onCompletion={this.onCompletion}
+        />
         <Modal
           animationType="fade"
           onRequestClose={() => {}}
