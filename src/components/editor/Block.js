@@ -18,8 +18,8 @@ const subViewStyle = {
 
 const closeBtnStyle = {
   position: 'absolute',
-  right: -10,
-  top: -5,
+  right: 10,
+  top: 0,
 }
 
 const Block = ({ children, hasContent, uid }, { onClickRemoveBlock }) =>
@@ -28,8 +28,8 @@ const Block = ({ children, hasContent, uid }, { onClickRemoveBlock }) =>
       {children}
       {hasContent &&
         <View style={closeBtnStyle}>
-          <IconButton onPress={() => onClickRemoveBlock(uid)}>
-            <DismissIcon />
+          <IconButton size="small" onPress={() => onClickRemoveBlock(uid)}>
+            <DismissIcon size="small" />
           </IconButton>
         </View>
       }
