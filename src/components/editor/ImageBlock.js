@@ -3,16 +3,17 @@ import { Dimensions, Image, Text, View } from 'react-native'
 import Block from './Block'
 
 const textStyle = {
-  backgroundColor: '#00d100',
-  borderRadius: 15,
-  color: '#fff',
-  height: 30,
-  paddingLeft: 10,
-  paddingTop: 4,
   position: 'absolute',
+  top: 10,
   right: 10,
-  top: 30,
-  width: 30,
+  width: 20,
+  height: 20,
+  lineHeight: 18,
+  borderRadius: 10,
+  fontSize: 12,
+  textAlign: 'center',
+  color: '#fff',
+  backgroundColor: '#00d100',
 }
 
 export default class ImageBlock extends PureComponent {
