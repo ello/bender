@@ -69,7 +69,7 @@ export default class ImageBlock extends PureComponent {
     const { width, height } = this.getImageDimensions()
     return (
       <Block hasContent={hasContent} uid={uid}>
-        <View style={{ paddingTop: 20 }} onLayout={this.onLayout}>
+        <View style={{ paddingVertical: 20 }} onLayout={this.onLayout}>
           <Image
             onLoad={this.onLoad}
             source={source}

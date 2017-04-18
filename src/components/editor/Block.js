@@ -4,15 +4,12 @@ import { IconButton } from '../buttons/Buttons'
 import { DismissIcon } from '../assets/Icons'
 
 const viewStyle = {
-  padding: 10,
   flex: 1,
 }
 
 const subViewStyle = {
-  borderColor: '#aaa',
-  borderStyle: 'dashed',
-  borderWidth: 1,
-  padding: 10,
+  paddingLeft: 10,
+  paddingRight: 15,
   flex: 1,
 }
 
