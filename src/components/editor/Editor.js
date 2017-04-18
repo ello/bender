@@ -614,8 +614,18 @@ class Editor extends Component {
   }
 
   handleHardwareBackPress = () => {
-    const { isPosting, isLoading } = this.props
-    if (isPosting || isLoading) { return true }
+    const { hasContent, isPosting, isLoading } = this.props
+    if (hasContent) {
+      Alert.alert(
+        'Lose your progress?',
+        'If you exit the editor you will lose your current draft.',
+        [
+          { text: 'No', style: 'cancel' },
+          { text: 'Yes', onPress: () => BackAndroid.exitApp() },
+        ],
+      )
+      return true
+    } else if (isPosting || isLoading) { return true }
     return false
   }
 
