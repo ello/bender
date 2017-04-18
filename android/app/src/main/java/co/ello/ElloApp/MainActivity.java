@@ -67,7 +67,7 @@ public class MainActivity
     public XWalkView xWalkView;
     private ElloUIClient xWalkClient;
     private SwipeRefreshLayout swipeLayout;
-    public String path = BuildConfig.ELLO_DOMAIN;
+    public String path;
     private ProgressDialog progress;
     private Boolean shouldReload = false;
     private Boolean webAppReady = false;
@@ -86,7 +86,7 @@ public class MainActivity
 
         sharedPreferences = getApplicationContext().getSharedPreferences(ElloPreferences.PREFERENCES_KEY, Context.MODE_PRIVATE);
 
-        path = sharedPreferences.getString(ElloPreferences.WEBAPP_DOMAIN, BuildConfig.ELLO_DOMAIN);
+        path = sharedPreferences.getString(ElloPreferences.WEBAPP_DOMAIN, BuildConfig.PROD_ELLO_DOMAIN);
         ConnectivityManager manager = (ConnectivityManager) getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
         reachability = new Reachability(manager);
 
