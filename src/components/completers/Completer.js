@@ -11,6 +11,11 @@ export const userRegex = /(\s|^)@{1}\w+/
 
 const scrollViewStyle = {
   maxHeight: 110,
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  left: 0,
+  elevation: 5,
 }
 
 const completionStyle = {

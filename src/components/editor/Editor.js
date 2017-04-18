@@ -691,13 +691,13 @@ class Editor extends Component {
           >
             {order ? order.valueSeq().map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
           </ScrollView>
-          <Completer
-            completions={completions}
-            isCompleterActive={isCompleterActive}
-            onCancel={this.onCancelAutoCompleter}
-            onCompletion={this.onCompletion}
-          />
         </View>
+        <Completer
+          completions={completions}
+          isCompleterActive={isCompleterActive}
+          onCancel={this.onCancelAutoCompleter}
+          onCompletion={this.onCompletion}
+        />
         <Modal
           animationType="fade"
           onRequestClose={() => {}}
