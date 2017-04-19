@@ -1,9 +1,13 @@
-import React from 'react';
-import ReactNative from 'react-native';
-import App from './App';
+import React from 'react'
+import renderer from 'react-test-renderer'
+import App from './App'
 
-import renderer from 'react-test-renderer';
+const initialState = {
+  authentication: {},
+  editor: {},
+  profile: {},
+}
 
 it('renders without crashing', () => {
-  const rendered = renderer.create(<App />).toJSON();
-});
+  renderer.create(<App jsState={JSON.stringify(initialState)} />).toJSON()
+})
