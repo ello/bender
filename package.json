@@ -82,10 +82,12 @@
     "test": "node node_modules/jest/bin/jest.js --watch"
   },
   "jest": {
-    "preset": "react-native"
+    "preset": "react-native",
+    "setupTestFrameworkScriptFile": "./tests_setup.js"
   },
   "dependencies": {
     "analytics-react-native": "1.1.0",
+    "chai": "3.5.0",
     "exif-js": "2.1.1",
     "humps": "2.0.0",
     "immutable": "3.8.1",
