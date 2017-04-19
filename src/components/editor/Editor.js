@@ -61,7 +61,7 @@ import TextBlock from './TextBlock'
 import Completer, { emojiRegex, userRegex } from '../completers/Completer'
 import BuyLinkDialog from '../dialogs/BuyLinkDialog'
 
-const ACTIVE_SERVICE_REGEXES = [
+export const ACTIVE_SERVICE_REGEXES = [
   /(?:.+?)?(?:youtube\.com\/v\/|watch\/|\?v=|&v=|youtu\.be\/|\/v=|^youtu\.be\/)([a-zA-Z0-9_-]{11})+/,
 ]
 
