@@ -607,8 +607,8 @@ class Editor extends Component {
         'Lose your progress?',
         'If you exit the editor you will lose your current draft.',
         [
-          { text: 'No', style: 'cancel' },
-          { text: 'Yes', onPress: () => BackAndroid.exitApp() },
+          { text: 'Keep editing', style: 'cancel' },
+          { text: 'Delete my draft', onPress: () => BackAndroid.exitApp() },
         ],
       )
       return true
