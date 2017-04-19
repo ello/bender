@@ -1,5 +1,6 @@
 package co.ello.ElloApp;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
@@ -12,16 +13,11 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
-import android.Manifest;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorListener;
 import android.hardware.SensorManager;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -29,7 +25,6 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.WindowManager;
 import android.webkit.ValueCallback;
-import android.net.ConnectivityManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -37,6 +32,7 @@ import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.nispok.snackbar.listeners.ActionClickListener;
+import com.squareup.seismic.ShakeDetector;
 
 import org.xwalk.core.JavascriptInterface;
 import org.xwalk.core.XWalkActivity;
@@ -53,7 +49,7 @@ import co.ello.ElloApp.PushNotifications.RegistrationIntentService;
 // AppCompatActivity, thanks a lot XWalkActivity
 public class MainActivity
         extends XWalkActivity
-        implements SwipeRefreshLayout.OnRefreshListener, SensorEventListener
+        implements SwipeRefreshLayout.OnRefreshListener, ShakeDetector.Listener
 {
     private final static String TAG = MainActivity.class.getSimpleName();
     private final static int MY_PERMISSIONS_REQUEST_CAMERA = 333;
@@ -77,8 +73,8 @@ public class MainActivity
     private Boolean isXWalkReady = false;
     private Date lastReloaded;
     private SensorManager sensorManager;
-    private static int count = 0;
-    private long lastUpdate;
+    private ShakeDetector shakeDetector;
+    private Boolean showingWebappDomainDialog = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +87,8 @@ public class MainActivity
         reachability = new Reachability(manager);
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        lastUpdate = System.currentTimeMillis();
+        shakeDetector = new ShakeDetector(this);
+        registerSensorListener();
 
         lastReloaded = new Date();
         setContentView(R.layout.activity_main);
@@ -159,22 +156,17 @@ public class MainActivity
             shouldReload = false;
             reloadXWalk();
         }
-        Boolean isStaff = sharedPreferences.getBoolean(ElloPreferences.IS_STAFF, false);
-        if (isStaff) {
-            registerSensorListener();
-        }
+
+        registerSensorListener();
         deepLinkWhenPresent();
     }
 
     private void registerSensorListener() {
-        if(webAppReady) {
-            sensorManager.registerListener(this,
-                    sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                    SensorManager.SENSOR_DELAY_NORMAL);
-        }
+        shakeDetector.start(sensorManager);
     }
+
     private void unregisterSensorListener() {
-        sensorManager.unregisterListener(this);
+        shakeDetector.stop();
     }
 
     private boolean shouldHardRefresh() {
@@ -293,12 +285,6 @@ public class MainActivity
     @JavascriptInterface
     public void setIsStaff(String isStaffString) {
         Boolean isStaff = isStaffString.equals("true");
-        if (isStaff) {
-            registerSensorListener();
-        }
-        else {
-            unregisterSensorListener();
-        }
         sharedPreferences.edit().putBoolean(ElloPreferences.IS_STAFF, isStaff).apply();
     }
 
@@ -510,39 +496,16 @@ public class MainActivity
         }
     }
 
-    // SensorEventListener methods, should only be available to staff users
-    @Override
-    public void onSensorChanged(SensorEvent event) {
+    // ShakeDetector.Listener methods, should only be available to staff users
+    public void hearShake() {
         Boolean isStaff = sharedPreferences.getBoolean(ElloPreferences.IS_STAFF, false);
-        if (isStaff && event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-
-            long curTime = System.currentTimeMillis();
-            if ((curTime - lastUpdate) > 100) {
-
-                float x = event.values[0];
-                float y = event.values[1];
-                float z = event.values[2];
-
-                double acceleration = Math.sqrt(Math.pow(x, 2) +
-                        Math.pow(y, 2) +
-                        Math.pow(z, 2)) - SensorManager.GRAVITY_EARTH;
-
-                if (Math.abs(acceleration) > 5) {
-                    lastUpdate = curTime;
-                    count++;
-                    if (count == 10) {
-                        count = 0;
-                        launchWebappDomainDialog();
-                    }
-                }
-            }
+        if (isStaff && !showingWebappDomainDialog) {
+            launchWebappDomainDialog();
         }
     }
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
-
     protected void launchWebappDomainDialog() {
+        showingWebappDomainDialog = true;
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         final CharSequence[] domainNames = {"Stage 1", "Stage 2", "Ninja", "Prod"};
         final String[] webappDomains = {BuildConfig.STAGE_1_ELLO_DOMAIN,
@@ -552,9 +515,11 @@ public class MainActivity
                 path = webappDomains[which];
                 sharedPreferences.edit().putBoolean(ElloPreferences.IS_STAFF, false).apply();
                 sharedPreferences.edit().putString(ElloPreferences.WEBAPP_DOMAIN, path).apply();
+                showingWebappDomainDialog = false;
                 loadPage(path);
             }
         });
+        alertDialogBuilder.setCancelable(false);
         alertDialogBuilder.create().show();
     }
 
