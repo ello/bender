@@ -28,7 +28,7 @@ This project was bootstrapped with [Create React Native App](https://github.com/
 Below you'll find information about performing common tasks. The most recent version of this guide is available [here](https://github.com/react-community/create-react-native-app/blob/master/react-native-scripts/template/README.md).
 
 ## Project Setup
-
+* Ensure you have an up-to-date version of node. Tests fail to run on older versions (v5.2.0 for example). Tests work correctly on node v7.5 & above.
 * Make sure you have yarn installed `brew install yarn`
 * Run `yarn`
 * Get a correct `.env` setup and update for the server you want to test against
