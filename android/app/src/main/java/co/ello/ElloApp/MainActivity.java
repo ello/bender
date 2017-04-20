@@ -296,10 +296,21 @@ public class MainActivity
             intent.putExtra("comment", comment);
             intent.putExtra("isComment", isComment);
             intent.putExtra("post", post);
+            intent.putExtra("initialRoute", "editor");
             startActivity(intent);
         }
     }
 
+    @JavascriptInterface
+    public void launchImagePicker(String jsState, String kind) {
+        if (webAppReady) {
+            Intent intent = new Intent(this, ReactNativeActivity.class);
+            intent.putExtra("jsState", jsState);
+            intent.putExtra("kind", kind);
+            intent.putExtra("initialRoute", "imagePicker");
+            startActivity(intent);
+        }
+    }
     private void setupRegisterDeviceReceiver() {
         registerDeviceReceiver = new BroadcastReceiver() {
             @Override
