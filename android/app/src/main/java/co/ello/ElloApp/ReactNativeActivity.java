@@ -64,6 +64,8 @@ public class ReactNativeActivity extends ReactActivity {
                 initialProps.putString("comment", intent.getExtras().getString("comment"));
                 initialProps.putString("isComment", intent.getExtras().getString("isComment"));
                 initialProps.putString("post", intent.getExtras().getString("post"));
+                initialProps.putString("kind", intent.getExtras().getString("kind"));
+                initialProps.putString("initialRoute", intent.getExtras().getString("initialRoute"));
                 return initialProps;
             }
         };
