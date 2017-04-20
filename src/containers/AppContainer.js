@@ -1,14 +1,9 @@
 import Immutable from 'immutable'
 import React, { PropTypes, PureComponent } from 'react'
-import { Navigator, StatusBar, View } from 'react-native'
+import { StatusBar, View } from 'react-native'
 import Editor from '../components/editor/Editor'
 import ImagePickerContainer from './ImagePickerContainer'
 import ModalContainer from './ModalContainer'
-
-const routes = [
-  { name: 'editor', index: 0, comp: Editor },
-  { name: 'imagePicker', index: 1, comp: ImagePickerContainer },
-]
 
 class AppContainer extends PureComponent {
 
@@ -34,26 +29,11 @@ class AppContainer extends PureComponent {
       isComment: isComment === 'true',
       post: post ? Immutable.fromJS(JSON.parse(post)) : Immutable.Map(),
     }
-    const startRoute = routes.find(r => r.name === initialRoute)
     return (
       <View style={{ flex: 1 }}>
         <StatusBar hidden />
-        <Navigator
-          initialRoute={startRoute}
-          initialRouteStack={routes}
-          lazyLoad
-          renderScene={(route) => {
-            const RouteComponent = route.comp
-            switch (route.index) {
-              case 0:
-                return <RouteComponent {...editorProps} />
-              case 1:
-                return <RouteComponent kind={kind} />
-              default:
-                return null
-            }
-          }}
-        />
+        {initialRoute === 'editor' && <Editor {...editorProps} />}
+        {initialRoute === 'imagePicker' && <ImagePickerContainer kind={kind} />}
         <ModalContainer />
       </View>
     )
