@@ -144,7 +144,7 @@ methods.getResult = (response, state, action) => {
 }
 
 methods.getCurrentUser = state =>
-  state.get(MAPPING_TYPES.USERS).find(user =>
+  state.get(MAPPING_TYPES.USERS, Immutable.Map()).find(user =>
     user.get('relationshipPriority') === RELATIONSHIP_PRIORITY.SELF,
   )
 
