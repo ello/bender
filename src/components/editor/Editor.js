@@ -61,8 +61,21 @@ import TextBlock from './TextBlock'
 import Completer, { emojiRegex, userRegex } from '../completers/Completer'
 import BuyLinkDialog from '../dialogs/BuyLinkDialog'
 
+function buildRegex(regexStr) {
+  const optionalPrefix = '(?:https?:\\/\\/)?(?:w{3}\\.)?';
+  const terminator = '(?:\\/?|$|\\s|\\?|#)';
+  return new RegExp(optionalPrefix + regexStr + terminator);
+}
+
 export const ACTIVE_SERVICE_REGEXES = [
   /(?:.+?)?(?:youtube\.com\/v\/|watch\/|\?v=|&v=|youtu\.be\/|\/v=|^youtu\.be\/)([a-zA-Z0-9_-]{11})+/,
+  buildRegex('vimeo.com/(\\S*)'),
+  buildRegex('(?:soundcloud.com|snd.sc)\\/([a-zA-Z0-9_-]*(?:\\/sets)?(?:\\/groups)?\\/[a-zA-Z0-9_-]*)'),
+  buildRegex('dailymotion.com/video/([a-zA-Z0-9-_]*)'),
+  buildRegex('(?:mixcloud.com)\\/(.*\\/.*)'),
+  buildRegex('(?:codepen.io)\\/([a-zA-Z0-9_\\-%]*\\/[a-zA-Z0-9_\\-%]*\\/[a-zA-Z0-9_\\-%]*)'),
+  buildRegex('([a-zA-Z0-9_\\-]*.bandcamp.com\\/(album|track)\\/[a-zA-Z0-9_\\-%]*)'),
+  buildRegex('(?:ustream.tv|ustre.am)\\/((?:(recorded|channel)\\/)?[a-zA-Z0-9_\\-%]*)'),
 ]
 
 const editorUniqueIdentifiers = {}
