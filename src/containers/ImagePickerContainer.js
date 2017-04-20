@@ -44,6 +44,10 @@ class ImagePickerContainer extends PureComponent {
     isUploading: false,
   }
 
+  componentWillMount() {
+    BackAndroid.addEventListener('hardwareBackPress', this.handleHardwareBackPress)
+  }
+
   componentDidMount() {
     const options = {
       title: '',
@@ -77,6 +81,15 @@ class ImagePickerContainer extends PureComponent {
     this.setState({ isUploading: false })
     SharedPreferences.setItem('reloadFromReact', 'true')
     BackAndroid.exitApp()
+  }
+
+  componentWillUnmount() {
+    BackAndroid.removeEventListener('hardwareBackPress', this.handleHardwareBackPress)
+  }
+
+  handleHardwareBackPress = () => {
+    if (this.state.isUploading) { return true }
+    return false
   }
 
   render() {
