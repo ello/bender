@@ -7,14 +7,6 @@
       "mainFilePath": "src/main/java/co/ello/ElloApp/Dagger/ElloApp.java"
     }
   },
-  "babel": {
-    "presets": [
-      "es2015",
-      "flow",
-      "react",
-      "stage-0"
-    ]
-  },
   "eslintConfig": {
     "extends": "airbnb",
     "parser": "babel-eslint",
@@ -113,10 +105,6 @@
   "devDependencies": {
     "babel-eslint": "7.2.1",
     "babel-jest": "19.0.0",
-    "babel-preset-es2015": "6.24.1",
-    "babel-preset-flow": "6.23.0",
-    "babel-preset-react": "6.24.1",
-    "babel-preset-stage-0": "6.24.1",
     "eslint": "3.18.0",
     "eslint-config-airbnb": "14.1.0",
     "eslint-plugin-import": "2.2.0",

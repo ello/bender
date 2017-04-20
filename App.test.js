@@ -1,6 +1,6 @@
-import React from 'react'
-import renderer from 'react-test-renderer'
-import App from './App'
+import React from 'react';
+import renderer from 'react-test-renderer';
+import App from './App';
 
 const initialState = {
   authentication: {},

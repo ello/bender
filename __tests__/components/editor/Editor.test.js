@@ -1,4 +1,4 @@
-import { ACTIVE_SERVICE_REGEXES } from '../../../src/components/editor/Editor'
+import { ACTIVE_SERVICE_REGEXES } from '../../../src/components/editor/Editor';
 
 describe('Editor', () => {
   describe('embeds', () => {
