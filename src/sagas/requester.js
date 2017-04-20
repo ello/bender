@@ -5,6 +5,7 @@ import { camelizeKeys } from 'humps'
 import { actionChannel, call, fork, put, select, take } from 'redux-saga/effects'
 import * as ACTION_TYPES from '../constants/action_types'
 import { selectRefreshToken } from '../selectors/authentication'
+import { selectPathname } from '../selectors/routing'
 import { clearAuthToken, refreshAuthenticationToken } from '../actions/authentication'
 import { extractJSON, fetchCredentials, getHeaders, getHeadHeader, sagaFetch } from './api'
 // import { openAlert } from '../actions/modals'
@@ -177,7 +178,7 @@ export function* performRequest(action) {
   } = action
   let { payload } = action
 
-  const pathname = endpoint.path
+  const pathname = yield select(selectPathname)
   payload = {
     ...payload,
     pathname,

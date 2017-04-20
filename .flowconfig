@@ -10,6 +10,8 @@
 .*/node_modules/react-native/lib/.*
 .*/node_modules/react-native/local-cli/.*
 .*/node_modules/react-native/packager/.*
+.*/node_modules/react-native-tab-view/.*
+.*/node_modules/react-navigation/.*
 
 [include]
 
