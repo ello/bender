@@ -296,8 +296,6 @@ class Editor extends Component {
   }
 
   componentDidMount() {
-    // TODO: remove this when we have embeds working
-    Clipboard.setString('https://www.youtube.com/watch?v=gUGda7GdZPQ')
     const { dispatch, editorId } = this.props
     dispatch(addEmptyTextBlock(editorId))
   }
