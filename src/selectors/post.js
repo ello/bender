@@ -16,6 +16,7 @@ import { selectUsers } from './user'
 
 const countProtector = count => (count < 0 ? 0 : count)
 
+export const selectPropsPost = (state, props) => get(props, 'post')
 export const selectPropsPostId = (state, props) =>
   get(props, 'postId') || get(props, 'post', Immutable.Map()).get('id')
 
@@ -25,9 +26,10 @@ export const selectPosts = state => state.json.get(POSTS, Immutable.Map())
 
 // Requires `postId`, `post` or `params.token` to be found in props
 export const selectPost = createSelector(
-  [selectPropsPostId, selectParamsToken, selectPosts], (id, token, posts) => {
+  [selectPropsPost, selectPropsPostId, selectParamsToken, selectPosts],
+  (propsPost, id, token, posts) => {
     if (id) {
-      return posts.get(id, Immutable.Map())
+      return posts.get(id, propsPost || Immutable.Map())
     } else if (token) {
       return (posts.find(post => post.get('token') === token)) || Immutable.Map()
     }
