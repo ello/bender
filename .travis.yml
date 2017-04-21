@@ -1,0 +1,21 @@
+language: node_js
+node_js:
+  - "7"
+cache: yarn
+before_install:
+- cp .env.example .env
+script:
+- yarn flow
+- yarn lint
+- yarn test
+- rvm install 2.3.1
+- rvm use 2.3.1
+- gem install danger -v 2.0.1 --no-ri --no-rdoc
+- danger
+notifications:
+  email: false
+  slack:
+    on_success: change
+    on_failure: change
+    rooms:
+      secure: pt477pePE1qJhTZCC/6t3kubCzpxuLBsar33iGqRMBr5BNMyc/7pCwuWCMVYOV0O/LNTQ8HFSEcau8SaZKZKFfCWOP8WxLYokBE70xtN6h+7NjgOoxes3agDSGlapZt/3URl32ffVPE2gjtL1NZlAkwVx6sCSad8Skt3MYS2wdxZNRgb4Uz9S+kLjxMvAY2dvfSqssUFNW/qpg8n7Uxrwzx1cF+RsXX9WoZyV3TNkPQekJsYtUmcHrJKXRQqUyyte+ZaHpWIkm7nx/DxDdjKUNLWd8J/Bx6HeoO/msdqtyac8XjK/XtKDi/59HdMg2uUl2LpjlA/bNnD2EYJ9Vx2o1mr8eF6CX8BILuPWB6HBP1md1dGBF/nyleNUEa7tQXkLF4iz+Q2Ihj0LFVnYND133oe+B3zeJ1WZVPfY1Bfuj1/ldwPz/KC1dkcdO3KGyJ6j5fMrbkdYsU1q1HKC1kF6WosiDDKnRr60losnZdscl05x0S7jvORbQkXqkso9oSBhFJMaJvplM8Fgjn5ViYWe2gSnvRkHYR9hFFA6OKnuhSjKP9ZiU9DHMgkaAboAl1h1fYaNW9Bb4HbTXG4FHoaVC7fEAHj9O84PZ9viCu99D0onH47iYDfRlT9grlY80jdfhLtGFqphxKMrZqB2Jnc8e88+ZGd3YFvDhd2ZNrtH0g=
