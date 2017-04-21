@@ -13,7 +13,7 @@ local.properties
 /.vscode
 /jsconfig.json
 android/app/build/
-android/app/ello-android-release-key.keystore
+*.keystore
 android/app/app.iml
 android/android.iml
 android/Ello.iml
