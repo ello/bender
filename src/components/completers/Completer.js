@@ -1,3 +1,4 @@
+import Immutable from 'immutable'
 import React, { PropTypes, PureComponent } from 'react'
 import {
   Image,
@@ -55,7 +56,7 @@ export default class Completer extends PureComponent {
 
   render() {
     const { completions, isCompleterActive } = this.props
-    if (!isCompleterActive || !completions || !completions.get('data').size) { return null }
+    if (!isCompleterActive || !completions || !completions.get('data', Immutable.List()).size) { return null }
     return (
       <ScrollView
         horizontal={false}

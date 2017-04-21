@@ -1,6 +1,6 @@
 // state.authentication.xxx
 export const selectAccessToken = state => state.authentication.get('accessToken')
-export const selectExpirationDate = state => state.authentication.get('expirationDate')
+export const selectExpirationDate = state => new Date(state.authentication.get('expirationDate', new Date()))
 export const selectIsLoggedIn = state => state.authentication.get('isLoggedIn')
 export const selectRefreshToken = state => state.authentication.get('refreshToken')
 
