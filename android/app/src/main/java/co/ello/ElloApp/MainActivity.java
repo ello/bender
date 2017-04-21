@@ -140,6 +140,7 @@ public class MainActivity
         if(shouldHardRefresh() || (reloadFromReact != null && reloadFromReact.equals("true"))) {
             shouldReload = true;
             sharedPreferences.edit().putString(ElloPreferences.RELOAD_FROM_REACT, null).apply();
+            progress.show();
         }
 
         inBackground = false;
