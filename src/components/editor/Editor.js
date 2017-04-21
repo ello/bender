@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Alert,
   BackAndroid,
-  Clipboard,
   Dimensions,
   Keyboard,
   Modal,

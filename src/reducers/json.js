@@ -2,7 +2,7 @@
 /* eslint-disable no-underscore-dangle */
 import Immutable from 'immutable'
 import { LOCATION_CHANGE } from 'react-router-redux'
-import { REHYDRATE } from 'redux-persist/constants'
+// import { REHYDRATE } from 'redux-persist/constants'
 import { camelize } from 'humps'
 import get from 'lodash/get'
 import union from 'lodash/union'
