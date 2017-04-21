@@ -77,7 +77,7 @@
     "flow": "flow",
     "ios": "react-native run-ios",
     "lint": "eslint ./src",
-    "mrclean": "yarn clean && rm .yarnclean && rm -rf $TMPDIR/react* && rm -rf node_modules/ && yarn",
+    "mrclean": "rm -rf $TMPDIR/react* && rm -rf node_modules/ && yarn",
     "start": "react-native start",
     "test": "node node_modules/jest/bin/jest.js --watch"
   },
