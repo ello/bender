@@ -319,12 +319,12 @@ export default function json(state = initialState, action = { type: '' }) {
       return initialState
     case ACTION_TYPES.CLEAR_PAGE_RESULT:
       return state.deleteIn(['pages', action.payload.resultKey])
-    // case ACTION_TYPES.COMMENT.CREATE_FAILURE:
-    // case ACTION_TYPES.COMMENT.CREATE_REQUEST:
-    // case ACTION_TYPES.COMMENT.CREATE_SUCCESS:
-    // case ACTION_TYPES.COMMENT.UPDATE_SUCCESS:
-    //   state = methods.parseLinked(get(action, 'payload.response.linked'), state)
-    //   return commentMethods.addOrUpdateComment(state, action)
+    case ACTION_TYPES.COMMENT.CREATE_FAILURE:
+    case ACTION_TYPES.COMMENT.CREATE_REQUEST:
+    case ACTION_TYPES.COMMENT.CREATE_SUCCESS:
+    case ACTION_TYPES.COMMENT.UPDATE_SUCCESS:
+      state = methods.parseLinked(get(action, 'payload.response.linked'), state)
+      return commentMethods.addOrUpdateComment(state, action)
     case ACTION_TYPES.COMMENT.DELETE_REQUEST:
     case ACTION_TYPES.COMMENT.DELETE_SUCCESS:
     case ACTION_TYPES.COMMENT.DELETE_FAILURE:
@@ -340,11 +340,11 @@ export default function json(state = initialState, action = { type: '' }) {
       break
     case ACTION_TYPES.NOTIFICATIONS.MARK_ANNOUNCEMENT_READ_REQUEST:
       return methods.markAnnouncementRead(state)
-    // case ACTION_TYPES.POST.CREATE_FAILURE:
-    // case ACTION_TYPES.POST.CREATE_SUCCESS:
-    // case ACTION_TYPES.POST.UPDATE_SUCCESS:
-    //   state = methods.parseLinked(get(action, 'payload.response.linked'), state)
-    //   return postMethods.addOrUpdatePost(state, action)
+    case ACTION_TYPES.POST.CREATE_FAILURE:
+    case ACTION_TYPES.POST.CREATE_SUCCESS:
+    case ACTION_TYPES.POST.UPDATE_SUCCESS:
+      state = methods.parseLinked(get(action, 'payload.response.linked'), state)
+      return postMethods.addOrUpdatePost(state, action)
     case ACTION_TYPES.POST.DELETE_REQUEST:
     case ACTION_TYPES.POST.DELETE_SUCCESS:
     case ACTION_TYPES.POST.DELETE_FAILURE:
@@ -365,15 +365,15 @@ export default function json(state = initialState, action = { type: '' }) {
       return postMethods.toggleEditing(state, action)
     case ACTION_TYPES.POST.TOGGLE_REPOSTING:
       return postMethods.toggleReposting(state, action)
-    // case ACTION_TYPES.PROFILE.SAVE_AVATAR_SUCCESS:
-    // case ACTION_TYPES.PROFILE.SAVE_COVER_SUCCESS:
     case ACTION_TYPES.PROFILE.LOAD_SUCCESS:
+    case ACTION_TYPES.PROFILE.SAVE_AVATAR_SUCCESS:
+    case ACTION_TYPES.PROFILE.SAVE_COVER_SUCCESS:
     case ACTION_TYPES.PROFILE.SAVE_SUCCESS:
       state = methods.parseLinked(get(action, 'payload.response.linked'), state)
       return methods.updateCurrentUser(state, action)
-    // case ACTION_TYPES.PROFILE.TMP_AVATAR_CREATED:
-    // case ACTION_TYPES.PROFILE.TMP_COVER_CREATED:
-    //   return methods.updateCurrentUserTmpAsset(state, action)
+    case ACTION_TYPES.PROFILE.TMP_AVATAR_CREATED:
+    case ACTION_TYPES.PROFILE.TMP_COVER_CREATED:
+      return methods.updateCurrentUserTmpAsset(state, action)
     case ACTION_TYPES.RELATIONSHIPS.BATCH_UPDATE_INTERNAL:
       return relationshipMethods.batchUpdateRelationship(state, action)
     case ACTION_TYPES.RELATIONSHIPS.UPDATE_INTERNAL:
