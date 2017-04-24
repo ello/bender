@@ -294,11 +294,11 @@ public class MainActivity
     public void launchEditor(String jsState, String post, String isComment, String comment) {
         if (webAppReady) {
             Hawk.put(ElloPreferences.JS_STATE, jsState);
+            Hawk.put("comment", comment);
+            Hawk.put("isComment", isComment);
+            Hawk.put("post", post);
+            Hawk.put("initialRoute", "editor");
             Intent intent = new Intent(this, ReactNativeActivity.class);
-            intent.putExtra("comment", comment);
-            intent.putExtra("isComment", isComment);
-            intent.putExtra("post", post);
-            intent.putExtra("initialRoute", "editor");
             startActivity(intent);
         }
     }
@@ -307,9 +307,9 @@ public class MainActivity
     public void launchImagePicker(String jsState, String kind) {
         if (webAppReady) {
             Hawk.put(ElloPreferences.JS_STATE, jsState);
+            Hawk.put("kind", kind);
+            Hawk.put("initialRoute", "imagePicker");
             Intent intent = new Intent(this, ReactNativeActivity.class);
-            intent.putExtra("kind", kind);
-            intent.putExtra("initialRoute", "imagePicker");
             startActivity(intent);
         }
     }

@@ -4,26 +4,33 @@ import { StatusBar, View } from 'react-native'
 import EditorContainer from './EditorContainer'
 import ImagePickerContainer from './ImagePickerContainer'
 import ModalContainer from './ModalContainer'
+import HawkWrapper from '../lib/hawk_wrapper'
 
 class AppContainer extends PureComponent {
 
-  static propTypes = {
-    comment: PropTypes.string,
-    initialRoute: PropTypes.string.isRequired,
-    isComment: PropTypes.string,
-    kind: PropTypes.string,
-    post: PropTypes.string,
-  }
-
-  static defaultProps = {
+  state = {
     comment: null,
-    isComment: false,
-    kind: '',
+    initialRoute: null,
+    isComment: null,
+    kind: null,
     post: null,
   }
 
+  componentWillMount() {
+    HawkWrapper.getItems(['comment', 'initialRoute', 'isComment', 'kind', 'post'], (values) => {
+      const [comment, initialRoute, isComment, kind, post] = values
+      this.setState({
+        comment,
+        initialRoute,
+        isComment,
+        kind,
+        post,
+      })
+    })
+  }
+
   render() {
-    const { comment, initialRoute, isComment, kind, post } = this.props
+    const { comment, initialRoute, isComment, kind, post } = this.state
     const editorProps = {
       comment: comment ? Immutable.fromJS(JSON.parse(comment)) : Immutable.Map(),
       isComment: isComment === 'true',

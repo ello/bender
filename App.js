@@ -6,28 +6,27 @@ import { persistStore } from 'redux-persist'
 import immutableTransform from 'redux-persist-transform-immutable'
 import { createNativeAppStore } from './src/store'
 import AppContainer from './src/containers/AppContainer'
+import HawkWrapper from './src/lib/hawk_wrapper'
 
 const whitelist = ['authentication', 'editor', 'gui', 'json', 'profile']
 export default class App extends PureComponent {
-
-  static propTypes = {
-    jsState: PropTypes.string.isRequired,
-  }
 
   state = {
     rehydrated: false,
   }
 
   componentWillMount() {
-    const state = JSON.parse(this.props.jsState)
-    const immutableState = {}
-    Object.keys(state).forEach(key => (immutableState[key] = Immutable.fromJS(state[key])))
-    this.store = createNativeAppStore(immutableState)
-    persistStore(
-      this.store,
-      { storage: AsyncStorage, transforms: [immutableTransform()], whitelist },
-      () => this.setState({ rehydrated: true }),
-    ).purge()
+    HawkWrapper.get('jsState', (value) => {
+      const state = JSON.parse(value)
+      const immutableState = {}
+      Object.keys(state).forEach(key => (immutableState[key] = Immutable.fromJS(state[key])))
+      this.store = createNativeAppStore(immutableState)
+      persistStore(
+        this.store,
+        { storage: AsyncStorage, transforms: [immutableTransform()], whitelist },
+        () => this.setState({ rehydrated: true }),
+      ).purge()
+    })
     // TODO: figure out what is happening on rehydrate as it seems to kill
     // certain things about the data like the fact that a post isReposting
   }
