@@ -1,13 +1,32 @@
+sudo: false
+dist: trusty
 language: node_js
 node_js:
   - "7"
+jdk:
+- oraclejdk8
 cache: yarn
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
 before_install:
 - cp .env.example .env
+- mkdir $PWD/android-sdk
+- export ANDROID_HOME=$PWD/android-sdk
+- mkdir "$ANDROID_HOME/licenses"
+- echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
+env:
+  - GRADLE_OPTS="-Xmx128m -Dorg.gradle.jvmargs='-Xmx256m -XX:MaxPermSize=128m'"
 script:
 - yarn flow
 - yarn lint
 - yarn test
+- cd android && ./gradlew check
 - rvm install 2.3.1
 - rvm use 2.3.1
 - gem install danger -v 2.0.1 --no-ri --no-rdoc
