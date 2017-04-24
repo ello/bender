@@ -19,8 +19,8 @@ import {
   createComment,
   toggleEditing as toggleCommentEditing,
   updateComment,
-} from '../../actions/comments'
-import { closeModal, openModal } from '../../actions/modals'
+} from '../actions/comments'
+import { closeModal, openModal } from '../actions/modals'
 import {
   addBlock,
   addEmptyTextBlock,
@@ -34,31 +34,31 @@ import {
   setIsCompleterActive,
   updateBlock,
   updateBuyLink,
-} from '../../actions/editor'
+} from '../actions/editor'
 import {
   createPost,
   toggleEditing,
   toggleReposting,
   updatePost,
-} from '../../actions/posts'
-import { EDITOR } from '../../constants/action_types'
-import { selectCompletions } from '../../selectors/editor'
-import { selectEmojis } from '../../selectors/emoji'
-import { selectIsCompleterActive } from '../../selectors/gui'
+} from '../actions/posts'
+import { EDITOR } from '../constants/action_types'
+import { selectCompletions } from '../selectors/editor'
+import { selectEmojis } from '../selectors/emoji'
+import { selectIsCompleterActive } from '../selectors/gui'
 import {
   selectPost,
   selectPostIsEmpty,
   selectPostIsOwn,
-} from '../../selectors/post'
-import { selectHasAutoWatchEnabled, selectIsOwnPage } from '../../selectors/profile'
-import { CameraIcon, CheckMark, DismissIcon, MoneyIcon, PencilIcon } from '../assets/Icons'
-import { FloatingButton, IconButton } from '../buttons/Buttons'
-import EmbedBlock from './EmbedBlock'
-import ImageBlock from './ImageBlock'
-import RepostBlock from './RepostBlock'
-import TextBlock from './TextBlock'
-import Completer, { emojiRegex, userRegex } from '../completers/Completer'
-import BuyLinkDialog from '../dialogs/BuyLinkDialog'
+} from '../selectors/post'
+import { selectHasAutoWatchEnabled, selectIsOwnPage } from '../selectors/profile'
+import { CameraIcon, CheckMark, DismissIcon, MoneyIcon, PencilIcon } from '../components/assets/Icons'
+import { FloatingButton, IconButton } from '../components/buttons/Buttons'
+import EmbedBlock from '../components/editor/EmbedBlock'
+import ImageBlock from '../components/editor/ImageBlock'
+import RepostBlock from '../components/editor/RepostBlock'
+import TextBlock from '../components/editor/TextBlock'
+import Completer, { emojiRegex, userRegex } from '../components/completers/Completer'
+import BuyLinkDialog from '../components/dialogs/BuyLinkDialog'
 
 function buildRegex(regexStr) {
   const optionalPrefix = '(?:https?:\\/\\/)?(?:w{3}\\.)?';
@@ -194,7 +194,7 @@ const moneyCheckMarkWrapperStyle = {
   right: 5,
 }
 
-class Editor extends Component {
+class EditorContainer extends Component {
 
   static propTypes = {
     allowsAutoWatch: PropTypes.bool,
@@ -738,5 +738,5 @@ class Editor extends Component {
   }
 }
 
-export default connect(mapStateToProps)(Editor)
+export default connect(mapStateToProps)(EditorContainer)
 
