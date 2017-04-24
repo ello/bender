@@ -23,7 +23,7 @@ export default class TextBlock extends PureComponent {
 
   state = {
     text: this.props.data,
-    viewHeight: 200,
+    viewHeight: 60,
   }
 
   onFocus = () => {

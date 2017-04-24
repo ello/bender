@@ -1,15 +1,8 @@
 import Immutable from 'immutable'
 import React, { Component, PropTypes } from 'react'
 import {
-  ActivityIndicator,
   Alert,
   BackAndroid,
-  Dimensions,
-  Keyboard,
-  Modal,
-  ScrollView,
-  Text,
-  View,
 } from 'react-native'
 import SharedPreferences from 'react-native-shared-preferences'
 import { connect } from 'react-redux'
@@ -51,13 +44,8 @@ import {
   selectPostIsOwn,
 } from '../selectors/post'
 import { selectHasAutoWatchEnabled, selectIsOwnPage } from '../selectors/profile'
-import { CameraIcon, CheckMark, DismissIcon, MoneyIcon, PencilIcon } from '../components/assets/Icons'
-import { FloatingButton, IconButton } from '../components/buttons/Buttons'
-import EmbedBlock from '../components/editor/EmbedBlock'
-import ImageBlock from '../components/editor/ImageBlock'
-import RepostBlock from '../components/editor/RepostBlock'
-import TextBlock from '../components/editor/TextBlock'
-import Completer, { emojiRegex, userRegex } from '../components/completers/Completer'
+import Editor from '../components/editor/Editor'
+import { emojiRegex, userRegex } from '../components/completers/Completer'
 import BuyLinkDialog from '../components/dialogs/BuyLinkDialog'
 
 function buildRegex(regexStr) {
@@ -157,43 +145,6 @@ function mapStateToProps(state, props) {
   }
 }
 
-const toolbarStyle = {
-  flexDirection: 'row',
-  height: 56,
-  marginVertical: 10,
-}
-const toolbarLeftStyle = {
-  flex: 1,
-  flexDirection: 'row',
-  justifyContent: 'flex-start',
-}
-const toolbarRightStyle = {
-  flex: 1,
-  flexDirection: 'row',
-  justifyContent: 'flex-end',
-  paddingRight: 10,
-}
-const activityIndicatorViewStyle = {
-  alignItems: 'center',
-  backgroundColor: 'rgba(0, 0, 0, 0.6)',
-  flex: 1,
-  justifyContent: 'center',
-  paddingHorizontal: 20,
-}
-const postingTextStyle = {
-  backgroundColor: '#000',
-  borderRadius: 20,
-  color: '#fff',
-  marginBottom: 20,
-  paddingHorizontal: 20,
-  paddingVertical: 10,
-}
-const moneyCheckMarkWrapperStyle = {
-  position: 'absolute',
-  top: 5,
-  right: 5,
-}
-
 class EditorContainer extends Component {
 
   static propTypes = {
@@ -252,26 +203,39 @@ class EditorContainer extends Component {
   }
 
   static childContextTypes = {
+    onCancelAutoCompleter: PropTypes.func,
+    onCompletion: PropTypes.func,
+    onChangeText: PropTypes.func,
     onCheckForEmbeds: PropTypes.func,
     onClickRemoveBlock: PropTypes.func,
     onEmojiCompleter: PropTypes.func,
     onHideCompleter: PropTypes.func,
+    onLaunchBuyLinkModal: PropTypes.func,
+    onResetEditor: PropTypes.func,
     onSelectionChange: PropTypes.func,
+    onShowImageOptions: PropTypes.func,
+    onSubmitPost: PropTypes.func,
     onUserCompleter: PropTypes.func,
   }
 
   state = {
     completerType: null,
-    scrollViewHeight: Dimensions.get('window').height - (toolbarStyle.height),
   }
 
   getChildContext() {
     return {
+      onCancelAutoCompleter: this.onCancelAutoCompleter,
+      onChangeText: this.onChangeText,
       onCheckForEmbeds: this.onCheckForEmbeds,
       onClickRemoveBlock: this.onClickRemoveBlock,
+      onCompletion: this.onCompletion,
       onEmojiCompleter: this.onEmojiCompleter,
       onHideCompleter: this.onHideCompleter,
+      onLaunchBuyLinkModal: this.onLaunchBuyLinkModal,
+      onResetEditor: this.onResetEditor,
       onSelectionChange: this.onSelectionChange,
+      onShowImageOptions: this.onShowImageOptions,
+      onSubmitPost: this.onSubmitPost,
       onUserCompleter: this.onUserCompleter,
     }
   }
@@ -289,8 +253,6 @@ class EditorContainer extends Component {
     }
     this.onEmojiCompleter = debounce(this.onEmojiCompleter, 333)
     this.onUserCompleter = debounce(this.onUserCompleter, 333)
-    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide)
-    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow)
     BackAndroid.addEventListener('hardwareBackPress', this.handleHardwareBackPress)
   }
 
@@ -299,15 +261,12 @@ class EditorContainer extends Component {
     dispatch(addEmptyTextBlock(editorId))
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps) {
     return !Immutable.is(this.props.collection, nextProps.collection) ||
       !Immutable.is(this.props.completions, nextProps.completions) ||
       !Immutable.is(this.props.order, nextProps.order) ||
       ['hasContent', 'hasMedia', 'hasMention', 'isCompleterActive', 'isLoading', 'isPosting'].some(prop =>
         this.props[prop] !== nextProps[prop],
-      ) ||
-      ['scrollViewHeight'].some(prop =>
-        this.state[prop] !== nextState[prop],
       )
   }
 
@@ -557,59 +516,6 @@ class EditorContainer extends Component {
     return letters.join('')
   }
 
-  getBlockElement(block) {
-    const blockProps = {
-      data: block.get('data'),
-      editorId: this.props.editorId,
-      hasContent: this.props.hasContent,
-      key: block.get('uid'),
-      kind: block.get('kind'),
-      linkURL: block.get('linkUrl'),
-      onRemoveBlock: this.remove,
-      uid: block.get('uid'),
-    }
-    switch (block.get('kind')) {
-      case 'embed':
-        return (
-          <EmbedBlock
-            {...blockProps}
-            source={{ uri: block.getIn(['data', 'thumbnailLargeUrl']) }}
-          />
-        )
-      case 'image':
-        return (
-          <ImageBlock
-            {...blockProps}
-            height={block.get('height')}
-            source={{ uri: block.get('blob') || block.getIn(['data', 'url']) }}
-            width={block.get('width')}
-          />
-        )
-      case 'repost':
-        return (
-          <RepostBlock {...blockProps} onRemoveBlock={null} />
-        )
-      case 'text':
-        return (
-          <TextBlock
-            {...blockProps}
-            onChange={this.onChangeText}
-          />
-        )
-      default:
-        return null
-    }
-  }
-
-  keyboardDidHide = () => {
-    this.onHideCompleter()
-    this.setState({ scrollViewHeight: (Dimensions.get('window').height - (toolbarStyle.height)) })
-  }
-
-  keyboardDidShow = ({ endCoordinates: { screenY } }) => {
-    this.setState({ scrollViewHeight: (screenY - (toolbarStyle.height)) })
-  }
-
   handleHardwareBackPress = () => {
     const { hasContent, isPosting, isLoading } = this.props
     if (hasContent) {
@@ -660,7 +566,6 @@ class EditorContainer extends Component {
 
   render() {
     const {
-      blocks,
       buyLink,
       collection,
       completions,
@@ -672,69 +577,21 @@ class EditorContainer extends Component {
       isLoading,
       isPosting,
       order,
-      repostContent,
     } = this.props
     const isPostingDisabled = isPosting || isLoading || !hasContent
-    const key = `${editorId}_${(blocks ? blocks.size : '') + (repostContent ? repostContent.size : '')}`
-    return (
-      <View key={key} style={{ flex: 1, backgroundColor: hasMention ? '#ffc' : '#eee' }}>
-        <View style={toolbarStyle}>
-          <View style={toolbarLeftStyle}>
-            {/* disable the dismiss `x` until persisting is working */}
-            {hasContent && false &&
-              <IconButton onPress={this.onResetEditor}>
-                <DismissIcon />
-              </IconButton>
-            }
-            <IconButton onPress={this.onShowImageOptions}>
-              <CameraIcon />
-            </IconButton>
-            <IconButton disabled={!hasMedia} onPress={this.onLaunchBuyLinkModal}>
-              {buyLink && buyLink.length &&
-                <View style={moneyCheckMarkWrapperStyle}>
-                  <CheckMark size="small" modifier="green" />
-                </View>
-              }
-              <MoneyIcon />
-            </IconButton>
-          </View>
-          <View style={toolbarRightStyle}>
-            <FloatingButton size="large" disabled={isPostingDisabled} onPress={this.onSubmitPost}>
-              <PencilIcon disabled={isPostingDisabled} />
-            </FloatingButton>
-          </View>
-        </View>
-        <View style={{ height: this.state.scrollViewHeight }}>
-          <ScrollView
-            horizontal={false}
-            ref={comp => (this.scrollView = comp)}
-          >
-            {order ? order.valueSeq().map(uid => this.getBlockElement(collection.get(`${uid}`))) : null}
-          </ScrollView>
-        </View>
-        <Completer
-          completions={completions}
-          isCompleterActive={isCompleterActive}
-          onCancel={this.onCancelAutoCompleter}
-          onCompletion={this.onCompletion}
-        />
-        <Modal
-          animationType="fade"
-          onRequestClose={() => {}}
-          transparent
-          visible={isPosting}
-        >
-          <View style={activityIndicatorViewStyle}>
-            <Text style={postingTextStyle}>Posting...</Text>
-            <ActivityIndicator
-              animating
-              color="#fff"
-              size="large"
-            />
-          </View>
-        </Modal>
-      </View>
-    )
+    const props = {
+      buyLink,
+      collection,
+      completions,
+      editorId,
+      hasMedia,
+      hasMention,
+      isCompleterActive,
+      isPosting,
+      isPostingDisabled,
+      order,
+    }
+    return <Editor {...props} />
   }
 }
 
