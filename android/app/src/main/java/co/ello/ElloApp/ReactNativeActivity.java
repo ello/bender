@@ -15,6 +15,7 @@ import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.nispok.snackbar.listeners.ActionClickListener;
+import com.orhanobut.hawk.Hawk;
 
 public class ReactNativeActivity extends ReactActivity {
 
@@ -59,13 +60,15 @@ public class ReactNativeActivity extends ReactActivity {
             @Override
             protected Bundle getLaunchOptions() {
                 Intent intent = getIntent();
+                String jsState = Hawk.get(ElloPreferences.JS_STATE);
                 Bundle initialProps = new Bundle();
-                initialProps.putString("jsState", intent.getExtras().getString("jsState"));
+                initialProps.putString(ElloPreferences.JS_STATE, jsState);
                 initialProps.putString("comment", intent.getExtras().getString("comment"));
                 initialProps.putString("isComment", intent.getExtras().getString("isComment"));
                 initialProps.putString("post", intent.getExtras().getString("post"));
                 initialProps.putString("kind", intent.getExtras().getString("kind"));
                 initialProps.putString("initialRoute", intent.getExtras().getString("initialRoute"));
+                Hawk.delete(ElloPreferences.JS_STATE);
                 return initialProps;
             }
         };

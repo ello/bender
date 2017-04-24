@@ -32,6 +32,7 @@ import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.nispok.snackbar.listeners.ActionClickListener;
+import com.orhanobut.hawk.Hawk;
 import com.squareup.seismic.ShakeDetector;
 
 import org.xwalk.core.JavascriptInterface;
@@ -79,7 +80,7 @@ public class MainActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Hawk.init(getApplicationContext()).build();
         sharedPreferences = getApplicationContext().getSharedPreferences(ElloPreferences.PREFERENCES_KEY, Context.MODE_PRIVATE);
 
         path = sharedPreferences.getString(ElloPreferences.WEBAPP_DOMAIN, BuildConfig.PROD_ELLO_DOMAIN);
@@ -292,8 +293,8 @@ public class MainActivity
     @JavascriptInterface
     public void launchEditor(String jsState, String post, String isComment, String comment) {
         if (webAppReady) {
+            Hawk.put(ElloPreferences.JS_STATE, jsState);
             Intent intent = new Intent(this, ReactNativeActivity.class);
-            intent.putExtra("jsState", jsState);
             intent.putExtra("comment", comment);
             intent.putExtra("isComment", isComment);
             intent.putExtra("post", post);
@@ -305,8 +306,8 @@ public class MainActivity
     @JavascriptInterface
     public void launchImagePicker(String jsState, String kind) {
         if (webAppReady) {
+            Hawk.put(ElloPreferences.JS_STATE, jsState);
             Intent intent = new Intent(this, ReactNativeActivity.class);
-            intent.putExtra("jsState", jsState);
             intent.putExtra("kind", kind);
             intent.putExtra("initialRoute", "imagePicker");
             startActivity(intent);
