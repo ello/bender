@@ -1,7 +1,7 @@
 import Immutable from 'immutable'
 import React, { PropTypes, PureComponent } from 'react'
 import { StatusBar, View } from 'react-native'
-import Editor from '../components/editor/Editor'
+import EditorContainer from './EditorContainer'
 import ImagePickerContainer from './ImagePickerContainer'
 import ModalContainer from './ModalContainer'
 
@@ -32,7 +32,7 @@ class AppContainer extends PureComponent {
     return (
       <View style={{ flex: 1 }}>
         <StatusBar hidden />
-        {initialRoute === 'editor' && <Editor {...editorProps} />}
+        {initialRoute === 'editor' && <EditorContainer {...editorProps} />}
         {initialRoute === 'imagePicker' && <ImagePickerContainer kind={kind} />}
         <ModalContainer />
       </View>
