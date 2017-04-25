@@ -1,6 +1,6 @@
-import { ACTIVE_SERVICE_REGEXES } from '../../../src/components/editor/Editor';
+import { ACTIVE_SERVICE_REGEXES } from '../../../src/containers/EditorContainer';
 
-describe('Editor', () => {
+describe('EditorContainer', () => {
   describe('embeds', () => {
     it('has active services', () => {
       expect(ACTIVE_SERVICE_REGEXES.length).toBe(8)

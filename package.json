@@ -7,11 +7,12 @@
       "mainFilePath": "src/main/java/co/ello/ElloApp/Dagger/ElloApp.java"
     }
   },
-  "babel": {
-    "presets": [
-      "flow",
-      "react"
-    ]
+  "babel" : {
+    "env": {
+      "test": {
+        "presets": ["react-native"]
+      }
+    }
   },
   "eslintConfig": {
     "extends": "airbnb",
@@ -79,7 +80,8 @@
     "lint": "eslint ./src",
     "mrclean": "rm -rf $TMPDIR/react* && rm -rf node_modules/ && yarn",
     "start": "react-native start",
-    "test": "node node_modules/jest/bin/jest.js --watch"
+    "test": "NODE_ENV=test node node_modules/jest/bin/jest.js",
+    "test:watch": "NODE_ENV=test node node_modules/jest/bin/jest.js --watch"
   },
   "jest": {
     "preset": "react-native",
@@ -112,9 +114,8 @@
   },
   "devDependencies": {
     "babel-eslint": "7.2.2",
-    "babel-jest": "19.0.0",
-    "babel-preset-flow": "6.23.0",
-    "babel-preset-react": "6.24.1",
+    "babel-jest": "^19.0.0",
+    "babel-preset-react-native": "^1.9.1",
     "eslint": "3.19.0",
     "eslint-config-airbnb": "14.1.0",
     "eslint-plugin-import": "2.2.0",

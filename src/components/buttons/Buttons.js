@@ -105,6 +105,7 @@ const floatingButtonStyles = {
   },
 }
 
+// $FlowFixMe
 export const FloatingButton = ({ children, ...props }: Props) => (
   <BaseButton styles={floatingButtonStyles} {...props} >
     {children}
@@ -119,6 +120,7 @@ const iconButtonStyles = StyleSheet.create({
   },
 })
 
+// $FlowFixMe
 export const IconButton = ({ children, ...props }: Props) => (
   <BaseButton styles={iconButtonStyles} {...props} >
     {children}
