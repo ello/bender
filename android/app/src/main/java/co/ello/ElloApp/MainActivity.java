@@ -140,7 +140,6 @@ public class MainActivity
         if(updateFromReact != null && updateFromReact.equals("true")) {
             updateWebappState();
             Hawk.delete(ElloPreferences.UPDATE_FROM_REACT);
-            return;
         }
 
         if(shouldHardRefresh()) {
@@ -321,7 +320,7 @@ public class MainActivity
     private void updateWebappState() {
         String jsState = Hawk.get(ElloPreferences.JS_STATE);
         String updateStateFunctionCall = "javascript:updateStateFromNative(" + jsState + ")";
-
+        Hawk.delete(ElloPreferences.JS_STATE);
         if(jsState != null) {
             xWalkView.load(updateStateFunctionCall, null);
         }

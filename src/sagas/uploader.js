@@ -15,6 +15,7 @@ import { AUTHENTICATION, EDITOR, PROFILE } from '../constants/action_types'
 import { fetchCredentials, getHeaders, sagaFetch } from './api'
 import { s3CredentialsPath } from '../networking/api'
 
+import { temporaryAssetCreated } from '../actions/profile'
 import { temporaryEditorAssetCreated } from '../actions/editor'
 import {
   imageGuid,
@@ -121,13 +122,17 @@ function* performUpload(action) {
     // const imageData = yield call(processImage, { ...fileData, file: objectURL })
     if (type === EDITOR.SAVE_ASSET) {
       yield put(temporaryEditorAssetCreated(file, editorId, width, height))
-      // The - 2 should always be consistent. The reason is that when a tmp image
-      // gets created at say uid 1 an additional text block is added to the bottom
-      // of the editor at uid 2 and the uid of the editor is now sitting at 3
-      // since it gets incremented after a block is added. So the - 2 gets us from
-      // the 3 back to the 1 where the image should reconcile back to.
-      uid = yield select(state => state.editor.getIn([editorId, 'uid']) - 2)
+    } else if (type === PROFILE.SAVE_AVATAR) {
+      yield put(temporaryAssetCreated(PROFILE.TMP_AVATAR_CREATED, file))
+    } else if (type === PROFILE.SAVE_COVER) {
+      yield put(temporaryAssetCreated(PROFILE.TMP_COVER_CREATED, file))
     }
+    // The - 2 should always be consistent. The reason is that when a tmp image
+    // gets created at say uid 1 an additional text block is added to the bottom
+    // of the editor at uid 2 and the uid of the editor is now sitting at 3
+    // since it gets incremented after a block is added. So the - 2 gets us from
+    // the 3 back to the 1 where the image should reconcile back to.
+    uid = yield select(state => state.editor.getIn([editorId, 'uid']) - 2)
     const { credentials } = yield call(fetchS3Credentials, accessToken)
     yield call(postAsset, credentials)
     // }
@@ -139,6 +144,10 @@ function* performUpload(action) {
       payload.uid = uid
       yield put({ meta, payload, type: SUCCESS })
       return
+    } else if (type === PROFILE.SAVE_AVATAR) {
+      yield put(temporaryAssetCreated(PROFILE.TMP_AVATAR_CREATED, assetUrl))
+    } else if (type === PROFILE.SAVE_COVER) {
+      yield put(temporaryAssetCreated(PROFILE.TMP_COVER_CREATED, assetUrl))
     }
 
     // the rest of the below should only happen when uploading

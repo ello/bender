@@ -36,8 +36,13 @@ const uploadingTextStyle = {
 class ImagePickerContainer extends PureComponent {
 
   static propTypes = {
+    asset: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
     kind: PropTypes.string.isRequired,
+  }
+
+  static defaultProps = {
+    asset: null,
   }
 
   state = {
@@ -77,9 +82,13 @@ class ImagePickerContainer extends PureComponent {
     })
   }
 
-  componentWillReceiveProps() {
-    this.setState({ isUploading: false })
-    ElloAndroidInterface.sendStateAndExit()
+  componentWillReceiveProps(nextProps) {
+    const { asset } = nextProps
+    const assetTmpUrl = asset.getIn(['tmp', 'url'])
+    if (assetTmpUrl && assetTmpUrl.indexOf('direct-uploads') > -1) {
+      this.setState({ isUploading: false })
+      ElloAndroidInterface.sendStateAndExit()
+    }
   }
 
   componentWillUnmount() {

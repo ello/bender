@@ -20,9 +20,9 @@ export default class App extends PureComponent {
       const state = JSON.parse(value)
       const immutableState = {}
       Object.keys(state).forEach(key => (immutableState[key] = Immutable.fromJS(state[key])))
-      this.store = createNativeAppStore(immutableState)
+      App.store = createNativeAppStore(immutableState)
       persistStore(
-        this.store,
+        App.store,
         { storage: AsyncStorage, transforms: [immutableTransform()], whitelist },
         () => this.setState({ rehydrated: true }),
       ).purge()
@@ -33,7 +33,7 @@ export default class App extends PureComponent {
 
   render() {
     return this.state.rehydrated ?
-      <Provider store={this.store}>
+      <Provider store={App.store}>
         <AppContainer {...this.props} />
       </Provider>
       :
