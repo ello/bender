@@ -4,7 +4,6 @@ import {
   Alert,
   BackAndroid,
 } from 'react-native'
-import SharedPreferences from 'react-native-shared-preferences'
 import { connect } from 'react-redux'
 import ImagePicker from 'react-native-image-picker'
 import debounce from 'lodash/debounce'
@@ -14,6 +13,7 @@ import {
   updateComment,
 } from '../actions/comments'
 import { closeModal, openModal } from '../actions/modals'
+import * as ElloAndroidInterface from '../lib/android_interface'
 import {
   addBlock,
   addEmptyTextBlock,
@@ -277,14 +277,11 @@ class EditorContainer extends Component {
       this.scrollView.scrollToEnd({ animated: true })
     }
     if (prevProps.isPosting && !this.props.isPosting) {
-      SharedPreferences.setItem('reloadFromReact', 'true')
-      BackAndroid.exitApp()
+      ElloAndroidInterface.sendStateAndExit()
     }
   }
 
   componentWillUnmount() {
-    this.keyboardDidHideListener.remove()
-    this.keyboardDidShowListener.remove()
     BackAndroid.removeEventListener('hardwareBackPress', this.handleHardwareBackPress)
   }
 

@@ -2,7 +2,7 @@ import React, { PropTypes, PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { ActivityIndicator, BackAndroid, Modal, StyleSheet, Text, View } from 'react-native'
 import ImagePicker from 'react-native-image-picker'
-import SharedPreferences from 'react-native-shared-preferences'
+import * as ElloAndroidInterface from '../lib/android_interface'
 import { saveAvatar, saveCover } from '../actions/profile'
 
 // need this to trigger a componentWillReceiveProps
@@ -79,8 +79,7 @@ class ImagePickerContainer extends PureComponent {
 
   componentWillReceiveProps() {
     this.setState({ isUploading: false })
-    SharedPreferences.setItem('reloadFromReact', 'true')
-    BackAndroid.exitApp()
+    ElloAndroidInterface.sendStateAndExit()
   }
 
   componentWillUnmount() {

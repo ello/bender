@@ -16,7 +16,6 @@ import java.util.List;
 
 import co.ello.ElloApp.BuildConfig;
 import co.ello.ElloApp.RNHawkWrapperPackage;
-import in.sriraman.sharedpreferences.RNSharedPreferencesReactPackage;
 
 public class ElloApp extends Application implements ReactApplication {
 
@@ -46,7 +45,6 @@ public class ElloApp extends Application implements ReactApplication {
                     new ReactNativeConfigPackage(),
                     new ImagePickerPackage(),
                     new SvgPackage(),
-                    new RNSharedPreferencesReactPackage(),
                     new RNHawkWrapperPackage()
             );
         }

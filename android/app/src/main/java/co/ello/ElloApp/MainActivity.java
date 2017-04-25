@@ -136,11 +136,15 @@ public class MainActivity
     @Override
     protected void onResume() {
         super.onResume();
-        String reloadFromReact = sharedPreferences.getString(ElloPreferences.RELOAD_FROM_REACT, null);
+        String updateFromReact = Hawk.get(ElloPreferences.UPDATE_FROM_REACT, null);
+        if(updateFromReact != null && updateFromReact.equals("true")) {
+            updateWebappState();
+            Hawk.delete(ElloPreferences.UPDATE_FROM_REACT);
+            return;
+        }
 
-        if(shouldHardRefresh() || (reloadFromReact != null && reloadFromReact.equals("true"))) {
+        if(shouldHardRefresh()) {
             shouldReload = true;
-            sharedPreferences.edit().putString(ElloPreferences.RELOAD_FROM_REACT, null).apply();
             progress.show();
         }
 
@@ -313,6 +317,16 @@ public class MainActivity
             startActivity(intent);
         }
     }
+
+    private void updateWebappState() {
+        String jsState = Hawk.get(ElloPreferences.JS_STATE);
+        String updateStateFunctionCall = "javascript:updateStateFromNative(" + jsState + ")";
+
+        if(jsState != null) {
+            xWalkView.load(updateStateFunctionCall, null);
+        }
+    }
+
     private void setupRegisterDeviceReceiver() {
         registerDeviceReceiver = new BroadcastReceiver() {
             @Override

@@ -26,8 +26,9 @@ public class RNHawkWrapperModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void put(String key, String value) {
+    public void put(String key, String value, Callback successCallback) {
         Hawk.put(key, value);
+        successCallback.invoke();
     }
 
     @ReactMethod

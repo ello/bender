@@ -99,7 +99,6 @@
     "react-native": "0.42.3",
     "react-native-config": "0.3.1",
     "react-native-image-picker": "0.26.3",
-    "react-native-shared-preferences": "0.0.8",
     "react-native-svg": "5.1.7",
     "react-redux": "5.0.4",
     "react-router-redux": "4.0.8",
