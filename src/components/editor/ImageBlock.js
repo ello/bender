@@ -4,7 +4,7 @@ import Block from './Block'
 
 const textStyle = {
   position: 'absolute',
-  top: 20,
+  top: 25,
   right: 20,
   width: 20,
   height: 20,
