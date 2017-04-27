@@ -9,8 +9,9 @@ export const getJSState = () => {
   return JSON.stringify(jsState)
 }
 
+export const test = 'test'
+
 export const sendStateAndExit = () =>
   HawkWrapper.put('updateFromReact', 'true', () => {
-    const state = getJSState()
-    HawkWrapper.put('jsState', state, () => BackAndroid.exitApp())
+    HawkWrapper.put('jsState', getJSState(), () => BackAndroid.exitApp())
   })

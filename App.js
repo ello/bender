@@ -1,5 +1,5 @@
 import Immutable from 'immutable'
-import React, { PropTypes, PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import { AsyncStorage, Text, View } from 'react-native'
 import { Provider } from 'react-redux'
 import { persistStore } from 'redux-persist'
