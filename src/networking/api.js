@@ -1,9 +1,10 @@
 import * as ENV from '../../env'
 import { getPagingQueryParams } from '../helpers/uri_helper'
+import App from '../../App'
 
 const API_VERSION = 'v2'
 const PER_PAGE = 25
-const basePath = () => `${ENV.AUTH_DOMAIN}/api`
+const basePath = () => `${App.authDomain}/api`
 
 function getAPIPath(relPath, queryParams = {}) {
   let path = `${basePath()}/${API_VERSION}/${relPath}`
@@ -271,7 +272,7 @@ export function loadEmojis() {
     }
   }
   return {
-    path: `${ENV.AUTH_DOMAIN}/emojis.json`,
+    path: `${App.authDomain}/emojis.json`,
   }
 }
 // Dummy editor endpoint to use for default action on text tools form
