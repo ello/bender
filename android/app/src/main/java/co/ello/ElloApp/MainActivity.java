@@ -82,10 +82,10 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         Hawk.init(getApplicationContext()).build();
 
-        elloDomain = Hawk.get(ElloPreferences.WEBAPP_DOMAIN, BuildConfig.DEV_ELLO_DOMAIN);
-        authDomain = Hawk.get(ElloPreferences.WEBAPP_AUTH_DOMAIN, BuildConfig.DEV_AUTH_DOMAIN);
-        clientId = Hawk.get(ElloPreferences.WEBAPP_AUTH_CLIENT_ID, BuildConfig.DEV_AUTH_CLIENT_ID);
-        clientSecret = Hawk.get(ElloPreferences.WEBAPP_AUTH_CLIENT_SECRET, BuildConfig.DEV_AUTH_CLIENT_SECRET);
+        elloDomain = Hawk.get(ElloPreferences.WEBAPP_DOMAIN, BuildConfig.PROD_ELLO_DOMAIN);
+        authDomain = Hawk.get(ElloPreferences.WEBAPP_AUTH_DOMAIN, BuildConfig.PROD_AUTH_DOMAIN);
+        clientId = Hawk.get(ElloPreferences.WEBAPP_AUTH_CLIENT_ID, BuildConfig.PROD_AUTH_CLIENT_ID);
+        clientSecret = Hawk.get(ElloPreferences.WEBAPP_AUTH_CLIENT_SECRET, BuildConfig.PROD_AUTH_CLIENT_SECRET);
 
         ConnectivityManager manager = (ConnectivityManager) getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
         reachability = new Reachability(manager);
