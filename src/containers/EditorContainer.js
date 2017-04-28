@@ -572,6 +572,7 @@ class EditorContainer extends Component {
       collection,
       completions,
       editorId,
+      hasContent,
       hasMedia,
       hasMention,
       isCompleterActive,

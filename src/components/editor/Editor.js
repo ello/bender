@@ -137,6 +137,7 @@ export default class Editor extends PureComponent {
           <ImageBlock
             {...blockProps}
             height={block.get('height')}
+            isUploading={block.get('isLoading')}
             source={{ uri: block.get('blob') || block.getIn(['data', 'url']) }}
             width={block.get('width')}
           />

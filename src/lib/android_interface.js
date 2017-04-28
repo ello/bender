@@ -3,10 +3,8 @@ import HawkWrapper from './hawk_wrapper'
 import App from '../../App'
 
 export const getJSState = () => {
-  const jsState = {}
   const state = App.store.getState()
-  Object.keys(state).forEach(key => (jsState[key] = state[key].toJS()))
-  return JSON.stringify(jsState)
+  return JSON.stringify(state)
 }
 
 export const test = 'test'

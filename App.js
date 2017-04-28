@@ -17,7 +17,6 @@ export default class App extends PureComponent {
 
   componentWillMount() {
     HawkWrapper.getItems(['jsState', 'webappAuthDomain', 'webappAuthClientId'], (values) => {
-      console.log('values', values)
       const [jsState, webappAuthDomain, webappAuthClientId] = values
       const state = JSON.parse(jsState)
       const immutableState = {}
