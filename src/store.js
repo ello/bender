@@ -3,6 +3,7 @@ import { combineReducers, compose, createStore, applyMiddleware } from 'redux'
 import { createLogger } from 'redux-logger'
 import { autoRehydrate } from 'redux-persist'
 import createSagaMiddleware, { END } from 'redux-saga'
+import * as ENV from '../env'
 import * as reducers from './reducers'
 import rootSaga from './sagas'
 
@@ -13,13 +14,12 @@ const reducer = combineReducers({
 const createNativeAppStore = (initialState = {}) => {
   const logConfig = {
     collapsed: true,
+    predicate: () => ENV.APP_DEBUG,
   }
   logConfig.stateTransformer = (state) => {
     const newState = {}
     Object.keys(state).forEach((key) => {
-      if (['json'].includes(key)) {
-        newState[key] = state[key].toJS()
-      }
+      newState[key] = state[key].toJS()
     })
     return newState
   }
