@@ -53,4 +53,4 @@ Below you'll find information about performing common tasks. The most recent ver
   - ELLO_RELEASE_KEY_ALIAS=XXXXXX
   - ELLO_RELEASE_STORE_PASSWORD=XXXXXX
   - ELLO_RELEASE_KEY_PASSWORD=XXXXXX
-* From the root of this project `cd android && ./gradlew assembleRelease`
+* From the root of this project `yarn release`
