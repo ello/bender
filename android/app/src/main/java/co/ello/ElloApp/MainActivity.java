@@ -61,7 +61,8 @@ public class MainActivity
     public XWalkView xWalkView;
     private ElloUIClient xWalkClient;
     private SwipeRefreshLayout swipeLayout;
-    public String path;
+    public String elloDomain;
+    public String authDomain;
     public String clientId;
     public String clientSecret;
     private ProgressDialog progress;
@@ -81,9 +82,10 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         Hawk.init(getApplicationContext()).build();
 
-        path = Hawk.get(ElloPreferences.WEBAPP_DOMAIN, BuildConfig.PROD_ELLO_DOMAIN);
-        clientId = Hawk.get(ElloPreferences.WEBAPP_AUTH_CLIENT_ID, BuildConfig.PROD_AUTH_CLIENT_ID);
-        clientSecret = Hawk.get(ElloPreferences.WEBAPP_AUTH_CLIENT_SECRET, BuildConfig.PROD_AUTH_CLIENT_SECRET);
+        elloDomain = Hawk.get(ElloPreferences.WEBAPP_DOMAIN, BuildConfig.DEV_ELLO_DOMAIN);
+        authDomain = Hawk.get(ElloPreferences.WEBAPP_AUTH_DOMAIN, BuildConfig.DEV_AUTH_DOMAIN);
+        clientId = Hawk.get(ElloPreferences.WEBAPP_AUTH_CLIENT_ID, BuildConfig.DEV_AUTH_CLIENT_ID);
+        clientSecret = Hawk.get(ElloPreferences.WEBAPP_AUTH_CLIENT_SECRET, BuildConfig.DEV_AUTH_CLIENT_SECRET);
 
         ConnectivityManager manager = (ConnectivityManager) getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
         reachability = new Reachability(manager);
@@ -268,7 +270,7 @@ public class MainActivity
     protected void onNewIntent(Intent intent) {
         Uri data = intent.getData();
         if (data != null) {
-            path = data.toString();
+            elloDomain = data.toString();
             isDeepLink = true;
         }
 
@@ -296,7 +298,7 @@ public class MainActivity
     public void launchEditor(String jsState, String post, String isComment, String comment) {
         if (webAppReady) {
             Hawk.put(ElloPreferences.JS_STATE, jsState);
-            Hawk.put(ElloPreferences.WEBAPP_DOMAIN, path);
+            Hawk.put(ElloPreferences.WEBAPP_AUTH_DOMAIN, authDomain);
             Hawk.put(ElloPreferences.WEBAPP_AUTH_CLIENT_ID, clientId);
             Hawk.put(ElloPreferences.WEBAPP_AUTH_CLIENT_SECRET, clientSecret);
             Hawk.put("comment", comment);
@@ -312,7 +314,7 @@ public class MainActivity
     public void launchImagePicker(String jsState, String kind) {
         if (webAppReady) {
             Hawk.put(ElloPreferences.JS_STATE, jsState);
-            Hawk.put(ElloPreferences.WEBAPP_DOMAIN, path);
+            Hawk.put(ElloPreferences.WEBAPP_AUTH_DOMAIN, authDomain);
             Hawk.put(ElloPreferences.WEBAPP_AUTH_CLIENT_ID, clientId);
             Hawk.put(ElloPreferences.WEBAPP_AUTH_CLIENT_SECRET, clientSecret);
             Hawk.put("kind", kind);
@@ -392,20 +394,20 @@ public class MainActivity
         String webURLFromReact = Hawk.get(ElloPreferences.PUSH_PATH_FROM_REACT, null);
 
         if (webURLFromReact != null) {
-            path = webURLFromReact;
+            elloDomain = webURLFromReact;
             Hawk.put(ElloPreferences.PUSH_PATH_FROM_REACT, null);
             isDeepLink = true;
         }
         if (isXWalkReady && webUrl != null) {
-            path = webUrl;
-            loadPage(path);
+            elloDomain = webUrl;
+            loadPage(elloDomain);
         } else if (isXWalkReady && data != null) {
-            path = data.toString();
+            elloDomain = data.toString();
             getIntent().setData(null);
-            loadPage(path);
+            loadPage(elloDomain);
         } else if (isXWalkReady && isDeepLink) {
             isDeepLink = false;
-            loadPage(path);
+            loadPage(elloDomain);
         }
     }
 
@@ -416,7 +418,7 @@ public class MainActivity
 
     private void displayScreenContent() {
         if(reachability.isNetworkConnected()) {
-            loadPage(path);
+            loadPage(elloDomain);
         } else {
             setupNoInternetView();
         }
@@ -541,21 +543,25 @@ public class MainActivity
         final CharSequence[] domainNames = {"Stage 1", "Stage 2", "Ninja", "Prod"};
         final String[] webappDomains = {BuildConfig.STAGE_1_ELLO_DOMAIN,
                 BuildConfig.STAGE_2_ELLO_DOMAIN, BuildConfig.NINJA_ELLO_DOMAIN, BuildConfig.PROD_ELLO_DOMAIN};
+        final String[] webappAuthDomains = {BuildConfig.STAGE_1_AUTH_DOMAIN,
+                BuildConfig.STAGE_2_AUTH_DOMAIN, BuildConfig.NINJA_AUTH_DOMAIN, BuildConfig.PROD_AUTH_DOMAIN};
         final String[] webappClientIds = {BuildConfig.STAGE_1_AUTH_CLIENT_ID,
                 BuildConfig.STAGE_2_AUTH_CLIENT_ID, BuildConfig.NINJA_AUTH_CLIENT_ID, BuildConfig.PROD_AUTH_CLIENT_ID};
         final String[] webappClientSecrets = {BuildConfig.STAGE_1_AUTH_CLIENT_SECRET,
                 BuildConfig.STAGE_2_AUTH_CLIENT_SECRET, BuildConfig.NINJA_AUTH_CLIENT_SECRET, BuildConfig.PROD_AUTH_CLIENT_SECRET};
         alertDialogBuilder.setItems(domainNames, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                path = webappDomains[which];
+                elloDomain = webappDomains[which];
+                authDomain = webappAuthDomains[which];
                 clientId = webappClientIds[which];
                 clientSecret = webappClientSecrets[which];
                 Hawk.put(ElloPreferences.IS_STAFF, false);
-                Hawk.put(ElloPreferences.WEBAPP_DOMAIN, path);
+                Hawk.put(ElloPreferences.WEBAPP_DOMAIN, elloDomain);
+                Hawk.put(ElloPreferences.WEBAPP_AUTH_DOMAIN, authDomain);
                 Hawk.put(ElloPreferences.WEBAPP_AUTH_CLIENT_ID, clientId);
                 Hawk.put(ElloPreferences.WEBAPP_AUTH_CLIENT_SECRET, clientSecret);
                 showingWebappDomainDialog = false;
-                loadPage(path);
+                loadPage(elloDomain);
             }
         });
         alertDialogBuilder.setCancelable(false);

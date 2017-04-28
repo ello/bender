@@ -43,7 +43,7 @@ import {
   selectPostIsEmpty,
   selectPostIsOwn,
 } from '../selectors/post'
-import { selectHasAutoWatchEnabled, selectIsOwnPage } from '../selectors/profile'
+import { selectHasAutoWatchEnabled } from '../selectors/profile'
 import Editor from '../components/editor/Editor'
 import { emojiRegex, userRegex } from '../components/completers/Completer'
 import BuyLinkDialog from '../components/dialogs/BuyLinkDialog'
@@ -135,7 +135,6 @@ function mapStateToProps(state, props) {
     isComment,
     isCompleterActive: selectIsCompleterActive(state),
     isLoading: editor.get('isLoading'),
-    isOwnPage: selectIsOwnPage(state),
     isOwnPost: selectPostIsOwn(state, props),
     isPostEmpty,
     isPosting: editor.get('isPosting'),
@@ -167,7 +166,6 @@ class EditorContainer extends Component {
     isComment: PropTypes.bool,
     isCompleterActive: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool,
-    isOwnPage: PropTypes.bool,
     // this is only used for reply all functionality
     // which is not implemented currently
     // isOwnPost: PropTypes.bool,
@@ -193,7 +191,6 @@ class EditorContainer extends Component {
     hasMention: false,
     isComment: false,
     isLoading: false,
-    isOwnPage: false,
     isOwnPost: false,
     isPosting: false,
     onSubmit: null,
@@ -456,7 +453,6 @@ class EditorContainer extends Component {
       dispatch,
       editorId,
       isComment,
-      isOwnPage,
       isPostEmpty,
       onSubmit,
       post,
@@ -483,11 +479,6 @@ class EditorContainer extends Component {
       )
     }
     if (onSubmit) { onSubmit() }
-    // if on own page scroll down to top of post content
-    if (isOwnPage && !isComment) {
-      const { onClickScrollToContent } = this.context
-      onClickScrollToContent()
-    }
   }
 
   getWordFromPosition(pos) {

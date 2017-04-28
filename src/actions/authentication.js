@@ -24,7 +24,7 @@ export function getUserCredentials(email, password, meta) {
         email,
         password,
         grant_type: 'password',
-        client_id: App.authClientId,
+        client_id: App.webappAuthClientId,
       },
     },
     meta,
@@ -50,7 +50,7 @@ export function refreshAuthenticationToken(refreshToken) {
       body: {
         refresh_token: refreshToken,
         grant_type: 'refresh_token',
-        client_id: clientCredentials.id,
+        client_id: App.webappAuthClientId,
       },
     },
   }

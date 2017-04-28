@@ -16,14 +16,15 @@ export default class App extends PureComponent {
   }
 
   componentWillMount() {
-    HawkWrapper.getItems(['jsState', 'webappDomain', 'webappAuthClientId'], (values) => {
-      const [jsState, authDomain, authClientId] = values
+    HawkWrapper.getItems(['jsState', 'webappAuthDomain', 'webappAuthClientId'], (values) => {
+      console.log('values', values)
+      const [jsState, webappAuthDomain, webappAuthClientId] = values
       const state = JSON.parse(jsState)
       const immutableState = {}
       Object.keys(state).forEach(key => (immutableState[key] = Immutable.fromJS(state[key])))
       App.store = createNativeAppStore(immutableState)
-      App.authDomain = authDomain
-      App.authClientId = authClientId
+      App.webappAuthDomain = webappAuthDomain
+      App.webappAuthClientId = webappAuthClientId
       persistStore(
         App.store,
         { storage: AsyncStorage, transforms: [immutableTransform()], whitelist },

@@ -12,6 +12,7 @@ public class ElloPreferences {
     public static final String IS_STAFF = "isStaff";
     public static final String JS_STATE = "jsState";
     public static final String WEBAPP_DOMAIN = "webappDomain";
+    public static final String WEBAPP_AUTH_DOMAIN = "webappAuthDomain";
     public static final String WEBAPP_AUTH_CLIENT_ID = "webappAuthClientId";
     public static final String WEBAPP_AUTH_CLIENT_SECRET = "webappAuthClientSecret";
 }

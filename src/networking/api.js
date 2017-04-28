@@ -4,7 +4,7 @@ import App from '../../App'
 
 const API_VERSION = 'v2'
 const PER_PAGE = 25
-const basePath = () => `${App.authDomain}/api`
+const basePath = () => `${App.webappAuthDomain}/api`
 
 function getAPIPath(relPath, queryParams = {}) {
   let path = `${basePath()}/${API_VERSION}/${relPath}`
@@ -272,7 +272,7 @@ export function loadEmojis() {
     }
   }
   return {
-    path: `${App.authDomain}/emojis.json`,
+    path: `${App.webappAuthDomain}/emojis.json`,
   }
 }
 // Dummy editor endpoint to use for default action on text tools form
