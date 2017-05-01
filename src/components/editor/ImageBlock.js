@@ -83,7 +83,6 @@ export default class ImageBlock extends PureComponent {
   render() {
     const { hasContent, isUploading, linkURL, source, uid } = this.props
     const { width, height } = this.getImageDimensions()
-    console.log('hasContent', hasContent)
     return (
       <Block hasContent={hasContent} uid={uid}>
         <View style={viewStyle} onLayout={this.onLayout}>

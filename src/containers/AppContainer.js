@@ -1,5 +1,5 @@
 import Immutable from 'immutable'
-import React, { PropTypes, PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import { StatusBar, View } from 'react-native'
 import EditorContainer from './EditorContainer'
 import ImagePickerContainer from './ImagePickerContainer'
