@@ -4,13 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.facebook.react.ReactActivity;
-import com.facebook.react.ReactActivityDelegate;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
@@ -54,26 +50,6 @@ public class ReactNativeActivity extends ReactActivity {
         return "Ello";
     }
 
-    @Override
-    protected ReactActivityDelegate createReactActivityDelegate() {
-        return new ReactActivityDelegate(this, getMainComponentName()) {
-            @Override
-            protected Bundle getLaunchOptions() {
-                Intent intent = getIntent();
-                String jsState = Hawk.get(ElloPreferences.JS_STATE);
-                Bundle initialProps = new Bundle();
-                initialProps.putString(ElloPreferences.JS_STATE, jsState);
-                initialProps.putString("comment", intent.getExtras().getString("comment"));
-                initialProps.putString("isComment", intent.getExtras().getString("isComment"));
-                initialProps.putString("post", intent.getExtras().getString("post"));
-                initialProps.putString("kind", intent.getExtras().getString("kind"));
-                initialProps.putString("initialRoute", intent.getExtras().getString("initialRoute"));
-                Hawk.delete(ElloPreferences.JS_STATE);
-                return initialProps;
-            }
-        };
-    }
-
     private void setupPushReceivedReceiver() {
         pushReceivedReceiver = new BroadcastReceiver() {
             @Override
@@ -92,8 +68,7 @@ public class ReactNativeActivity extends ReactActivity {
                             .actionListener(new ActionClickListener() {
                                 @Override
                                 public void onActionClicked(Snackbar snackbar) {
-                                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(ElloPreferences.PREFERENCES_KEY, Context.MODE_PRIVATE); //PreferenceManager.getDefaultSharedPreferences(getApplication());
-                                    sharedPreferences.edit().putString(ElloPreferences.PUSH_PATH_FROM_REACT, webUrl).apply();
+                                    Hawk.put(ElloPreferences.PUSH_PATH_FROM_REACT, webUrl);
                                     finish();
                                 }
                             });

@@ -4,7 +4,6 @@ import {
   Alert,
   BackAndroid,
 } from 'react-native'
-import SharedPreferences from 'react-native-shared-preferences'
 import { connect } from 'react-redux'
 import ImagePicker from 'react-native-image-picker'
 import debounce from 'lodash/debounce'
@@ -14,6 +13,7 @@ import {
   updateComment,
 } from '../actions/comments'
 import { closeModal, openModal } from '../actions/modals'
+import * as ElloAndroidInterface from '../lib/android_interface'
 import {
   addBlock,
   addEmptyTextBlock,
@@ -43,7 +43,7 @@ import {
   selectPostIsEmpty,
   selectPostIsOwn,
 } from '../selectors/post'
-import { selectHasAutoWatchEnabled, selectIsOwnPage } from '../selectors/profile'
+import { selectHasAutoWatchEnabled } from '../selectors/profile'
 import Editor from '../components/editor/Editor'
 import { emojiRegex, userRegex } from '../components/completers/Completer'
 import BuyLinkDialog from '../components/dialogs/BuyLinkDialog'
@@ -135,7 +135,6 @@ function mapStateToProps(state, props) {
     isComment,
     isCompleterActive: selectIsCompleterActive(state),
     isLoading: editor.get('isLoading'),
-    isOwnPage: selectIsOwnPage(state),
     isOwnPost: selectPostIsOwn(state, props),
     isPostEmpty,
     isPosting: editor.get('isPosting'),
@@ -167,7 +166,6 @@ class EditorContainer extends Component {
     isComment: PropTypes.bool,
     isCompleterActive: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool,
-    isOwnPage: PropTypes.bool,
     // this is only used for reply all functionality
     // which is not implemented currently
     // isOwnPost: PropTypes.bool,
@@ -193,7 +191,6 @@ class EditorContainer extends Component {
     hasMention: false,
     isComment: false,
     isLoading: false,
-    isOwnPage: false,
     isOwnPost: false,
     isPosting: false,
     onSubmit: null,
@@ -277,14 +274,11 @@ class EditorContainer extends Component {
       this.scrollView.scrollToEnd({ animated: true })
     }
     if (prevProps.isPosting && !this.props.isPosting) {
-      SharedPreferences.setItem('reloadFromReact', 'true')
-      BackAndroid.exitApp()
+      ElloAndroidInterface.sendStateAndExit()
     }
   }
 
   componentWillUnmount() {
-    this.keyboardDidHideListener.remove()
-    this.keyboardDidShowListener.remove()
     BackAndroid.removeEventListener('hardwareBackPress', this.handleHardwareBackPress)
   }
 
@@ -459,7 +453,6 @@ class EditorContainer extends Component {
       dispatch,
       editorId,
       isComment,
-      isOwnPage,
       isPostEmpty,
       onSubmit,
       post,
@@ -486,11 +479,6 @@ class EditorContainer extends Component {
       )
     }
     if (onSubmit) { onSubmit() }
-    // if on own page scroll down to top of post content
-    if (isOwnPage && !isComment) {
-      const { onClickScrollToContent } = this.context
-      onClickScrollToContent()
-    }
   }
 
   getWordFromPosition(pos) {
@@ -584,6 +572,7 @@ class EditorContainer extends Component {
       collection,
       completions,
       editorId,
+      hasContent,
       hasMedia,
       hasMention,
       isCompleterActive,

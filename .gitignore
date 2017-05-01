@@ -1,19 +1,32 @@
-node_modules/
-.expo/
-npm-debug.*
-.gradle
+# general
 generated
 intermediates
 tmp
 logs
+
+# Visual Studio Code
+/.vscode
+/jsconfig.json
+
+# Android
+.idea
+.gradle
+local.properties
+*.iml
+*.keystore
+android/app/build/
+.classpath
 *.apk
 *.idea
 local.properties
 *.rawproto
-/.vscode
-/jsconfig.json
-android/app/build/
-*.keystore
-android/app/app.iml
-android/android.iml
-android/Ello.iml
+.expo/
+npm-debug.*
+
+# Node
+node_modules
+*.log
+.nvm
+
+# OS X
+.DS_Store

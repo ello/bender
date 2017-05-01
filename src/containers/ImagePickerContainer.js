@@ -2,7 +2,7 @@ import React, { PropTypes, PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { ActivityIndicator, BackAndroid, Modal, StyleSheet, Text, View } from 'react-native'
 import ImagePicker from 'react-native-image-picker'
-import SharedPreferences from 'react-native-shared-preferences'
+import * as ElloAndroidInterface from '../lib/android_interface'
 import { saveAvatar, saveCover } from '../actions/profile'
 
 // need this to trigger a componentWillReceiveProps
@@ -36,8 +36,13 @@ const uploadingTextStyle = {
 class ImagePickerContainer extends PureComponent {
 
   static propTypes = {
+    asset: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
     kind: PropTypes.string.isRequired,
+  }
+
+  static defaultProps = {
+    asset: null,
   }
 
   state = {
@@ -77,10 +82,13 @@ class ImagePickerContainer extends PureComponent {
     })
   }
 
-  componentWillReceiveProps() {
-    this.setState({ isUploading: false })
-    SharedPreferences.setItem('reloadFromReact', 'true')
-    BackAndroid.exitApp()
+  componentWillReceiveProps(nextProps) {
+    const { asset } = nextProps
+    const assetTmpUrl = asset.getIn(['tmp', 'url'])
+    if (assetTmpUrl && assetTmpUrl.indexOf('direct-uploads') > -1) {
+      this.setState({ isUploading: false })
+      ElloAndroidInterface.sendStateAndExit()
+    }
   }
 
   componentWillUnmount() {

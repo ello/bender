@@ -37,7 +37,7 @@ public class MainActivityTest {
 
     @Test
     public void hasProductionPath() throws Exception {
-        assertEquals("https://ello.co", activity.path);
+        assertEquals("https://ello.co", activity.elloDomain);
     }
 
     @Test
