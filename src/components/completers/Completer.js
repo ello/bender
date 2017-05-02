@@ -1,9 +1,11 @@
+import Immutable from 'immutable'
 import React, { PropTypes, PureComponent } from 'react'
 import {
   Image,
   ScrollView,
   Text,
-  TouchableOpacity,
+  TouchableHighlight,
+  View,
 } from 'react-native'
 
 export const emojiRegex = /\s?:{1}(\w+|\+|-):{0}$/
@@ -11,9 +13,14 @@ export const userRegex = /(\s|^)@{1}\w+/
 
 const scrollViewStyle = {
   maxHeight: 110,
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  left: 0,
+  elevation: 5,
 }
-
 const completionStyle = {
+  flex: 1,
   backgroundColor: '#000',
   borderBottomWidth: 1,
   borderBottomColor: '#fff',
@@ -21,13 +28,15 @@ const completionStyle = {
   height: 40,
   padding: 10,
 }
-
+const buttonStyle = {
+  flex: 1,
+  flexDirection: 'row',
+}
 const imageStyle = {
   borderRadius: 10,
   height: 20,
   width: 20,
 }
-
 const textStyle = {
   color: '#fff',
   marginLeft: 10,
@@ -47,7 +56,7 @@ export default class Completer extends PureComponent {
 
   render() {
     const { completions, isCompleterActive } = this.props
-    if (!isCompleterActive || !completions || !completions.get('data').size) { return null }
+    if (!isCompleterActive || !completions || !completions.get('data', Immutable.List()).size) { return null }
     return (
       <ScrollView
         horizontal={false}
@@ -55,14 +64,16 @@ export default class Completer extends PureComponent {
         style={scrollViewStyle}
       >
         {completions.get('data').map(completion =>
-          <TouchableOpacity
+          <TouchableHighlight
             key={`completion_${completion.get('name')}`}
             onPress={() => this.props.onCompletion({ value: completion.get('name') })}
             style={completionStyle}
           >
-            <Image source={{ uri: completion.get('imageUrl') }} style={imageStyle} />
-            <Text style={textStyle}>{completion.get('name')}</Text>
-          </TouchableOpacity>,
+            <View style={buttonStyle}>
+              <Image source={{ uri: completion.get('imageUrl') }} style={imageStyle} />
+              <Text style={textStyle}>{completion.get('name')}</Text>
+            </View>
+          </TouchableHighlight>,
         )}
       </ScrollView>
     )

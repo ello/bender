@@ -23,7 +23,7 @@ export default class TextBlock extends PureComponent {
 
   state = {
     text: this.props.data,
-    viewHeight: 200,
+    viewHeight: 60,
   }
 
   onFocus = () => {
@@ -65,7 +65,7 @@ export default class TextBlock extends PureComponent {
             onChangeText={this.onChangeText}
             onContentSizeChange={this.onContentSizeChange}
             onSelectionChange={this.onInternalSelectionChange}
-            placeholder={!hasContent ? 'Say Ello...' : null}
+            placeholder={!hasContent ? 'Add images, embeds, text & links.' : null}
             style={{ height: viewHeight }}
             underlineColorAndroid="transparent"
           />

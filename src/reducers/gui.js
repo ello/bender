@@ -2,7 +2,7 @@
 import Immutable from 'immutable'
 import { REHYDRATE } from 'redux-persist/constants'
 import get from 'lodash/get'
-// import { LOCATION_CHANGE } from 'react-router-redux'
+import { LOCATION_CHANGE } from 'react-router-redux'
 import {
   AUTHENTICATION,
   EDITOR,
@@ -19,10 +19,10 @@ let location = {}
 const oldDate = new Date()
 oldDate.setFullYear(oldDate.getFullYear() - 2)
 
-// const HOME_STREAMS_WHITELIST = [
-//   /^\/discover/,
-//   /^\/following$/,
-// ]
+const HOME_STREAMS_WHITELIST = [
+  /^\/discover/,
+  /^\/following$/,
+]
 
 // this is used for testing in StreamContainer_test
 export const setLocation = (loc) => {
@@ -146,27 +146,27 @@ export default (state = initialState, action = { type: '' }) => {
           .set('lastNotificationCheck', new Date().toUTCString())
       }
       return state
-    // case LOCATION_CHANGE: {
-    //   location = payload
-    //   const pathname = location.pathname
-    //   if (typeof window !== 'undefined' &&
-    //       window.nonImmutableState && window.nonImmutableState.gui) {
-    //     state = convertStateToImmutable(JSON.parse(window.nonImmutableState.gui))
-    //     delete window.nonImmutableState.gui
-    //     return state
-    //   }
-    //   if (HOME_STREAMS_WHITELIST.some(re => re.test(pathname))) {
-    //     return state.withMutations((s) => {
-    //       s.set('homeStream', pathname)
-    //         .set('isGridMode', getIsGridMode(state))
-    //         .set('isNavbarHidden', false)
-    //     })
-    //   }
-    //   return state.withMutations((s) => {
-    //     s.set('isGridMode', getIsGridMode(state))
-    //       .set('isNavbarHidden', false)
-    //   })
-    // }
+    case LOCATION_CHANGE: {
+      location = payload
+      const pathname = location.pathname
+      if (typeof window !== 'undefined' &&
+          window.nonImmutableState && window.nonImmutableState.gui) {
+        state = convertStateToImmutable(JSON.parse(window.nonImmutableState.gui))
+        delete window.nonImmutableState.gui
+        return state
+      }
+      if (HOME_STREAMS_WHITELIST.some(re => re.test(pathname))) {
+        return state.withMutations((s) => {
+          s.set('homeStream', pathname)
+            .set('isGridMode', getIsGridMode(state))
+            .set('isNavbarHidden', false)
+        })
+      }
+      return state.withMutations((s) => {
+        s.set('isGridMode', getIsGridMode(state))
+          .set('isNavbarHidden', false)
+      })
+    }
     case PROFILE.DELETE_SUCCESS: {
       return initialState.set('columnCount', state.get('columnCount'))
         .set('innerWidth', state.get('innerWidth'))

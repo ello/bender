@@ -1,3 +1,32 @@
-node_modules/
+# general
+generated
+intermediates
+tmp
+logs
+
+# Visual Studio Code
+/.vscode
+/jsconfig.json
+
+# Android
+.idea
+.gradle
+local.properties
+*.iml
+*.keystore
+android/app/build/
+.classpath
+*.apk
+*.idea
+local.properties
+*.rawproto
 .expo/
 npm-debug.*
+
+# Node
+node_modules
+*.log
+.nvm
+
+# OS X
+.DS_Store

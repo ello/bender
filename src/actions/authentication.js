@@ -1,15 +1,12 @@
-import * as ENV from '../../env'
 import { AUTHENTICATION } from '../constants/action_types'
+import App from '../../App'
+
 import {
   loginToken,
   logout as logoutEndpoint,
   forgotPassword,
   refreshAuthToken,
 } from '../networking/api'
-
-const clientCredentials = {
-  id: ENV.AUTH_CLIENT_ID,
-}
 
 export function clearAuthToken() {
   return {
@@ -27,7 +24,7 @@ export function getUserCredentials(email, password, meta) {
         email,
         password,
         grant_type: 'password',
-        client_id: clientCredentials.id,
+        client_id: App.webappAuthClientId,
       },
     },
     meta,
@@ -53,7 +50,7 @@ export function refreshAuthenticationToken(refreshToken) {
       body: {
         refresh_token: refreshToken,
         grant_type: 'refresh_token',
-        client_id: clientCredentials.id,
+        client_id: App.webappAuthClientId,
       },
     },
   }

@@ -1,0 +1,58 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.android.tools.build:gradle:2.3.1'
+
+      classpath 'com.google.gms:google-services:3.0.0'
+      classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+
+      // NOTE: Do not place your application dependencies here; they belong
+      // in the individual module build.gradle files
+  }
+}
+
+allprojects {
+  repositories {
+    mavenLocal()
+      jcenter()
+      maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        url "$rootDir/../node_modules/react-native/android"
+      }
+  }
+}
+
+// Force subprojects to use the same sdk/build-tools versions
+// http://stackoverflow.com/questions/24494077/gradle-force-build-tools-version-on-third-party-libraries
+ext {
+  compileSdkVersion = 23
+    buildToolsVersion = "25.0.0"
+}
+subprojects { subproject ->
+  afterEvaluate{
+    if((subproject.plugins.hasPlugin('android') || subproject.plugins.hasPlugin('android-library'))) {
+      android {
+        compileSdkVersion rootProject.ext.compileSdkVersion
+          buildToolsVersion rootProject.ext.buildToolsVersion
+      }
+    }
+  }
+}
+
+// Limit resource usage on Travis
+if (System.env.TRAVIS == 'true') {
+  allprojects {
+    tasks.withType(GroovyCompile) {
+      groovyOptions.fork = false
+    }
+    tasks.withType(Test) {
+      // containers (currently) have 2 dedicated cores and 4GB of memory
+      maxParallelForks = 2
+        minHeapSize = '128m'
+    }
+  }
+}

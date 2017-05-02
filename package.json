@@ -2,6 +2,18 @@
   "name": "NativeApp",
   "version": "0.1.0",
   "private": true,
+  "rnpm": {
+    "android": {
+      "mainFilePath": "src/main/java/co/ello/ElloApp/Dagger/ElloApp.java"
+    }
+  },
+  "babel" : {
+    "env": {
+      "test": {
+        "presets": ["react-native"]
+      }
+    }
+  },
   "eslintConfig": {
     "extends": "airbnb",
     "parser": "babel-eslint",
@@ -12,7 +24,8 @@
     },
     "globals": {
       "AndroidInterface": false,
-      "ENV": false
+      "ENV": false,
+      "expect": true
     },
     "rules": {
       "jsx-a11y/tabindex-no-positive": 0,
@@ -60,45 +73,58 @@
       "semi": 0
     }
   },
-  "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
   "scripts": {
-    "start": "react-native-scripts start",
-    "eject": "react-native-scripts eject",
-    "android": "react-native-scripts android",
-    "ios": "react-native-scripts ios",
-    "test": "node node_modules/jest/bin/jest.js --watch"
+    "android": "react-native run-android",
+    "flow": "flow",
+    "install:debug": "adb install android/app/build/outputs/apk/app-debug.apk",
+    "install:release": "adb install android/app/build/outputs/apk/app-release.apk",
+    "ios": "react-native run-ios",
+    "lint": "eslint ./src",
+    "mrclean": "rm -rf $TMPDIR/react* && rm -rf node_modules/ && yarn",
+    "release": "cd android/ && ./gradlew assembleRelease && cd ../",
+    "start": "react-native start",
+    "test": "NODE_ENV=test node node_modules/jest/bin/jest.js",
+    "test:watch": "NODE_ENV=test node node_modules/jest/bin/jest.js --watch"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "react-native",
+    "setupTestFrameworkScriptFile": "./tests_setup.js"
   },
   "dependencies": {
-    "exif-js": "2.1.1",
-    "expo": "15.1.2",
+    "analytics-react-native": "1.1.0",
+    "chai": "3.5.0",
+    "exif-js": "2.2.1",
     "humps": "2.0.0",
     "immutable": "3.8.1",
+    "jwt-decode": "2.2.0",
     "lodash": "4.17.4",
     "react": "15.4.2",
     "react-native": "0.42.3",
-    "react-redux": "5.0.3",
+    "react-native-config": "0.3.1",
+    "react-native-image-picker": "0.26.3",
+    "react-native-svg": "5.1.7",
+    "react-redux": "5.0.4",
     "react-router-redux": "4.0.8",
     "redux": "3.6.0",
-    "redux-logger": "3.0.0",
-    "redux-persist": "4.5.0",
-    "redux-persist-immutable": "4.2.0",
+    "redux-logger": "3.0.1",
+    "redux-persist": "4.6.0",
     "redux-persist-transform-immutable": "4.2.0",
-    "redux-saga": "0.14.3",
+    "redux-saga": "0.14.7",
     "reselect": "3.0.0",
+    "trunc-html": "1.1.2",
     "url-regex": "3.2.0"
   },
   "devDependencies": {
-    "babel-eslint": "7.2.1",
-    "eslint": "3.18.0",
+    "babel-eslint": "7.2.2",
+    "babel-jest": "^19.0.0",
+    "babel-preset-react-native": "^1.9.1",
+    "eslint": "3.19.0",
     "eslint-config-airbnb": "14.1.0",
     "eslint-plugin-import": "2.2.0",
     "eslint-plugin-jsx-a11y": "4.0.0",
     "eslint-plugin-react": "6.10.3",
-    "jest-expo": "0.3.1",
-    "react-native-scripts": "0.0.25",
+    "flow-bin": "0.44.2",
+    "jest": "19.0.2",
     "react-test-renderer": "15.4.0"
   }
 }
