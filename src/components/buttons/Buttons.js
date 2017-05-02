@@ -100,8 +100,7 @@ const floatingButtonStyles = {
   },
   disabled: {
     elevation: 0,
-    opacity: 0.4,
-    backgroundColor: 'transparent',
+    backgroundColor: '#aaa',
   },
 }
 

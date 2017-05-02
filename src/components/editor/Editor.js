@@ -12,7 +12,7 @@ import {
   View,
 // $FlowFixMe
 } from 'react-native'
-import { CameraIcon, CheckMark, DismissIcon, MoneyIcon, PencilIcon } from '../assets/Icons'
+import { CameraIcon, CheckMark, DismissIcon, MoneyIcon, PlusIcon } from '../assets/Icons'
 import { FloatingButton, IconButton } from '../buttons/Buttons'
 import Completer from '../completers/Completer'
 import EmbedBlock from './EmbedBlock'
@@ -214,7 +214,7 @@ export default class Editor extends PureComponent {
           </View>
           <View style={toolbarRightStyle}>
             <FloatingButton size="large" disabled={isPostingDisabled} onPress={onSubmitPost}>
-              <PencilIcon disabled={isPostingDisabled} />
+              <PlusIcon disabled={isPostingDisabled} />
             </FloatingButton>
           </View>
         </View>

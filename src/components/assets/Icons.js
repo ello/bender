@@ -101,3 +101,10 @@ export const LockIcon = ({ ...rest }: any) => (
   </SvgIcon>
 )
 
+export const PlusIcon = ({ ...rest }: any) =>
+  <SvgIcon {...rest}>
+    <G x={-2} y={-2}>
+      <Polygon stroke="none" fill="#fff" points="13 11 13 5 11 5 11 11 5 11 5 13 11 13 11 19 13 19 13 13 19 13 19 11" />
+    </G>
+  </SvgIcon>
+
