@@ -7,70 +7,21 @@
       "mainFilePath": "src/main/java/co/ello/ElloApp/Dagger/ElloApp.java"
     }
   },
-  "babel" : {
+  "babel": {
     "env": {
       "test": {
-        "presets": ["react-native"]
+        "presets": [
+          "react-native"
+        ]
       }
     }
   },
   "eslintConfig": {
-    "extends": "airbnb",
-    "parser": "babel-eslint",
-    "env": {
-      "browser": true,
-      "node": true,
-      "mocha": true
-    },
+    "extends": "ello",
     "globals": {
       "AndroidInterface": false,
       "ENV": false,
       "expect": true
-    },
-    "rules": {
-      "jsx-a11y/tabindex-no-positive": 0,
-      "no-alert": 2,
-      "no-console": 2,
-      "no-debugger": 2,
-      "react/forbid-prop-types": [
-        1,
-        {
-          "forbid": [
-            "any"
-          ]
-        }
-      ],
-      "react/jsx-filename-extension": [
-        1,
-        {
-          "extensions": [
-            ".js",
-            ".jsx"
-          ]
-        }
-      ],
-      "react/prefer-stateless-function": [
-        2,
-        {
-          "ignorePureComponents": true
-        }
-      ],
-      "react/sort-comp": [
-        "error",
-        {
-          "order": [
-            "type-annotations",
-            "static-methods",
-            "lifecycle",
-            "/^on.+$/",
-            "/^(get|set)(?!(InitialState$|DefaultProps$|ChildContext$)).+$/",
-            "everything-else",
-            "/^render.+$/",
-            "render"
-          ]
-        }
-      ],
-      "semi": 0
     }
   },
   "scripts": {
@@ -119,10 +70,7 @@
     "babel-jest": "^19.0.0",
     "babel-preset-react-native": "^1.9.1",
     "eslint": "3.19.0",
-    "eslint-config-airbnb": "14.1.0",
-    "eslint-plugin-import": "2.2.0",
-    "eslint-plugin-jsx-a11y": "4.0.0",
-    "eslint-plugin-react": "6.10.3",
+    "eslint-config-ello": "1.0.3",
     "flow-bin": "0.44.2",
     "jest": "19.0.2",
     "react-test-renderer": "15.4.0"
