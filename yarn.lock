@@ -1558,6 +1558,15 @@ eslint-config-airbnb@14.1.0:
   dependencies:
     eslint-config-airbnb-base "^11.1.0"
 
+eslint-config-ello@1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/eslint-config-ello/-/eslint-config-ello-1.0.3.tgz#b79050778839a42394872ed6439d6eceb7af5670"
+  dependencies:
+    eslint-config-airbnb "14.1.0"
+    eslint-plugin-import "2.2.0"
+    eslint-plugin-jsx-a11y "4.0.0"
+    eslint-plugin-react "6.10.3"
+
 eslint-import-resolver-node@^0.2.0:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/eslint-import-resolver-node/-/eslint-import-resolver-node-0.2.3.tgz#5add8106e8c928db2cba232bcd9efa846e3da16c"
