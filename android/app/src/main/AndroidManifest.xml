@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="co.ello.ElloApp"
     android:versionCode="1"
     android:versionName="1.0">
@@ -7,6 +8,7 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove"/>
     <permission android:name="co.ello.ElloApp.permission.C2D_MESSAGE" android:protectionLevel="signature" />
     <uses-permission android:name="co.ello.ElloApp.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
