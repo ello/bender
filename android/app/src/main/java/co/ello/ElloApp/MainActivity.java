@@ -337,7 +337,9 @@ public class MainActivity
         registerDeviceReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String reg_id = intent.getExtras().getString("GCM_REG_ID");
+                Bundle extras = intent.getExtras();
+                if (extras == null) { return; }
+                String reg_id = extras.getString("GCM_REG_ID");
                 if(reg_id != null) {
                     String registerFunctionCall =
                         "javascript:registerAndroidNotifications(\"" +
