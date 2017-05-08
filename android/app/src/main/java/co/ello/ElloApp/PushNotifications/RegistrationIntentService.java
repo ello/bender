@@ -26,11 +26,10 @@ public class RegistrationIntentService extends IntentService {
         if(token != null) {
             registrationComplete.putExtra("GCM_REG_ID", token);
             Hawk.put(ElloPreferences.SENT_TOKEN_TO_SERVER, true);
+            sendBroadcast(registrationComplete);
         }
         else {
             Hawk.put(ElloPreferences.SENT_TOKEN_TO_SERVER, false);
         }
-
-        sendBroadcast(registrationComplete);
     }
 }

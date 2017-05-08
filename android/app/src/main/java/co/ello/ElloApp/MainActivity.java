@@ -338,13 +338,13 @@ public class MainActivity
             @Override
             public void onReceive(Context context, Intent intent) {
                 String reg_id = intent.getExtras().getString("GCM_REG_ID");
-                String registerFunctionCall =
+                if(reg_id != null) {
+                    String registerFunctionCall =
                         "javascript:registerAndroidNotifications(\"" +
                                 reg_id + "\", \"" +
                                 packageName() + "\", \"" +
                                 versionName() + "\", \"" +
                                 versionCode() + "\")";
-                if(reg_id != null) {
                     xWalkView.load(registerFunctionCall, null);
                 }
             }
