@@ -60,6 +60,7 @@ export default class TextBlock extends PureComponent {
           <TextInput
             defaultValue={data}
             multiline
+            autoFocus="true"
             onBlur={this.context.onHideCompleter}
             onFocus={this.onFocus}
             onChangeText={this.onChangeText}
