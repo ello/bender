@@ -12,7 +12,8 @@ import {
   View,
 // $FlowFixMe
 } from 'react-native'
-import { CameraIcon, CheckMark, DismissIcon, MoneyIcon, PlusIcon } from '../assets/Icons'
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import { CameraIcon, CheckMark, DismissIcon, MoneyIcon } from '../assets/Icons'
 import { FloatingButton, IconButton } from '../buttons/Buttons'
 import Completer from '../completers/Completer'
 import EmbedBlock from './EmbedBlock'
@@ -64,6 +65,9 @@ const postingTextStyle = {
   marginBottom: 20,
   paddingHorizontal: 20,
   paddingVertical: 10,
+}
+const sendIconStyle = {
+  marginLeft: 3,
 }
 const moneyCheckMarkWrapperStyle = {
   position: 'absolute',
@@ -214,7 +218,7 @@ export default class Editor extends PureComponent {
           </View>
           <View style={toolbarRightStyle}>
             <FloatingButton size="large" disabled={isPostingDisabled} onPress={onSubmitPost}>
-              <PlusIcon disabled={isPostingDisabled} />
+              <Icon name="send" size={24} style={sendIconStyle} color="#fff" />
             </FloatingButton>
           </View>
         </View>
