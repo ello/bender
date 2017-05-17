@@ -1,6 +1,9 @@
-apply plugin: "com.android.application"
-
+apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
+project.ext.vectoricons = [
+  iconFontNames: [ 'MaterialIcons.ttf' ]
+]
+apply from: '../../node_modules/react-native-vector-icons/fonts.gradle'
 
 import com.android.build.OutputFile
 
