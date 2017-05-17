@@ -175,6 +175,7 @@ class EditorContainer extends Component {
     order: PropTypes.object,
     post: PropTypes.object,
     repostContent: PropTypes.object,
+    text: PropTypes.string,
   }
 
   static defaultProps = {
@@ -197,6 +198,7 @@ class EditorContainer extends Component {
     order: null,
     post: null,
     repostContent: Immutable.List(),
+    text: null,
   }
 
   static childContextTypes = {
@@ -254,8 +256,17 @@ class EditorContainer extends Component {
   }
 
   componentDidMount() {
-    const { dispatch, editorId } = this.props
+    const { dispatch, editorId, text } = this.props
     dispatch(addEmptyTextBlock(editorId))
+    if (text) {
+      dispatch({
+        type: EDITOR.APPEND_TEXT,
+        payload: {
+          editorId,
+          text,
+        },
+      })
+    }
   }
 
   shouldComponentUpdate(nextProps) {

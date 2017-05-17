@@ -295,7 +295,7 @@ public class MainActivity
     }
 
     @JavascriptInterface
-    public void launchEditor(String jsState, String post, String isComment, String comment) {
+    public void launchEditor(String jsState, String post, String isComment, String comment, String text) {
         if (webAppReady) {
             Hawk.put(ElloPreferences.JS_STATE, jsState);
             Hawk.put(ElloPreferences.WEBAPP_AUTH_DOMAIN, authDomain);
@@ -304,6 +304,7 @@ public class MainActivity
             Hawk.put("comment", comment);
             Hawk.put("isComment", isComment);
             Hawk.put("post", post);
+            Hawk.put("text", text);
             Hawk.put("initialRoute", "editor");
             Intent intent = new Intent(this, ReactNativeActivity.class);
             startActivity(intent);
