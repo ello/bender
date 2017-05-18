@@ -17,24 +17,26 @@ class AppContainer extends PureComponent {
   }
 
   componentWillMount() {
-    HawkWrapper.getItems(['comment', 'initialRoute', 'isComment', 'kind', 'post'], (values) => {
-      const [comment, initialRoute, isComment, kind, post] = values
+    HawkWrapper.getItems(['comment', 'initialRoute', 'isComment', 'kind', 'post', 'text'], (values) => {
+      const [comment, initialRoute, isComment, kind, post, text] = values
       this.setState({
         comment,
         initialRoute,
         isComment,
         kind,
         post,
+        text,
       })
     })
   }
 
   render() {
-    const { comment, initialRoute, isComment, kind, post } = this.state
+    const { comment, initialRoute, isComment, kind, post, text } = this.state
     const editorProps = {
       comment: comment ? Immutable.fromJS(JSON.parse(comment)) : Immutable.Map(),
       isComment: isComment === 'true',
       post: post ? Immutable.fromJS(JSON.parse(post)) : Immutable.Map(),
+      text,
     }
     return (
       <View style={{ flex: 1 }}>
