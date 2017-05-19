@@ -32,7 +32,7 @@
     "ios": "react-native run-ios",
     "lint": "eslint ./src",
     "mrclean": "rm -rf $TMPDIR/react* && rm -rf node_modules/ && yarn",
-    "release": "cd android/ && ./gradlew assembleRelease && cd ../",
+    "release": "yes | cp -rf .env.prod .env && cd android/ && ./gradlew assembleRelease && cd ../",
     "start": "react-native start",
     "test": "NODE_ENV=test node node_modules/jest/bin/jest.js",
     "test:watch": "NODE_ENV=test node node_modules/jest/bin/jest.js --watch"

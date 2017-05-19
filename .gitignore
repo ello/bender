@@ -3,6 +3,7 @@ generated
 intermediates
 tmp
 logs
+.env.prod
 
 # Visual Studio Code
 /.vscode
