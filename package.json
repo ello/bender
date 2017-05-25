@@ -32,7 +32,7 @@
     "ios": "react-native run-ios",
     "lint": "eslint ./src",
     "mrclean": "rm -rf $TMPDIR/react* && rm -rf node_modules/ && yarn",
-    "release": "cd android/ && ./gradlew assembleRelease && cd ../",
+    "release": "cp -rf .env.prod .env && cd android/ && ./gradlew assembleRelease && cd ../",
     "start": "react-native start",
     "test": "NODE_ENV=test node node_modules/jest/bin/jest.js",
     "test:watch": "NODE_ENV=test node node_modules/jest/bin/jest.js --watch"
@@ -54,6 +54,7 @@
     "react-native-config": "0.3.1",
     "react-native-image-picker": "0.26.3",
     "react-native-svg": "5.1.7",
+    "react-native-vector-icons": "4.1.1",
     "react-redux": "5.0.4",
     "react-router-redux": "4.0.8",
     "redux": "3.6.0",
@@ -67,8 +68,8 @@
   },
   "devDependencies": {
     "babel-eslint": "7.2.2",
-    "babel-jest": "^19.0.0",
-    "babel-preset-react-native": "^1.9.1",
+    "babel-jest": "19.0.0",
+    "babel-preset-react-native": "1.9.1",
     "eslint": "3.19.0",
     "eslint-config-ello": "1.0.3",
     "flow-bin": "0.44.2",

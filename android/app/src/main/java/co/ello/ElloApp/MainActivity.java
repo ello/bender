@@ -311,6 +311,14 @@ public class MainActivity
     }
 
     @JavascriptInterface
+    public void launchEditor(String jsState, String post, String isComment, String comment, String text) {
+        if (webAppReady) {
+            Hawk.put("text", text);
+            this.launchEditor(jsState, post, isComment, comment);
+        }
+    }
+
+    @JavascriptInterface
     public void launchImagePicker(String jsState, String kind) {
         if (webAppReady) {
             Hawk.put(ElloPreferences.JS_STATE, jsState);
@@ -337,14 +345,16 @@ public class MainActivity
         registerDeviceReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String reg_id = intent.getExtras().getString("GCM_REG_ID");
-                String registerFunctionCall =
+                Bundle extras = intent.getExtras();
+                if (extras == null) { return; }
+                String reg_id = extras.getString("GCM_REG_ID");
+                if(reg_id != null) {
+                    String registerFunctionCall =
                         "javascript:registerAndroidNotifications(\"" +
                                 reg_id + "\", \"" +
                                 packageName() + "\", \"" +
                                 versionName() + "\", \"" +
                                 versionCode() + "\")";
-                if(reg_id != null) {
                     xWalkView.load(registerFunctionCall, null);
                 }
             }
