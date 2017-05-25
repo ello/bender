@@ -9,15 +9,12 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.orhanobut.hawk.Hawk;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class RNHawkWrapperModule extends ReactContextBaseJavaModule {
 
     public RNHawkWrapperModule(ReactApplicationContext reactContext) {
         super(reactContext);
+        Hawk.init(reactContext).build();
     }
 
     @Override
