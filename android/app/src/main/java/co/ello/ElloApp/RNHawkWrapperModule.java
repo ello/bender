@@ -40,8 +40,9 @@ public class RNHawkWrapperModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void getItems(ReadableArray keys, Callback successCallback) {
         WritableNativeArray data = new WritableNativeArray();
-        for(int i=0;i<keys.size();i++){
-            String value = Hawk.get(keys.getString(i));
+        for(int i=0; i<keys.size(); i++) {
+            String key = keys.getString(i);
+            String value = Hawk.get(key);
             data.pushString(value);
         }
         successCallback.invoke(data);
@@ -62,6 +63,14 @@ public class RNHawkWrapperModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void delete(String key) {
         Hawk.delete(key);
+    }
+
+    @ReactMethod
+    public void deleteItems(ReadableArray keys) {
+        for(int i=0; i<keys.size(); i++) {
+            String key = keys.getString(i);
+            Hawk.delete(key);
+        }
     }
 
     @ReactMethod
