@@ -6,6 +6,8 @@ import ImagePickerContainer from './ImagePickerContainer'
 import ModalContainer from './ModalContainer'
 import HawkWrapper from '../lib/hawk_wrapper'
 
+const HAWK_ITEMS = ['comment', 'initialRoute', 'isComment', 'kind', 'post', 'text']
+
 class AppContainer extends PureComponent {
 
   state = {
@@ -17,7 +19,7 @@ class AppContainer extends PureComponent {
   }
 
   componentWillMount() {
-    HawkWrapper.getItems(['comment', 'initialRoute', 'isComment', 'kind', 'post', 'text'], (values) => {
+    HawkWrapper.getItems(HAWK_ITEMS, (values) => {
       const [comment, initialRoute, isComment, kind, post, text] = values
       this.setState({
         comment,
@@ -27,6 +29,7 @@ class AppContainer extends PureComponent {
         post,
         text,
       })
+      HawkWrapper.deleteItems(HAWK_ITEMS)
     })
   }
 
