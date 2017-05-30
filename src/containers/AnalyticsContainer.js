@@ -3,14 +3,21 @@ import { connect } from 'react-redux'
 import Analytics from 'analytics-react-native'
 import * as ENV from '../../env'
 import { selectIsLoggedIn } from '../selectors/authentication'
-import { selectAllowsAnalytics, selectAnalyticsId, selectCreatedAt } from '../selectors/profile'
+import {
+  selectAllowsAnalytics,
+  selectAnalyticsId,
+  selectCreatedAt,
+  selectIsNabaroo,
+  selectProfileIsFeatured,
+} from '../selectors/profile'
 
 const agent = 'android'
 const analytics = new Analytics(ENV.SEGMENT_WRITE_KEY, { flushAt: 1 })
 
-export function addSegment(uid, createdAt) {
+export function addSegment({ createdAt, hasAccount, isFeatured, isNabaroo, uid }) {
   if (uid) {
-    analytics.identify({ userId: uid, traits: { agent, createdAt } })
+    const traits = { agent, createdAt, hasAccount, isFeatured, isNabaroo }
+    analytics.identify({ userId: uid, traits })
   }
 }
 
@@ -23,9 +30,12 @@ function mapStateToProps(state) {
     allowsAnalytics: selectAllowsAnalytics(state),
     analyticsId: selectAnalyticsId(state),
     createdAt: selectCreatedAt(state),
+    isFeatured: selectProfileIsFeatured(state),
     isLoggedIn: selectIsLoggedIn(state),
+    isNabaroo: selectIsNabaroo(state),
   }
 }
+
 
 class AnalyticsContainer extends Component {
 
@@ -33,7 +43,9 @@ class AnalyticsContainer extends Component {
     allowsAnalytics: PropTypes.bool,
     analyticsId: PropTypes.string,
     createdAt: PropTypes.string,
+    isFeatured: PropTypes.bool.isRequired,
     isLoggedIn: PropTypes.bool.isRequired,
+    isNabaroo: PropTypes.bool.isRequired,
   }
 
   static defaultProps = {
@@ -47,27 +59,29 @@ class AnalyticsContainer extends Component {
   }
 
   componentDidMount() {
-    const { analyticsId, allowsAnalytics, createdAt, isLoggedIn } = this.props
+    const { analyticsId, allowsAnalytics, createdAt,
+      isFeatured, isLoggedIn, isNabaroo } = this.props
     if (this.hasLoadedTracking) { return }
     if (!isLoggedIn && doesAllowTracking()) {
       this.hasLoadedTracking = true
-      addSegment()
+      addSegment({})
     } else if (analyticsId && allowsAnalytics) {
       this.hasLoadedTracking = true
-      addSegment(analyticsId, createdAt)
+      addSegment({ createdAt, hasAccount: isLoggedIn, isFeatured, isNabaroo, uid: analyticsId })
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    const { allowsAnalytics, analyticsId, createdAt } = nextProps
+    const { allowsAnalytics, analyticsId, createdAt, isFeatured, isLoggedIn, isNabaroo } = nextProps
     if (this.hasLoadedTracking) {
       // identify the user if they didn't previously have an id to identify with
       if (!this.props.analyticsId && analyticsId && analytics) {
-        analytics.identify({ userId: analyticsId, traits: { agent, createdAt } })
+        const traits = { agent, createdAt, hasAccount: isLoggedIn, isFeatured, isNabaroo }
+        analytics.identify({ userId: analyticsId, traits })
       }
     } else if (this.props.analyticsId && analyticsId && allowsAnalytics) {
       this.hasLoadedTracking = true
-      addSegment(analyticsId, createdAt)
+      addSegment({ createdAt, hasAccount: isLoggedIn, isFeatured, isNabaroo, uid: analyticsId })
     }
   }
 
