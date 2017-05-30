@@ -44,6 +44,8 @@ import org.xwalk.core.XWalkView;
 import java.util.Date;
 
 import co.ello.ElloApp.PushNotifications.RegistrationIntentService;
+import hotchemi.android.rate.AppRate;
+import hotchemi.android.rate.OnClickButtonListener;
 
 // Using a 3rd party Snackbar because we can't extend
 // AppCompatActivity, thanks a lot XWalkActivity
@@ -102,6 +104,7 @@ public class MainActivity
         setupWebView();
         setupRegisterDeviceReceiver();
         setupPushReceivedReceiver();
+        setupRatePrompt();
     }
 
     protected void onXWalkReady() {
@@ -341,6 +344,14 @@ public class MainActivity
         }
     }
 
+    private void track(String name) {
+        if(name != null) {
+            String trackFunctionCall =
+                    "javascript:trackAndroidEvent(\"" + name + "\")";
+            xWalkView.load(trackFunctionCall, null);
+        }
+    }
+
     private void setupRegisterDeviceReceiver() {
         registerDeviceReceiver = new BroadcastReceiver() {
             @Override
@@ -391,7 +402,35 @@ public class MainActivity
         registerReceiver(pushReceivedReceiver, new IntentFilter(ElloPreferences.PUSH_RECEIVED));
     }
 
+    private void setupRatePrompt(){
+        AppRate.with(this)
+            .setInstallDays(7)
+            .setLaunchTimes(3)
+            .setRemindInterval(7)
+            .setShowLaterButton(true)
+            .setDebug(true)
+            .setOnClickButtonListener(new OnClickButtonListener() {
+                @Override
+                public void onClickButton(int which) {
+                    switch (which) {
+                        case -1: track("rate prompt user attempted to rate app");
+                            break;
+                        case -2: track("rate prompt user declined to rate app");
+                            break;
+                        case -3: track("rate prompt remind me later");
+                            break;
+                        default:
+                                break;
+                    }
+                }
+            })
+            .monitor();
 
+        Boolean showRateDialog = AppRate.showRateDialogIfMeetsConditions(this);
+        if(showRateDialog) {
+            track("rate prompt shown");
+        }
+    }
 
     private void deepLinkWhenPresent(){
         if (progress == null) {
