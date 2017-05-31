@@ -104,7 +104,6 @@ public class MainActivity
         setupWebView();
         setupRegisterDeviceReceiver();
         setupPushReceivedReceiver();
-        setupRatePrompt();
     }
 
     protected void onXWalkReady() {
@@ -119,6 +118,7 @@ public class MainActivity
         xWalkView.addJavascriptInterface(this, "AndroidInterface");
         displayScreenContent();
         deepLinkWhenPresent();
+        setupRatePrompt();
     }
 
     @Override
@@ -345,7 +345,7 @@ public class MainActivity
     }
 
     private void track(String name) {
-        if(name != null) {
+        if(name != null && isXWalkReady) {
             String trackFunctionCall =
                     "javascript:trackAndroidEvent(\"" + name + "\")";
             xWalkView.load(trackFunctionCall, null);
