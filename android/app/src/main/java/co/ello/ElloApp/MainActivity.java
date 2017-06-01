@@ -408,7 +408,6 @@ public class MainActivity
             .setLaunchTimes(3)
             .setRemindInterval(7)
             .setShowLaterButton(true)
-            .setDebug(true)
             .setOnClickButtonListener(new OnClickButtonListener() {
                 @Override
                 public void onClickButton(int which) {
