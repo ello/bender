@@ -96,7 +96,7 @@ android {
         applicationId "co.ello.ElloApp"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 40
+        versionCode 41
         versionName "2.0.3"
         ndk {
             abiFilters "armeabi-v7a", "x86"
