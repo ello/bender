@@ -2,12 +2,13 @@
 import Immutable from 'immutable'
 import get from 'lodash/get'
 import reduce from 'lodash/reduce'
+import { COMMENT, EDITOR, POST } from '../constants/action_types'
 import { suggestEmoji } from '../components/completers/EmojiSuggester'
 import { userRegex } from '../components/completers/Completer'
-import { COMMENT, EDITOR, POST } from '../constants/action_types'
 
 const methods = {}
 const initialState = Immutable.Map({
+  artistInvite: null,
   collection: Immutable.Map(),
   hasContent: false,
   hasMedia: false,
@@ -39,19 +40,17 @@ methods.getCompletions = (action) => {
 methods.rehydrateEditors = (persistedEditors = Immutable.Map()) => {
   let editors = Immutable.Map()
   persistedEditors.keySeq().forEach((key) => {
-    const pe = persistedEditors.get(key)
+    let pe = persistedEditors.get(key)
     if (pe && pe.get('shouldPersist')) {
       // clear out the blobs
       const collection = pe.get('collection')
       collection.keySeq().forEach((uid) => {
         const block = collection.get(uid)
         if (/image/.test(block.get('kind'))) {
-          block.delete('blob')
-          pe.setIn(['collection', uid], block)
+          pe = pe.setIn(['collection', uid], block.delete('blob'))
         }
       })
-      pe.set('isLoading', false)
-      pe.set('isPosting', false)
+      pe = pe.set('isLoading', false).set('isPosting', false)
       editors = editors.set(key, pe)
     }
   })
@@ -71,8 +70,6 @@ methods.hasMedia = (state) => {
   const order = state.get('order')
   return order.some(uid => /embed|image/.test(collection.getIn([`${uid}`, 'kind'])))
 }
-
-methods.hasMention = () => false
 
 methods.hasMention = (state) => {
   const collection = state.get('collection')
@@ -212,6 +209,8 @@ methods.updateBuyLink = (state, action) => {
 
 methods.getEditorObject = (state = initialState, action) => {
   switch (action.type) {
+    case EDITOR.ADD_ARTIST_INVITE:
+      return state.set('artistInvite', action.payload.artistInvite)
     case EDITOR.ADD_BLOCK:
       return methods.add({
         block: action.payload.block,
@@ -225,7 +224,7 @@ methods.getEditorObject = (state = initialState, action) => {
     case EDITOR.APPEND_TEXT:
       return methods.appendText(state, action.payload.text)
     case EDITOR.INITIALIZE:
-      if (state.get('shouldPersist')) {
+      if (state.get('shouldPersist') || get(action, 'payload.shouldPersist')) {
         return state
       }
       return initialState

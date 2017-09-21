@@ -4,16 +4,21 @@ import * as api from '../networking/api'
 // import * as StreamRenderables from '../components/streams/StreamRenderables'
 import { resetEditor } from '../actions/editor'
 
-export function createPost(body, editorId, repostId, repostedFromId) {
+export function createPost(body, editorId, repostId, repostedFromId, artistInviteId) {
+  const data = body.length ? { body } : null
+  if (data && !repostId && !repostedFromId && artistInviteId) {
+    data.artist_invite_id = artistInviteId
+  }
   return {
     type: POST.CREATE,
     payload: {
-      body: body.length ? { body } : null,
+      body: data,
       editorId,
       endpoint: api.createPost(repostId),
       method: 'POST',
     },
     meta: {
+      artistInviteId,
       mappingType: MAPPING_TYPES.POSTS,
       repostId,
       repostedFromId,

@@ -98,6 +98,7 @@ function mapStateToProps(state, props) {
   if (firstBlock) {
     buyLink = firstBlock.get('linkUrl')
   }
+  const artistInvite = editor.get('artistInvite')
   let blocks
   let repostContent
   if (autoPopulate) {
@@ -122,6 +123,7 @@ function mapStateToProps(state, props) {
   }
   return {
     allowsAutoWatch: selectHasAutoWatchEnabled(state),
+    artistInviteId: artistInvite ? artistInvite.get('id') : props.post.get('artistInviteId'),
     blocks,
     buyLink,
     collection,
@@ -148,6 +150,7 @@ class EditorContainer extends Component {
 
   static propTypes = {
     allowsAutoWatch: PropTypes.bool,
+    artistInviteId: PropTypes.string,
     // this is used to prepopulate text for zero states
     // which are currently just disabled in the webapp
     // when the user agent is ello android
@@ -180,6 +183,7 @@ class EditorContainer extends Component {
 
   static defaultProps = {
     allowsAutoWatch: false,
+    artistInviteId: null,
     autoPopulate: null,
     blocks: Immutable.List(),
     buyLink: null,
@@ -460,6 +464,7 @@ class EditorContainer extends Component {
     const data = this.serialize()
     const {
       allowsAutoWatch,
+      artistInviteId,
       comment,
       dispatch,
       editorId,
@@ -477,7 +482,7 @@ class EditorContainer extends Component {
       }
     } else if (isPostEmpty) {
       // dispatch(closeOmnibar())
-      dispatch(createPost(data, editorId))
+      dispatch(createPost(data, editorId, null, null, artistInviteId))
     } else if (post.get('isEditing')) {
       dispatch(toggleEditing(post, false))
       dispatch(updatePost(post, data, editorId))
@@ -486,7 +491,7 @@ class EditorContainer extends Component {
       const repostId = post.get('repostId') || post.get('id')
       const repostedFromId = post.get('repostId') ? post.get('id') : null
       dispatch(createPost(data, editorId,
-        repostId, repostedFromId),
+        repostId, repostedFromId, artistInviteId),
       )
     }
     if (onSubmit) { onSubmit() }
