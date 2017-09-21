@@ -123,7 +123,7 @@ function mapStateToProps(state, props) {
   }
   return {
     allowsAutoWatch: selectHasAutoWatchEnabled(state),
-    artistInviteId: artistInvite ? artistInvite.get('id') : props.post.get('artistInviteId'),
+    artistInviteId: artistInvite ? artistInvite.get('id') : post.get('artistInviteId'),
     blocks,
     buyLink,
     collection,
