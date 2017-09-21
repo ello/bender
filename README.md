@@ -32,6 +32,12 @@ Below you'll find information about performing common tasks. The most recent ver
 * Make sure you have yarn installed `brew install yarn`
 * Run `yarn`
 * Get a correct `.env` setup and update for the server you want to test against
+* Find your Android SDK path (`local.properties` file in Android Studio) and set your Android path in your .bashrc:
+```
+echo 'export ANDROID_HOME=/Users/Foo/Library/Android/sdk
+export PATH=${PATH}:${ANDROID_HOME}/tools
+export PATH=${PATH}:${ANDROID_HOME}/platform-tools' >> .bashrc
+```
 * Connect an android device in debug mode to your machine or launch an emulator
 * Run `yarn android`
 * If you see an error about the target SDK being off you may need to go and
@@ -44,6 +50,16 @@ Below you'll find information about performing common tasks. The most recent ver
 * While in a React Native view, shake the device or press `cmd+m` on the emulator
   to launch the react-native debug tools. We recommend using Live Reload and the
   remote JS debugger.
+
+## Troubleshoot
+In the event that you're trying to build to your device and come across this
+error:
+```
+Installing APK 'app-debug.apk' on 'Nexus 5X - 7.1.2' for app:debug
+01:31:20 E/SplitApkInstaller: Failed to finalize session : INSTALL_FAILED_VERSION_DOWNGRADE
+```
+check to make sure that you do not have a copy of the app already installed on
+the device. If you do, uninstalling will fix the issue.
 
 ## Generating a signed APK for the play store
 * Follow the instructions in the `android.keystore` entry in the 1Password Engineering vault
