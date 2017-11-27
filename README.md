@@ -39,11 +39,8 @@ export PATH=${PATH}:${ANDROID_HOME}/tools
 export PATH=${PATH}:${ANDROID_HOME}/platform-tools' >> .bashrc
 ```
 * Connect an android device in debug mode to your machine or launch an emulator
+* Make sure watchman is running properly
 * Run `yarn android`
-* If you see an error about the target SDK being off you may need to go and
-  update the build.gradle files for the associated 3rd party projects to match
-  your main app's buildToolsVersion in your project's build.gradle and run `yarn
-  android` again
 * You might get asked to allow overlays when initially launching the react
   native view.. you should allow this and then hit back to get to the actual
   view underneath.
