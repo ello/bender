@@ -1,13 +1,13 @@
 {
   "project_info": {
     "project_id": "ello-a9933",
-    "project_number": "769929328748",
+    "project_number": "239482123000",
     "name": "Ello"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:769929328748:android:89373394221fd6f9",
+        "mobilesdk_app_id": "1:239482123000:android:89373394221fd6f9",
         "client_id": "android:co.ello.ElloApp",
         "client_type": 1,
         "android_client_info": {
