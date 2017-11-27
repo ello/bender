@@ -67,3 +67,4 @@ the device. If you do, uninstalling will fix the issue.
   - ELLO_RELEASE_STORE_PASSWORD=XXXXXX
   - ELLO_RELEASE_KEY_PASSWORD=XXXXXX
 * From the root of this project `yarn release`
+* APK is created in `android/app/build/outputs/apk`
